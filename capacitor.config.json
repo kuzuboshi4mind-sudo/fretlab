@@ -1,0 +1,7 @@
+{
+  "appId": "com.fretlab.app",
+  "appName": "Fretlab",
+  "webDir": "www",
+  "android": { "allowMixedContent": false },
+  "ios": { "contentInset": "always" }
+}
