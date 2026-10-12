@@ -1,45 +1,53 @@
 <title>Fretlab ギター練習帳</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: sticky tab strip over a single working panel; the rosewood fretboard is the recurring centerpiece */
+/* Layout: quiet white page with hairlines; ebony fretboard is the one dark object; faint line-drawn botanicals sit behind everything */
 :root{
-  --bg:#eceee9; --surface:#f7f8f5; --panel:#e1e5df; --line:#c8cec6;
-  --fg:#1c211e; --muted:#5a625d;
-  --accent:#2a5b88; --accent-ink:#ffffff; --accent-soft:#d5e1ec;
-  --root:#c47d10; --root-ink:#1c1406;
-  --third:#2a5b88; --third-ink:#ffffff;
-  --fifth:#3f7a52; --fifth-ink:#ffffff;
-  --other:#e8e2d3; --other-ink:#2a221a;
-  --good:#2f8a4a; --warn:#b5721a; --bad:#b3402f;
-  --wood:#4a2f22; --wood-hi:#5b3a2a; --fretwire:#cfc8b8; --string:#e3dccb; --inlay:#efe7d3; --nut:#f3eee2;
-  --display:"Big Shoulders Display", "Arial Narrow", sans-serif;
-  --body:"Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+  --bg:#f7f7f3; --surface:#fdfdfb; --panel:#efefe9; --line:#e2e2da;
+  --fg:#161816; --muted:#878a84;
+  --accent:#161816; --accent-ink:#fbfbf9; --accent-soft:#e5ebe1;
+  --root:#8a6d3b; --root-ink:#ffffff;
+  --third:#4f6b58; --third-ink:#ffffff;
+  --fifth:#6d7f93; --fifth-ink:#ffffff;
+  --other:#ece7da; --other-ink:#2a2620;
+  --good:#4f7a5a; --warn:#a8772e; --bad:#a5473a;
+  --wood:#2b2826; --wood-hi:#353130; --fretwire:#bdb6a8; --string:#ddd6c6; --inlay:#e8e2d3; --nut:#f4f0e6;
+  --leaf:#7f9a83; --wash:rgba(143,174,139,.10);
+  --display:"Cormorant Garamond", "Times New Roman", serif;
+  --serif:"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --body:"Noto Sans JP", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
   --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
-  --r:10px;
+  --r:14px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#111518; --surface:#192024; --panel:#21292e; --line:#323c42;
-  --fg:#e3e8ea; --muted:#97a2a8;
-  --accent:#7db0e3; --accent-ink:#0b1622; --accent-soft:#1f3346;
-  --root:#eaa53b; --root-ink:#1c1406; --third:#7db0e3; --third-ink:#0b1622;
-  --fifth:#85bb94; --fifth-ink:#0d1a11; --other:#d9d2c2; --other-ink:#231c15;
-  --good:#5cc27a; --warn:#e2a24a; --bad:#e2735f;
-  --wood:#33211a; --wood-hi:#402a20; --fretwire:#a9a294; --string:#cfc8b8; --inlay:#cfc6b0; --nut:#ddd6c6;
+  --bg:#121412; --surface:#181b18; --panel:#1f231f; --line:#2c312c;
+  --fg:#e9ebe6; --muted:#8f968e;
+  --accent:#e9ebe6; --accent-ink:#121412; --accent-soft:#243026;
+  --root:#c9a66b; --root-ink:#1a140a; --third:#8fb39a; --third-ink:#0f1a12;
+  --fifth:#9fb2c6; --fifth-ink:#0f1620; --other:#d8d2c2; --other-ink:#221d16;
+  --good:#7fbf8f; --warn:#d9a55a; --bad:#d9776a;
+  --wood:#1d1b19; --wood-hi:#262321; --fretwire:#8f897e; --string:#cbc4b4; --inlay:#bfb8a8; --nut:#d9d3c5;
+  --leaf:#7f9a83; --wash:rgba(143,174,139,.07);
   color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#111518; --surface:#192024; --panel:#21292e; --line:#323c42;
-  --fg:#e3e8ea; --muted:#97a2a8;
-  --accent:#7db0e3; --accent-ink:#0b1622; --accent-soft:#1f3346;
-  --root:#eaa53b; --root-ink:#1c1406; --third:#7db0e3; --third-ink:#0b1622;
-  --fifth:#85bb94; --fifth-ink:#0d1a11; --other:#d9d2c2; --other-ink:#231c15;
-  --good:#5cc27a; --warn:#e2a24a; --bad:#e2735f;
-  --wood:#33211a; --wood-hi:#402a20; --fretwire:#a9a294; --string:#cfc8b8; --inlay:#cfc6b0; --nut:#ddd6c6;
+  --bg:#121412; --surface:#181b18; --panel:#1f231f; --line:#2c312c;
+  --fg:#e9ebe6; --muted:#8f968e;
+  --accent:#e9ebe6; --accent-ink:#121412; --accent-soft:#243026;
+  --root:#c9a66b; --root-ink:#1a140a; --third:#8fb39a; --third-ink:#0f1a12;
+  --fifth:#9fb2c6; --fifth-ink:#0f1620; --other:#d8d2c2; --other-ink:#221d16;
+  --good:#7fbf8f; --warn:#d9a55a; --bad:#d9776a;
+  --wood:#1d1b19; --wood-hi:#262321; --fretwire:#8f897e; --string:#cbc4b4; --inlay:#bfb8a8; --nut:#d9d3c5;
+  --leaf:#7f9a83; --wash:rgba(143,174,139,.07);
   color-scheme:dark}
 
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.65;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.7;margin:0;position:relative}
+.botanic{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.botanic::before{content:"";position:absolute;inset:-20%;background:radial-gradient(40% 35% at 92% 6%,var(--wash),transparent 70%),radial-gradient(45% 40% at 0% 100%,var(--wash),transparent 70%)}
+.botanic svg{position:absolute;stroke:var(--leaf);fill:none;opacity:.32}
+.wrap{position:relative;z-index:1}
 .wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
 h1,h2,h3{text-wrap:balance;margin:0}
 button,select,input{font:inherit;color:inherit}
@@ -47,54 +55,54 @@ button,select,input{font:inherit;color:inherit}
 
 /* header + tabs */
 .top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding-block:18px 6px}
-.mark{font-family:var(--display);font-weight:800;font-size:34px;letter-spacing:.04em;line-height:1}
-.mark span{color:var(--root)}
+.mark{font-family:var(--serif);font-weight:700;font-size:22px;letter-spacing:.32em;line-height:1}
+.mark span{color:inherit}
 .sub{color:var(--muted);font-size:13px}
 .tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:20px;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex:0 0 auto;background:none;border:0;border-bottom:3px solid transparent;padding:12px 14px 9px;cursor:pointer;color:var(--muted);font-weight:500;white-space:nowrap}
-.tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--root);font-weight:700}
+.tab{flex:0 0 auto;background:none;border:0;border-bottom:1.5px solid transparent;padding:14px 12px 10px;letter-spacing:.06em;cursor:pointer;color:var(--muted);font-weight:500;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--fg);font-weight:500}
 .tab:hover{color:var(--fg)}
 
 .panel-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-.panel-head h2{font-size:22px;font-weight:700}
+.panel-head h2{font-family:var(--serif);font-size:24px;font-weight:700;letter-spacing:.06em}
 .panel-head p{margin:2px 0 0;color:var(--muted);font-size:13.5px;max-width:60ch}
 
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
-.label{font-size:12px;letter-spacing:.06em;color:var(--muted);font-weight:500;display:block;margin-bottom:6px}
+.card{background:color-mix(in srgb,var(--surface) 88%,transparent);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.label{font-size:11px;letter-spacing:.24em;color:var(--muted);font-weight:500;display:block;margin-bottom:6px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .stack{display:flex;flex-direction:column;gap:14px}
 
-.btn{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:500;min-height:40px}
+.btn{background:transparent;border:1px solid var(--line);border-radius:999px;padding:8px 18px;cursor:pointer;font-weight:500;min-height:40px;letter-spacing:.06em}
 .btn:hover{border-color:var(--muted)}
-.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:500}
 .btn.big{padding:12px 26px;font-size:17px;min-width:140px}
-select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:40px}
+select{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-height:40px}
 input[type=range]{accent-color:var(--accent);width:100%}
 input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
-.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface)}
 .seg button{background:none;border:0;padding:7px 12px;cursor:pointer;min-height:38px;border-right:1px solid var(--line)}
 .seg button:last-child{border-right:0}
-.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:500}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer;min-height:34px;font-weight:500}
 .chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
-.chip.note{font-family:var(--display);font-weight:600;font-size:17px;min-width:44px;padding:3px 10px}
+.chip.note{font-family:var(--display);font-weight:500;font-size:19px;min-width:44px;padding:3px 10px}
 .check{display:flex;align-items:center;gap:8px;cursor:pointer}
 
 /* metronome */
 .metro{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px}
 .metro-main{display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px 16px}
-.term{font-family:var(--display);font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:var(--root);font-weight:600}
+.term{font-family:var(--display);font-style:italic;font-size:24px;color:var(--root);font-weight:400}
 .bpm{display:flex;align-items:center;gap:14px}
-.bpm output{font-family:var(--display);font-weight:800;font-size:112px;line-height:.9;font-variant-numeric:tabular-nums;min-width:3ch;text-align:center}
-.round{width:52px;height:52px;border-radius:50%;font-size:24px;padding:0;display:grid;place-items:center}
-.unit{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.2em;margin-top:-6px}
+.bpm output{font-family:var(--display);font-weight:300;font-size:128px;line-height:1;font-variant-numeric:lining-nums tabular-nums;font-variant-numeric:tabular-nums;min-width:3ch;text-align:center}
+.round{width:48px;height:48px;border-radius:50%;font-size:22px;font-weight:300;padding:0;display:grid;place-items:center}
+.unit{font-family:var(--body);font-size:10px;color:var(--muted);letter-spacing:.5em;margin-top:-2px}
 .beats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;min-height:34px;padding-block:6px}
-.beat{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:var(--panel);transition:transform .06s}
-.beat.acc{border-color:var(--root)}
-.beat.on{background:var(--accent);border-color:var(--accent);transform:scale(1.18)}
-.beat.acc.on{background:var(--root);border-color:var(--root)}
+.beat{width:12px;height:12px;border-radius:50%;border:0;background:var(--line);transition:transform .06s;margin:8px}
+.beat.acc{background:color-mix(in srgb,var(--root) 45%,var(--line))}
+.beat.on{background:var(--fg);transform:scale(1.5)}
+.beat.acc.on{background:var(--root)}
 .metro-main input[type=range]{max-width:420px}
 .trainer-status{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
 .mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
@@ -102,29 +110,40 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .mini input{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-family:var(--mono)}
 
 /* tuner */
-.tuner{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px}
-.gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
-.gauge{width:100%;max-width:420px}
-.gauge .tick{stroke:var(--muted)}
-.gauge .zone{fill:var(--good);opacity:.25}
-.gauge text{fill:var(--muted);font-family:var(--mono);font-size:10px}
-#needle{stroke:var(--fg);stroke-width:3;stroke-linecap:round;transition:transform .12s ease-out;transform-origin:150px 160px}
-.gauge.in #needle{stroke:var(--good)}
-.tnote{font-family:var(--display);font-weight:800;font-size:84px;line-height:.9}
-.tnote sub{font-size:30px;color:var(--muted);font-weight:600}
-.treadout{font-family:var(--mono);font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
-.tstate{font-weight:700;min-height:1.6em}
+.tuner{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px;align-items:start}
+.tuner-main{display:flex;flex-direction:column;gap:12px}
+.inst-row{justify-content:space-between}
+.inst-row select{flex:1;min-width:170px}
+#instSeg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));flex:1 1 320px;border-radius:999px}
+#instSeg button{padding:7px 4px;font-size:13px;white-space:nowrap}
+.tnote-row{display:flex;align-items:flex-end;justify-content:center;gap:18px;margin-top:6px}
+.tnote{font-family:var(--display);font-weight:300;font-size:104px;line-height:.9;font-variant-numeric:lining-nums;transition:color .2s}
+.tnote.ok{color:var(--good)}
+.tnote sub{font-size:32px;color:var(--muted);font-weight:400}
+.tmeta{padding-bottom:10px}
+.ttarget{font-size:13px;color:var(--muted);letter-spacing:.06em}
+.treadout{font-family:var(--mono);font-size:14px;color:var(--fg);font-variant-numeric:tabular-nums;display:flex;gap:12px}
+.treadout span+span{color:var(--muted)}
+.trace-wrap{position:relative}
+.trace-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--muted);padding-inline:6px}
+#trace{display:block;width:100%;height:260px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.trace-side{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);letter-spacing:.2em;margin-top:4px}
+.tstate{font-weight:500;min-height:1.6em;text-align:center;letter-spacing:.04em}
 .tstate.good{color:var(--good)} .tstate.warn{color:var(--warn)}
 .msg{font-size:13px;color:var(--muted);max-width:46ch}
-.strings{display:flex;flex-direction:column;gap:6px}
-.sbtn{display:grid;grid-template-columns:44px 52px 1fr auto;align-items:center;gap:8px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer;min-height:44px}
+.strings-row{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+.sbtn{display:flex;flex-direction:column;align-items:center;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 0 6px;cursor:pointer;width:48px;color:var(--fg)}
 .sbtn:hover{border-color:var(--muted)}
-.sbtn.hit{border-color:var(--good);box-shadow:inset 0 0 0 1px var(--good)}
-.sbtn .sn{font-size:12px;color:var(--muted)}
-.sbtn .nn{font-family:var(--display);font-size:22px;font-weight:800}
-.sbtn .hz{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.sbtn.hit{border-color:var(--fg);background:var(--fg);color:var(--bg)}
+.sbtn.hit .sn,.sbtn.hit .nn sub{color:inherit;opacity:.75}
+.sbtn .nn{font-family:var(--display);font-size:24px;font-weight:500;line-height:1}
+.sbtn .nn sub{font-size:11px;color:var(--muted)}
+.sbtn .sn{font-size:10px;color:var(--muted);letter-spacing:.06em}
+#autoBtn[aria-pressed="true"]{border-color:var(--fg)}
 .a4{display:flex;align-items:center;gap:8px;font-family:var(--mono)}
 .a4 .btn{min-width:40px;padding:4px}
+.howto p{margin:0 0 8px;font-size:13.5px;color:var(--muted)}
+.howto b{color:var(--fg);font-weight:500}
 
 /* fretboard */
 .board-scroll{overflow-x:auto;border-radius:var(--r);-webkit-overflow-scrolling:touch}
@@ -157,24 +176,24 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 
 /* chords */
 .chord-head{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap;margin-block:18px 12px}
-.chord-name{font-family:var(--display);font-weight:800;font-size:64px;line-height:.9}
+.chord-name{font-family:var(--display);font-weight:400;font-size:72px;line-height:.95}
 .tones{display:flex;gap:6px;flex-wrap:wrap}
 .tone{display:flex;flex-direction:column;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:4px 10px;min-width:48px}
 .tone b{font-family:var(--display);font-size:20px}
 .tone small{font-size:11px;color:var(--muted);font-family:var(--mono)}
-.voicings{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.voicings{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
 .voicing{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px}
 .voicing .vl{font-size:12px;color:var(--muted);text-align:center}
 .voicing .tab-str{font-family:var(--mono);font-size:12px;letter-spacing:.1em}
-.diagram{width:150px;height:auto}
+.diagram{width:190px;max-width:100%;height:auto}
 .diagram .g{stroke:var(--muted)}
-.diagram .gn{stroke:var(--fg);stroke-width:5}
+.diagram .gn{stroke:var(--fg);stroke-width:4}
 .diagram .mk{fill:none;stroke:var(--muted);stroke-width:1.5}
 .diagram .x{stroke:var(--muted);stroke-width:1.5}
 .diagram .bf{fill:var(--muted);font-family:var(--mono);font-size:10px}
 .diagram .bar{fill:var(--fg);opacity:.85}
 .diagram .dot circle{stroke:none}
-.diagram .dot text{font-size:8px}
+.diagram .dot text{font-size:7.5px}
 
 /* scales */
 .scale-info{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:16px}
@@ -223,28 +242,28 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .prog-title{font-size:22px}
 .prog-controls > div{display:flex;flex-direction:column}
 .bpm-mini{display:flex;align-items:center;gap:6px}
-.bpm-mini output{font-family:var(--display);font-weight:800;font-size:34px;min-width:2.4ch;text-align:center;font-variant-numeric:tabular-nums}
+.bpm-mini output{font-family:var(--display);font-weight:500;font-size:34px;min-width:2.4ch;text-align:center;font-variant-numeric:tabular-nums}
 .bpm-mini .btn{min-width:40px;padding:4px}
 .bars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
 .bar{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 10px 8px;min-height:74px;display:flex;flex-direction:column;justify-content:space-between;position:relative}
 .bar .bn{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
-.bar .bc{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--display);font-weight:800;font-size:24px;line-height:1.1}
+.bar .bc{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--display);font-weight:500;font-size:24px;line-height:1.1}
 .bar .bc span.cur{color:var(--root)}
 .bar.on{border-color:var(--root);box-shadow:inset 0 0 0 1px var(--root)}
 .bar .beatline{position:absolute;left:0;bottom:0;height:3px;background:var(--root);border-radius:0 0 0 8px;width:0}
 .now-next{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
 .nn-card{display:flex;flex-direction:column;align-items:center;gap:4px}
-.nn-name{font-family:var(--display);font-weight:800;font-size:48px;line-height:1}
+.nn-name{font-family:var(--display);font-weight:500;font-size:48px;line-height:1}
 .nn-name.dim{color:var(--muted)}
-.count-badge{font-family:var(--display);font-weight:800;font-size:28px;color:var(--root)}
+.count-badge{font-family:var(--display);font-weight:500;font-size:28px;color:var(--root)}
 
 /* log */
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
-.stat .v{font-family:var(--display);font-weight:800;font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat .v{font-family:var(--display);font-weight:500;font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums}
 .stat .v small{font-size:16px;color:var(--muted);font-weight:600;margin-left:3px}
 .log-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:16px;align-items:start}
-.timer{font-family:var(--display);font-weight:800;font-size:72px;line-height:1;font-variant-numeric:tabular-nums}
+.timer{font-family:var(--display);font-weight:500;font-size:72px;line-height:1;font-variant-numeric:tabular-nums}
 .timer.run{color:var(--good)}
 .log-chart svg{width:100%;height:auto;display:block;overflow:visible}
 .log-chart .grid{stroke:var(--line);stroke-width:1}
@@ -288,6 +307,32 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
+<div class="botanic" aria-hidden="true">
+  <svg style="right:-40px;top:-10px" width="300" height="360" viewBox="0 0 300 360" stroke-width="1.1" stroke-linecap="round">
+    <path d="M250 0 C220 80 200 160 120 360"/>
+    <g>
+      <path d="M244 30 c-30 -10 -50 4 -56 20 c22 8 44 2 56 -20z"/><path d="M240 40 l-46 8"/>
+      <path d="M236 62 c26 -16 48 -8 56 6 c-20 14 -44 12 -56 -6z"/><path d="M236 62 l52 4"/>
+      <path d="M226 98 c-32 -6 -52 10 -56 26 c24 6 46 -2 56 -26z"/><path d="M224 104 l-50 18"/>
+      <path d="M218 128 c24 -20 48 -14 58 0 c-18 16 -44 18 -58 0z"/><path d="M218 128 l54 -2"/>
+      <path d="M204 166 c-30 -2 -48 16 -50 32 c24 2 44 -8 50 -32z"/><path d="M202 172 l-46 24"/>
+      <path d="M196 196 c22 -22 46 -18 58 -6 c-16 18 -42 22 -58 6z"/><path d="M196 196 l54 -8"/>
+      <path d="M178 236 c-28 2 -44 20 -44 36 c22 0 40 -12 44 -36z"/>
+      <path d="M170 262 c20 -20 42 -18 52 -6 c-14 16 -38 20 -52 6z"/>
+    </g>
+  </svg>
+  <svg style="left:-30px;bottom:-20px" width="260" height="300" viewBox="0 0 260 300" stroke-width="1" stroke-linecap="round">
+    <path d="M20 300 C60 220 110 140 230 40"/>
+    <g>
+      <path d="M52 238 q-34 -14 -40 -46"/><path d="M52 238 q8 -36 40 -48"/>
+      <path d="M78 200 q-32 -16 -36 -48"/><path d="M78 200 q10 -34 42 -44"/>
+      <path d="M106 166 q-30 -18 -32 -48"/><path d="M106 166 q12 -32 44 -40"/>
+      <path d="M136 134 q-28 -18 -28 -46"/><path d="M136 134 q14 -30 44 -34"/>
+      <path d="M168 104 q-24 -18 -22 -42"/><path d="M168 104 q16 -26 42 -28"/>
+      <path d="M200 72 q-20 -16 -16 -36"/><path d="M200 72 q16 -20 36 -20"/>
+    </g>
+  </svg>
+</div>
 <div class="wrap">
   <header class="top">
     <div class="mark">FRET<span>LAB</span></div>
@@ -360,27 +405,42 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 
   <!-- TUNER -->
   <section data-panel="tuner" hidden>
-    <div class="panel-head"><div><h2>チューナー</h2><p>マイクで音程を測るか、基準音を鳴らして耳で合わせます。弦は一本ずつ、低い方から下から上へ合わせるのが基本です。</p></div></div>
+    <div class="panel-head"><div><h2>チューナー</h2><p>弦を1本ずつ鳴らすと、いちばん近い弦を自動で選んで、音程の動きを線で表示します。線が中央の帯に入ればOK。弦のボタンを押すと、その弦に固定して基準音も鳴ります。</p></div></div>
     <div class="tuner">
-      <div class="card gauge-wrap">
-        <svg class="gauge" id="gauge" viewBox="0 0 300 180" aria-hidden="true">
-          <path class="zone" d="M150 160 L141.6 41.3 A119 119 0 0 1 158.4 41.3 Z"></path>
-          <g id="ticks"></g>
-          <line id="needle" x1="150" y1="160" x2="150" y2="48"></line>
-          <circle cx="150" cy="160" r="6" fill="currentColor"></circle>
-        </svg>
-        <div class="tnote" id="tNote">–</div>
-        <div class="treadout"><span id="tCents">±0 cent</span> · <span id="tHz">— Hz</span></div>
+      <div class="card tuner-main">
+        <div class="row inst-row">
+          <div class="seg" id="instSeg"><button data-v="guitar">ギター</button><button data-v="bass4">ベース4弦</button><button data-v="bass5">ベース5弦</button><button data-v="uke">ウクレレ</button></div>
+          <select id="tuningSel" aria-label="チューニング"></select>
+        </div>
+        <div class="tnote-row">
+          <div class="tnote" id="tNote">–</div>
+          <div class="tmeta">
+            <div class="ttarget" id="tTarget">弦を鳴らしてください</div>
+            <div class="treadout"><span id="tCents">± 0 cent</span><span id="tHz">— Hz</span></div>
+          </div>
+        </div>
+        <div class="trace-wrap">
+          <div class="trace-scale"><span>−50</span><span>−25</span><span>0</span><span>+25</span><span>+50</span></div>
+          <canvas id="trace" aria-label="音程の推移"></canvas>
+          <div class="trace-side"><span>低い</span><span>高い</span></div>
+        </div>
         <div class="tstate" id="tState"></div>
-        <button class="btn primary big" id="micBtn">マイクで測る</button>
-        <div class="msg" id="micMsg">ギターをマイクの近くで一音ずつ鳴らしてください。針が中央の緑の範囲（±5セント以内）に入ればOKです。</div>
+        <div class="strings-row" id="stringBtns"></div>
+        <div class="row" style="justify-content:center;margin-top:6px">
+          <button class="btn primary big" id="micBtn">マイクで測る</button>
+          <button class="btn" id="autoBtn" aria-pressed="true">自動で弦を判定</button>
+        </div>
+        <div class="msg" id="micMsg" style="text-align:center;margin-inline:auto">楽器をスマホのマイクに近づけて、1本ずつ鳴らしてください。</div>
       </div>
       <div class="card stack">
-        <div><label class="label" for="tuningSel">チューニング</label><select id="tuningSel"></select></div>
         <div><span class="label">基準ピッチ A4</span>
           <div class="a4"><button class="btn" id="a4Down" aria-label="A4を下げる">−</button><output id="a4Out">440</output> Hz<button class="btn" id="a4Up" aria-label="A4を上げる">+</button></div></div>
-        <div><span class="label">基準音（タップで再生）</span><div class="strings" id="stringBtns"></div></div>
-        <label class="check"><input type="checkbox" id="loopChk"> 基準音を繰り返し鳴らす</label>
+        <label class="check"><input type="checkbox" id="loopChk"> 弦ボタンの基準音を繰り返し鳴らす</label>
+        <div class="howto">
+          <span class="label">メーターの読み方</span>
+          <p>線が<b>左</b>に流れていたら音が低いので、ペグを<b>締めて</b>上げます。<b>右</b>なら高いので、一度少し<b>緩めてから</b>下から合わせ直すと狂いにくくなります。中央の帯（±5セント）に線がまっすぐ収まれば完了です。</p>
+          <p>ベースの低い弦は、音が出てから一瞬待つと安定して読み取れます。ウクレレのHigh-G（4弦が高いG）にも対応しています。</p>
+        </div>
       </div>
     </div>
   </section>
@@ -888,25 +948,37 @@ function setRhythm(v){
 })();
 
 /* ---------- tuner ---------- */
-const T={tuning:0,stream:null,analyser:null,buf:null,hist:[],loop:null,lastMidi:null};
-(function gaugeTicks(){
-  let s='';
-  for(let c=-50;c<=50;c+=5){
-    const a=(c*1.2-90)*Math.PI/180, long=c%25===0, r1=124, r2=long?108:116;
-    s+=`<line class="tick" x1="${150+r1*Math.cos(a)}" y1="${160+r1*Math.sin(a)}" x2="${150+r2*Math.cos(a)}" y2="${160+r2*Math.sin(a)}" stroke-width="${long?2:1}"/>`;
-    if(long) s+=`<text x="${150+138*Math.cos(a)}" y="${160+138*Math.sin(a)+3}" text-anchor="middle">${c>0?'+'+c:c}</text>`;
-  }
-  $('#ticks').innerHTML=s;
-})();
-function noteLabel(m){return `${NOTES_S[m%12]}<sub>${Math.floor(m/12)-1}</sub>`}
-function renderStrings(){
-  const tu=TUNINGS[T.tuning], el=$('#stringBtns'); el.innerHTML='';
-  tu.m.slice().reverse().forEach((m,i)=>{
-    const b=document.createElement('button'); b.className='sbtn'; b.dataset.m=m;
-    b.innerHTML=`<span class="sn">${i+1}弦</span><span class="nn">${noteLabel(m)}</span><span class="hz">${mfreq(m).toFixed(2)} Hz</span><span aria-hidden="true">▶</span>`;
-    b.addEventListener('click',()=>playRef(m)); el.appendChild(b);
-  });
+// 楽器ごとの弦（低い弦→高い弦の順ではなく、物理的な並び：太い弦→細い弦）と解析設定
+const INSTR={
+  guitar:{name:'ギター',dec:2,min:60,max:1400,tunings:TUNINGS},
+  bass4:{name:'ベース4弦',dec:4,min:25,max:500,tunings:[
+    {name:'スタンダード（EADG）',m:[28,33,38,43]},{name:'半音下げ（E♭A♭D♭G♭）',m:[27,32,37,42]},{name:'ドロップD（DADG）',m:[26,33,38,43]}]},
+  bass5:{name:'ベース5弦',dec:4,min:25,max:500,tunings:[
+    {name:'スタンダード（BEADG）',m:[23,28,33,38,43]},{name:'半音下げ（B♭E♭A♭D♭G♭）',m:[22,27,32,37,42]},{name:'ハイC（EADGC）',m:[28,33,38,43,48]}]},
+  uke:{name:'ウクレレ',dec:1,min:180,max:1200,tunings:[
+    {name:'スタンダード High-G（GCEA）',m:[67,60,64,69]},{name:'Low-G（GCEA）',m:[55,60,64,69]},{name:'D調（ADF♯B）',m:[69,62,66,71]}]},
+};
+const T={inst:store.get('tInst','guitar'),tuning:0,stream:null,analyser:null,buf:null,hist:[],loop:null,target:null,auto:true,trace:[],raf:0};
+if(!INSTR[T.inst]) T.inst='guitar';
+const curTuning=()=>INSTR[T.inst].tunings[T.tuning]||INSTR[T.inst].tunings[0];
+function noteLabel(m){return `${NOTES_S[((m%12)+12)%12]}<sub>${Math.floor(m/12)-1}</sub>`}
+function renderTunings(){
+  const sel=$('#tuningSel'); sel.innerHTML=''; INSTR[T.inst].tunings.forEach((t,i)=>sel.add(new Option(t.name,i)));
+  T.tuning=Math.min(T.tuning,INSTR[T.inst].tunings.length-1); sel.value=T.tuning;
 }
+function renderStrings(){
+  const ms=curTuning().m, el=$('#stringBtns'); el.innerHTML=''; const n=ms.length;
+  ms.forEach((m,i)=>{
+    const b=document.createElement('button'); b.className='sbtn'; b.dataset.i=i;
+    b.innerHTML=`<span class="nn">${noteLabel(m)}</span><span class="sn">${n-i}弦</span>`;
+    b.title=`${n-i}弦 ${mfreq(m).toFixed(2)} Hz`;
+    b.addEventListener('click',()=>{T.auto=false;T.target=i;syncAuto();playRef(m);markString();});
+    el.appendChild(b);
+  });
+  markString();
+}
+function markString(){document.querySelectorAll('#stringBtns .sbtn').forEach(b=>b.classList.toggle('hit',+b.dataset.i===T.target));}
+function syncAuto(){$('#autoBtn').setAttribute('aria-pressed',String(T.auto));}
 function playRef(m){
   clearInterval(T.loop); pluck(m,0,0.7);
   if($('#loopChk').checked) T.loop=setInterval(()=>pluck(m,0,0.7),2200);
@@ -926,49 +998,85 @@ function autoCorrelate(b,sr){
   const x1=c[mp-1],x2=c[mp],x3=c[mp+1],a=(x1+x3-2*x2)/2,bb=(x3-x1)/2;
   const T0=a?mp-bb/(2*a):mp; return sr/T0;
 }
+// 低音ほど間引いて（平均して）長い時間を解析する：ベースの最低音 B0≒31Hz まで読める
+function detectPitch(){
+  const I=INSTR[T.inst], d=I.dec, N=d===2?4096:2048, full=T.buf;
+  const src=full.subarray(full.length-N*d); let x=src;
+  if(d>1){ x=new Float32Array(N); for(let i=0;i<N;i++){let s=0;for(let k=0;k<d;k++) s+=src[i*d+k]; x[i]=s/d;} }
+  const f=autoCorrelate(x,ctx.sampleRate/d);
+  return (f>=I.min&&f<=I.max)?f:-1;
+}
 let frame=0;
 function tunerLoop(){
   if(!T.analyser) return;
-  requestAnimationFrame(tunerLoop);
+  T.raf=requestAnimationFrame(tunerLoop);
   if(++frame%2) return;
   T.analyser.getFloatTimeDomainData(T.buf);
-  const f=autoCorrelate(T.buf,ctx.sampleRate);
-  if(f<60||f>1400){return;}
+  const f=detectPitch();
+  if(f<0){ T.hist=[]; T.trace.unshift(null); trimTrace(); drawTrace(); return; }
   T.hist.push(f); if(T.hist.length>5) T.hist.shift();
   const fm=[...T.hist].sort((a,b)=>a-b)[Math.floor(T.hist.length/2)];
-  const mf=69+12*Math.log2(fm/a4), m=Math.round(mf), cents=Math.round((mf-m)*100);
-  $('#tNote').innerHTML=noteLabel(m);
-  $('#tCents').textContent=(cents>0?'+':cents<0?'−':'±')+Math.abs(cents)+' cent';
+  const ms=curTuning().m, mf=69+12*Math.log2(fm/a4);
+  if(T.auto){ let bi=0; ms.forEach((m,i)=>{ if(Math.abs(mf-m)<Math.abs(mf-ms[bi])) bi=i; }); if(bi!==T.target){T.trace.unshift(null);} T.target=bi; markString(); }
+  const tm=ms[T.target??0], cents=Math.round((mf-tm)*100), n=ms.length;
+  $('#tNote').innerHTML=noteLabel(tm);
+  $('#tTarget').textContent=`${n-(T.target??0)}弦をチューニング中${T.auto?'（自動）':''}`;
+  $('#tCents').textContent=(cents>0?'+ ':cents<0?'− ':'± ')+Math.min(999,Math.abs(cents))+' cent';
   $('#tHz').textContent=fm.toFixed(1)+' Hz';
-  $('#needle').style.transform=`rotate(${Math.max(-50,Math.min(50,cents))*1.2}deg)`;
-  const ok=Math.abs(cents)<=5; $('#gauge').classList.toggle('in',ok);
-  const st=$('#tState'); st.className='tstate '+(ok?'good':'warn');
-  st.textContent= ok?'チューニングOK':(cents<0?'低い ― ペグを締めて上げる':'高い ― 一度下げてから合わせ直す');
-  document.querySelectorAll('.sbtn').forEach(b=>b.classList.toggle('hit',+b.dataset.m===m));
+  const ok=Math.abs(cents)<=5, st=$('#tState');
+  st.className='tstate '+(ok?'good':'warn');
+  st.textContent= ok?'✓ チューニングOK':Math.abs(cents)>150?(cents<0?'かなり低い ― 弦を確認してください':'かなり高い ― 弦を確認してください'):(cents<0?'← 低い：ペグを締めて上げる':'高い → 一度緩めてから合わせ直す');
+  $('#tNote').classList.toggle('ok',ok);
+  T.trace.unshift(cents); trimTrace(); drawTrace();
+}
+function trimTrace(){ if(T.trace.length>160) T.trace.length=160; }
+// 心電図のように、最新の値を上に描き、古い値ほど下へ流す
+function drawTrace(){
+  const cv=$('#trace'); if(!cv) return; const dpr=window.devicePixelRatio||1, W=cv.clientWidth, H=cv.clientHeight; if(!W) return;
+  if(cv.width!==Math.round(W*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);}
+  const g=cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,W,H);
+  const cs=getComputedStyle(document.documentElement), col=k=>cs.getPropertyValue(k).trim();
+  const X=c=>W/2+Math.max(-55,Math.min(55,c))/50*(W/2-14);
+  g.fillStyle=col('--good'); g.globalAlpha=.14; g.fillRect(X(-5),0,X(5)-X(-5),H); g.globalAlpha=1;
+  [-50,-25,25,50].forEach(c=>{g.strokeStyle=col('--line');g.lineWidth=1;g.beginPath();g.moveTo(X(c)+.5,0);g.lineTo(X(c)+.5,H);g.stroke();});
+  g.strokeStyle=col('--fg'); g.globalAlpha=.5; g.lineWidth=1; g.beginPath(); g.moveTo(W/2,0); g.lineTo(W/2,H); g.stroke(); g.globalAlpha=1;
+  const step=H/150; g.lineWidth=2.2; g.lineCap='round'; g.lineJoin='round';
+  for(let i=1;i<T.trace.length;i++){
+    const a=T.trace[i-1], b=T.trace[i]; if(a==null||b==null||Math.abs(a-b)>30) continue;
+    g.globalAlpha=Math.max(.08,1-i/150);
+    g.strokeStyle=(Math.abs(a)<=5&&Math.abs(b)<=5)?col('--good'):col('--warn');
+    g.beginPath(); g.moveTo(X(a),12+(i-1)*step); g.lineTo(X(b),12+i*step); g.stroke();
+  }
+  g.globalAlpha=1;
+  const c0=T.trace[0];
+  if(c0!=null){ g.fillStyle=Math.abs(c0)<=5?col('--good'):col('--warn'); g.beginPath(); g.arc(X(c0),12,7,0,Math.PI*2); g.fill(); }
 }
 async function micToggle(){
   const btn=$('#micBtn'), msg=$('#micMsg');
-  if(T.stream){T.stream.getTracks().forEach(t=>t.stop());T.stream=null;T.analyser=null;btn.textContent='マイクで測る';msg.textContent='測定を止めました。';return;}
+  if(T.stream){T.stream.getTracks().forEach(t=>t.stop());T.stream=null;T.analyser=null;cancelAnimationFrame(T.raf);btn.textContent='マイクで測る';msg.textContent='測定を止めました。';return;}
   ac();
   try{
     if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) throw new Error('nomedia');
     T.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
-    const src=ctx.createMediaStreamSource(T.stream); T.analyser=ctx.createAnalyser(); T.analyser.fftSize=4096;
-    T.buf=new Float32Array(T.analyser.fftSize); src.connect(T.analyser); T.hist=[];
-    btn.textContent='測定を止める'; msg.textContent='聴いています… 一音ずつ、はっきり弾いてください。'; tunerLoop();
+    const src=ctx.createMediaStreamSource(T.stream); T.analyser=ctx.createAnalyser(); T.analyser.fftSize=8192;
+    T.buf=new Float32Array(T.analyser.fftSize); src.connect(T.analyser); T.hist=[]; T.trace=[];
+    btn.textContent='測定を止める'; msg.textContent='聴いています… 1本ずつ、はっきり弾いてください。'; tunerLoop();
   }catch(e){
     T.stream=null;
-    msg.textContent='この環境ではマイクを使えませんでした。右の基準音を鳴らして、耳で合わせてください（音のうなりが消えたら合っています）。';
+    msg.textContent='この環境ではマイクを使えませんでした。弦のボタンで基準音を鳴らして、耳で合わせてください（音のうなりが消えたら合っています）。';
   }
 }
 (function initTuner(){
-  const sel=$('#tuningSel'); TUNINGS.forEach((t,i)=>sel.add(new Option(t.name,i)));
-  sel.addEventListener('change',()=>{T.tuning=+sel.value;renderStrings();});
+  segInit($('#instSeg'),T.inst,v=>{T.inst=v;store.set('tInst',v);T.tuning=0;T.target=null;T.auto=true;syncAuto();T.hist=[];T.trace=[];renderTunings();renderStrings();drawTrace();});
+  renderTunings();
+  $('#tuningSel').addEventListener('change',e=>{T.tuning=+e.target.value;T.target=null;renderStrings();});
+  $('#autoBtn').addEventListener('click',()=>{T.auto=true;syncAuto();});
   $('#a4Down').addEventListener('click',()=>setA4(a4-1));
   $('#a4Up').addEventListener('click',()=>setA4(a4+1));
   $('#loopChk').addEventListener('change',e=>{if(!e.target.checked) clearInterval(T.loop);});
   $('#micBtn').addEventListener('click',micToggle);
   setA4(store.get('a4',440));
+  new ResizeObserver(()=>drawTrace()).observe($('#trace'));
 })();
 
 /* ---------- fretboard renderer ---------- */
@@ -1004,24 +1112,26 @@ const kindOf=semi=>semi===0?'root':(semi===3||semi===4)?'third':semi===7?'fifth'
 /* ---------- chords ---------- */
 const C={root:store.get('cRoot',0),type:store.get('cType','maj')};
 function diagram(frets,root,type){
+  // 横向き：左がナット（ヘッド側）、上が1弦・下が6弦（タブ譜や指板と同じ向き）
   const played=frets.filter(f=>f!==null&&f>0); const mn=played.length?Math.min(...played):1, mx=played.length?Math.max(...played):1;
-  const base=mx<=4?1:mn; const sx=i=>22+i*20, fy=j=>34+j*24;
-  let s=`<svg class="diagram" viewBox="0 0 140 168">`;
-  for(let i=0;i<6;i++) s+=`<line class="g" x1="${sx(i)}" y1="${fy(0)}" x2="${sx(i)}" y2="${fy(5)}"/>`;
-  for(let j=0;j<=5;j++) s+=`<line class="${j===0&&base===1?'gn':'g'}" x1="${sx(0)}" y1="${fy(j)}" x2="${sx(5)}" y2="${fy(j)}"/>`;
-  if(base>1) s+=`<text class="bf" x="${sx(5)+8}" y="${fy(0)+16}">${base}fr</text>`;
-  // barre
+  const base=mx<=4?1:mn; const fx=j=>30+j*29, sy=i=>12+(5-i)*17;
+  let s=`<svg class="diagram" viewBox="0 0 182 124" role="img" aria-label="コードダイアグラム">`;
+  for(let j=0;j<=5;j++) s+=`<line class="${j===0&&base===1?'gn':'g'}" x1="${fx(j)}" y1="${sy(5)}" x2="${fx(j)}" y2="${sy(0)}"/>`;
+  for(let i=0;i<6;i++) s+=`<line class="g st" x1="${fx(0)}" y1="${sy(i)}" x2="${fx(5)}" y2="${sy(i)}" style="stroke-width:${(1.6-i*0.13).toFixed(2)}"/>`;
+  for(let j=0;j<5;j++){const fr=base+j; if(fr===base&&base>1||[3,5,7,9,12,15].includes(fr)) s+=`<text class="bf" x="${(fx(j)+fx(j+1))/2}" y="120" text-anchor="middle">${fr}</text>`;}
   if(base>1||played.length&&mn>0){
     const idx=frets.map((f,i)=>f===mn?i:-1).filter(i=>i>=0);
     if(idx.length>=2){const a=idx[0],b=idx[idx.length-1];
-      if(frets.slice(a,b+1).every(f=>f!==null&&f>=mn)&&mn>0&&!(OPEN[root]&&OPEN[root][type]&&OPEN[root][type].join()===frets.join()))
-        s+=`<rect class="bar" x="${sx(a)-8}" y="${fy(mn-base+0.5)-8}" width="${sx(b)-sx(a)+16}" height="16" rx="8"/>`;}
+      if(frets.slice(a,b+1).every(f=>f!==null&&f>=mn)&&mn>0&&!(OPEN[root]&&OPEN[root][type]&&OPEN[root][type].join()===frets.join())){
+        const cx=(fx(mn-base)+fx(mn-base+1))/2;
+        s+=`<rect class="bar" x="${cx-7.5}" y="${sy(b)-7.5}" width="15" height="${sy(a)-sy(b)+15}" rx="7.5"/>`;}}
   }
   frets.forEach((f,i)=>{
-    if(f===null){s+=`<g class="x"><line x1="${sx(i)-5}" y1="12" x2="${sx(i)+5}" y2="22"/><line x1="${sx(i)+5}" y1="12" x2="${sx(i)-5}" y2="22"/></g>`;return;}
-    if(f===0){s+=`<circle class="mk" cx="${sx(i)}" cy="17" r="5"/>`;return;}
-    const semi=((STD[i]+f-root)%12+12)%12;
-    s+=`<g class="dot k-${kindOf(semi)}"><circle cx="${sx(i)}" cy="${fy(f-base+0.5)}" r="8.5"/><text x="${sx(i)}" y="${fy(f-base+0.5)}">${chordDeg(semi,type)}</text></g>`;
+    const y=sy(i);
+    if(f===null){s+=`<g class="x"><line x1="11" y1="${y-4}" x2="19" y2="${y+4}"/><line x1="19" y1="${y-4}" x2="11" y2="${y+4}"/></g>`;return;}
+    if(f===0){s+=`<circle class="mk" cx="15" cy="${y}" r="4.5"/>`;return;}
+    const semi=((STD[i]+f-root)%12+12)%12, cx=(fx(f-base)+fx(f-base+1))/2;
+    s+=`<g class="dot k-${kindOf(semi)}"><circle cx="${cx}" cy="${y}" r="7.5"/><text x="${cx}" y="${y}">${chordDeg(semi,type)}</text></g>`;
   });
   return s+'</svg>';
 }

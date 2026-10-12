@@ -10,7 +10,7 @@ python3 tools/make_icons.py www/icons
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#2a1c15">
+<meta name="theme-color" content="#f7f7f3">
 <meta name="description" content="ギタリストのための練習アプリ。メトロノーム、ドラム、チューナー、コード、コード進行、指板、スケール、練習記録。">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -34,8 +34,8 @@ cat > www/manifest.webmanifest <<'MAN'
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#111518",
-  "theme_color": "#2a1c15",
+  "background_color": "#f7f7f3",
+  "theme_color": "#f7f7f3",
   "categories": ["music", "education"],
   "icons": [
     {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
