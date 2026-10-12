@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fretlab ギター練習帳 ― メトロノームもチューナーもコード表も、ひとつのアプリに</title>
+<meta name="description" content="ギタリストのための無料練習アプリ。メトロノーム（ドラム15パターン）、チューナー、コード一覧、コード進行100パターン、指板、スケール、練習記録。登録不要・広告なし・オフラインで動きます。">
+<meta name="theme-color" content="#2a1c15">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Fretlab ギター練習帳">
+<meta property="og:description" content="メトロノーム、ドラム、チューナー、コード、コード進行100、指板、スケール、練習記録。無料・登録不要・オフライン対応のギター練習アプリ。">
+<meta property="og:url" content="https://kuzuboshi4mind-sudo.github.io/fretlab/about/">
+<meta property="og:image" content="https://kuzuboshi4mind-sudo.github.io/fretlab/about/img/og.png">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: rosewood hero (the one loud moment) → stat strip → alternating feature rows with phone frames → install steps → FAQ → closing CTA */
+:root{
+  --bg:#eceee9; --surface:#f7f8f5; --panel:#e1e5df; --line:#c8cec6;
+  --fg:#1c211e; --muted:#5a625d; --accent:#2a5b88; --accent-ink:#fff; --root:#c47d10;
+  --wood:#2a1c15; --wood-2:#3a271d; --wood-fg:#f3eee2; --wood-muted:#c9bda8; --fret:#8d8273; --string:#d9d0bd;
+  --amber:#eaa53b; --blue:#7db0e3; --green:#85bb94;
+  --display:"Big Shoulders Display","Arial Narrow",sans-serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111518; --surface:#192024; --panel:#21292e; --line:#323c42;
+  --fg:#e3e8ea; --muted:#97a2a8; --accent:#7db0e3; --accent-ink:#0b1622; --root:#eaa53b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111518; --surface:#192024; --panel:#21292e; --line:#323c42;
+  --fg:#e3e8ea; --muted:#97a2a8; --accent:#7db0e3; --accent-ink:#0b1622; --root:#eaa53b; color-scheme:dark}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.75}
+img{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{margin:0;line-height:1.3}
+.nw{display:inline-block}
+
+/* hero */
+.hero{background:var(--wood);color:var(--wood-fg);position:relative;overflow:hidden}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:18px}
+.mark{font-family:var(--display);font-weight:900;font-size:28px;letter-spacing:.05em;text-decoration:none;line-height:1}
+.mark span{color:var(--amber)}
+.nav a.small{font-size:14px;color:var(--wood-muted);text-decoration:none;border:1px solid rgba(243,238,226,.25);border-radius:999px;padding:6px 14px}
+.nav a.small:hover{color:var(--wood-fg);border-color:var(--wood-fg)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px;align-items:center;padding-block:40px 0}
+.eyebrow{font-size:13px;letter-spacing:.14em;color:var(--amber);font-weight:700}
+.hero h1{font-size:clamp(32px,4.6vw,54px);font-weight:900;line-height:1.22;margin-block:12px 18px;letter-spacing:.01em}
+.hero h1 em{font-style:normal;color:var(--amber)}
+.lead{font-size:17px;color:var(--wood-muted);max-width:34em;margin:0}
+.ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 26px;border-radius:12px;font-weight:700;font-size:16px;text-decoration:none;transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn.primary{background:var(--amber);color:#1c1406}
+.btn.ghost{border:1px solid rgba(243,238,226,.35);color:var(--wood-fg)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px;font-size:13px;color:var(--wood-muted)}
+.chips span{border:1px solid rgba(243,238,226,.2);border-radius:999px;padding:3px 12px}
+.hero-phone{justify-self:center;align-self:end;margin-bottom:-60px;position:relative;z-index:2}
+.fretstrip{position:relative;z-index:1;margin-top:28px;height:150px}
+.fretstrip svg{width:100%;height:100%;display:block}
+
+/* phone frame */
+.phone{width:min(300px,78vw);aspect-ratio:390/844;border-radius:44px;padding:10px;background:#0b0e10;box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 0 0 1.5px #2b3136;max-width:100%}
+.phone img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:34px}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;border-bottom:1px solid var(--line);padding-block:90px 34px}
+.stat{padding-inline:12px;border-left:1px solid var(--line)}
+.stat:first-child{border-left:0;padding-left:0}
+.stat b{display:block;font-family:var(--display);font-weight:900;font-size:clamp(40px,5vw,60px);line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--muted)}
+
+/* features */
+.section{padding-block:72px}
+.sec-head{max-width:40em;margin-bottom:40px}
+.sec-head .eyebrow{color:var(--root)}
+.sec-head h2{font-size:clamp(26px,3.4vw,38px);font-weight:900;margin-top:8px}
+.sec-head p{color:var(--muted);margin:10px 0 0}
+.feature{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center;padding-block:44px;border-top:1px solid var(--line)}
+.feature:nth-child(even) .f-media{order:-1}
+.f-label{font-family:var(--mono);font-size:12.5px;color:var(--root);letter-spacing:.08em}
+.feature h3{font-size:clamp(23px,2.8vw,30px);font-weight:900;margin-block:6px 12px}
+.feature p{margin:0;color:var(--muted);max-width:32em}
+.feature ul{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:8px}
+.feature li{display:flex;gap:10px;align-items:baseline}
+.feature li::before{content:"";flex:0 0 9px;height:9px;border-radius:50%;background:var(--root);transform:translateY(-1px)}
+.f-media{display:flex;gap:18px;justify-content:center}
+.f-media .phone{width:min(260px,40vw)}
+.f-media .phone + .phone{margin-top:48px}
+
+/* install */
+.install{background:var(--surface);border-block:1px solid var(--line)}
+.inst-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+.inst{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:24px}
+.inst h3{font-size:20px;display:flex;align-items:baseline;gap:10px}
+.inst h3 small{font-size:13px;color:var(--muted);font-weight:500}
+.inst ol{margin:16px 0 0;padding:0;list-style:none;counter-reset:s;display:grid;gap:12px}
+.inst li{counter-increment:s;display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start}
+.inst li::before{content:counter(s);font-family:var(--display);font-weight:800;font-size:18px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--fg);color:var(--bg);line-height:1}
+.url{font-family:var(--mono);font-size:13.5px;background:var(--panel);border-radius:6px;padding:2px 8px;overflow-wrap:anywhere}
+.note{font-size:14px;color:var(--muted);margin-top:18px}
+
+/* faq */
+.faq{max-width:780px}
+.faq details{border-top:1px solid var(--line);padding-block:4px}
+.faq details:last-child{border-bottom:1px solid var(--line)}
+.faq summary{cursor:pointer;font-weight:700;font-size:17px;padding-block:16px;list-style:none;display:flex;justify-content:space-between;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-family:var(--display);font-size:26px;line-height:1;color:var(--root)}
+.faq details[open] summary::after{content:"−"}
+.faq p{margin:0 0 18px;color:var(--muted);max-width:60ch}
+
+/* closing */
+.closing{background:var(--wood);color:var(--wood-fg);text-align:center;padding-block:80px}
+.closing h2{font-size:clamp(28px,4vw,44px);font-weight:900}
+.closing p{color:var(--wood-muted);margin:12px auto 0;max-width:34em}
+.closing .ctas{justify-content:center}
+footer{padding-block:28px;font-size:13px;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:860px){
+  .hero-grid{grid-template-columns:minmax(0,1fr);gap:32px;padding-top:20px}
+  .hero-phone{margin-bottom:-40px}
+  .fretstrip{height:110px;margin-top:-90px}
+  .stats{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:24px;padding-top:70px}
+  .stat:nth-child(4){border-left:0;padding-left:0}
+  .feature{grid-template-columns:minmax(0,1fr);gap:28px}
+  .feature:nth-child(even) .f-media{order:0}
+  .f-media .phone{width:min(220px,42vw)}
+  .f-media .phone + .phone{margin-top:32px}
+  .inst-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="mark" href="./">FRET<span>LAB</span></a>
+      <a class="small" href="../">アプリを開く →</a>
+    </nav>
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">ギタリストのための練習アプリ</div>
+        <h1><span class="nw">メトロノームも、</span><span class="nw">チューナーも、</span><span class="nw"><em>コード表</em>も。</span><br><span class="nw">練習の道具を、</span><span class="nw">ひとつに。</span></h1>
+        <p class="lead">ドラムに合わせてテンポ練習、マイクでチューニング、100のコード進行を伴奏つきで。スマホのホーム画面に入れて、ギターの横にいつでも置いておけます。</p>
+        <div class="ctas">
+          <a class="btn primary" href="../">無料で使ってみる</a>
+          <a class="btn ghost" href="#install">ホーム画面に追加する方法</a>
+        </div>
+        <div class="chips"><span>無料</span><span>登録不要</span><span>広告なし</span><span>オフライン対応</span><span>iPhone / Android / PC</span></div>
+      </div>
+      <div class="hero-phone"><div class="phone"><img src="img/progressions.webp" alt="コード進行の画面。王道進行を8ビートに合わせて再生し、今のコードFM7が光っている" width="390" height="844"></div></div>
+    </div>
+  </div>
+  <div class="fretstrip" aria-hidden="true"><svg id="strip" preserveAspectRatio="xMidYMid slice"></svg></div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="stats" aria-label="収録内容">
+      <div class="stat"><b>8</b><span>練習ツール</span></div>
+      <div class="stat"><b>100</b><span>コード進行</span></div>
+      <div class="stat"><b>204</b><span>コード（12×17種）</span></div>
+      <div class="stat"><b>15</b><span>ドラムパターン</span></div>
+      <div class="stat"><b>13</b><span>スケール</span></div>
+      <div class="stat"><b>¥0</b><span>ずっと無料</span></div>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow">できること</div>
+        <h2><span class="nw">毎日の練習で使う道具を、</span><span class="nw">全部入れました</span></h2>
+        <p>アプリをいくつも行き来せずに、ウォームアップから曲の練習、記録まで。</p>
+      </div>
+
+      <div class="features">
+        <article class="feature">
+          <div>
+            <div class="f-label">METRONOME · DRUMS</div>
+            <h3><span class="nw">クリックだけじゃない、</span><span class="nw">ドラムで鳴るメトロノーム</span></h3>
+            <p>8ビート、16ビート、シャッフル、ボサノヴァ、ワルツまで15パターン。バンドで弾いているときのノリを、一人でも練習できます。</p>
+            <ul>
+              <li>BPM 30〜260、タップでテンポ入力</li>
+              <li>ウッドブロックやカウベルなどクリック音色10種</li>
+              <li>数小節ごとに自動でテンポを上げるスピードトレーナー</li>
+            </ul>
+          </div>
+          <div class="f-media">
+            <div class="phone"><img src="img/metronome.webp" alt="メトロノームの画面。BPM 96、Andante" loading="lazy" width="390" height="844"></div>
+            <div class="phone"><img src="img/drums.webp" alt="ドラムパターンの画面。16ビートのハット・スネア・キックの並び" loading="lazy" width="390" height="844"></div>
+          </div>
+        </article>
+
+        <article class="feature">
+          <div>
+            <div class="f-label">100 PROGRESSIONS</div>
+            <h3><span class="nw">定番のコード進行100を、</span><span class="nw">伴奏つきで</span></h3>
+            <p>カノン進行、王道進行、丸サ進行、12小節ブルース、ツーファイブ。好きなキーに移調して再生すると、今のコードと次のコードの押さえ方が順番に出てきます。</p>
+            <ul>
+              <li>ポップス、J-POP、ロック、ブルース、ジャズなど9ジャンル</li>
+              <li>伴奏はストローク・アルペジオなど4種類から</li>
+              <li>度数表示に切り替えて、進行の仕組みも覚えられる</li>
+            </ul>
+          </div>
+          <div class="f-media">
+            <div class="phone"><img src="img/progressions.webp" alt="コード進行の再生画面" loading="lazy" width="390" height="844"></div>
+          </div>
+        </article>
+
+        <article class="feature">
+          <div>
+            <div class="f-label">TUNER</div>
+            <h3>マイクで測れるチューナー</h3>
+            <p>弦を鳴らすだけで、音名とずれ（セント）を表示。±5セント以内に入ると緑に変わります。耳で合わせたいときは基準音も鳴らせます。</p>
+            <ul>
+              <li>スタンダード、半音下げ、ドロップD、DADGADなど7種</li>
+              <li>基準ピッチ A4＝430〜450Hz に変更可能</li>
+              <li>マイクの音は端末の中だけで処理し、外に送りません</li>
+            </ul>
+          </div>
+          <div class="f-media">
+            <div class="phone"><img src="img/tuner.webp" alt="チューナーの画面。A2、+2セントでチューニングOK" loading="lazy" width="390" height="844"></div>
+          </div>
+        </article>
+
+        <article class="feature">
+          <div>
+            <div class="f-label">CHORDS · FRETBOARD · SCALES</div>
+            <h3><span class="nw">コード表、指板、スケールを</span><span class="nw">度数で見る</span></h3>
+            <p>コードは1つにつき2〜4通りの押さえ方。丸の中に「R・3・5・♭7」と度数が出るので、形だけでなく中身で覚えられます。</p>
+            <ul>
+              <li>12ルート×17タイプのコード一覧</li>
+              <li>ペンタトニック、ブルース、モードなど13スケール</li>
+              <li>指板の音名を覚えるクイズつき</li>
+            </ul>
+          </div>
+          <div class="f-media">
+            <div class="phone"><img src="img/chords.webp" alt="コード一覧の画面。Am7の押さえ方と度数" loading="lazy" width="390" height="844"></div>
+            <div class="phone"><img src="img/scales.webp" alt="スケール表の画面。Aマイナーペンタトニックを指板に表示" loading="lazy" width="390" height="844"></div>
+          </div>
+        </article>
+
+        <article class="feature">
+          <div>
+            <div class="f-label">PRACTICE LOG</div>
+            <h3><span class="nw">続けた日数が見えると、</span><span class="nw">続けたくなる</span></h3>
+            <p>タイマーで練習時間を計って、内容と一緒に記録。直近14日のグラフ、連続練習日数、累計時間がひと目でわかります。</p>
+            <ul>
+              <li>メトロノームを止めたときに「記録しますか？」と提案</li>
+              <li>1日の目標時間を設定して、達成した日は緑に</li>
+              <li>記録は端末の中に保存。バックアップも簡単</li>
+            </ul>
+          </div>
+          <div class="f-media">
+            <div class="phone"><img src="img/log.webp" alt="練習記録の画面。連続6日、直近7日で210分" loading="lazy" width="390" height="844"></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section install" id="install">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow">はじめかた</div>
+        <h2><span class="nw">アプリストアは不要。</span><span class="nw">ホーム画面に追加するだけ</span></h2>
+        <p>ブラウザで開いて、ホーム画面に追加すれば、普通のアプリと同じように全画面で使えます。一度開けば、電波のない場所でも動きます。</p>
+      </div>
+      <div class="inst-grid">
+        <div class="inst">
+          <h3>iPhone <small>Safari で</small></h3>
+          <ol>
+            <li><span>Safari で <span class="url">kuzuboshi4mind-sudo.github.io/fretlab</span> を開く</span></li>
+            <li><span>画面下の共有ボタン（□に↑）をタップ</span></li>
+            <li><span>「ホーム画面に追加」を選んで「追加」</span></li>
+          </ol>
+        </div>
+        <div class="inst">
+          <h3>Android <small>Chrome で</small></h3>
+          <ol>
+            <li><span>Chrome で <span class="url">kuzuboshi4mind-sudo.github.io/fretlab</span> を開く</span></li>
+            <li><span>画面上の「アプリとしてインストール」をタップ（または右上の︙メニュー）</span></li>
+            <li><span>「インストール」を選ぶ</span></li>
+          </ol>
+        </div>
+      </div>
+      <p class="note">パソコンでも Chrome や Edge でそのまま使えます。チューナーを初めて使うときは、マイクの使用を「許可」してください。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow">よくある質問</div>
+        <h2>気になるところ</h2>
+      </div>
+      <div class="faq">
+        <details><summary>本当に無料ですか？</summary><p>はい、すべての機能が無料です。広告もアプリ内課金もありません。</p></details>
+        <details><summary>アカウント登録は必要ですか？</summary><p>不要です。開いてすぐに使えます。メールアドレスなどの個人情報も入力しません。</p></details>
+        <details><summary>練習記録はどこに保存されますか？</summary><p>お使いの端末のブラウザの中に保存されます。サーバーには送られません。そのため、機種変更や別の端末に移すときは、練習記録の画面の「バックアップ / 復元」を使ってください。</p></details>
+        <details><summary>チューナーで録音した音はどうなりますか？</summary><p>マイクの音は端末の中で音程を計算するためだけに使い、保存も送信もしません。</p></details>
+        <details><summary>電波のないスタジオでも使えますか？</summary><p>一度開いたあとはオフラインでも動きます。ホーム画面に追加しておくのがおすすめです。</p></details>
+        <details><summary>iPhone で音が鳴りません</summary><p>iPhone の消音（マナーモード）がオンになっていると、メトロノームやドラムの音が鳴りません。消音をオフにしてお使いください。</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="closing">
+    <div class="wrap">
+      <h2><span class="nw">今日の練習から、</span><span class="nw">使ってみてください</span></h2>
+      <p>ダウンロードも登録もいりません。ギターを持って、ボタンをひとつ押すだけ。</p>
+      <div class="ctas"><a class="btn primary" href="../">Fretlab を開く</a></div>
+    </div>
+  </section>
+</main>
+
+<div class="wrap">
+  <footer>
+    <span>Fretlab ギター練習帳</span>
+    <a href="https://github.com/kuzuboshi4mind-sudo/fretlab">GitHub でソースを見る</a>
+  </footer>
+</div>
+
+<script>
+// ヒーロー下の指板：実際のフレット間隔（2^(-n/12)）で描き、Cメジャーコードの押さえ位置にドット
+(function(){
+  const svg=document.getElementById('strip'); if(!svg) return;
+  const W=1200,H=150,top=22,gap=21,frets=15; svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const xs=[0]; let sum=0; const ws=[]; for(let i=1;i<=frets;i++){const w=Math.pow(2,-(i-1)/12);ws.push(w);sum+=w;}
+  let x=40; xs[0]=x; ws.forEach(w=>{x+=w/sum*(W-60);xs.push(x);});
+  const y=s=>top+s*gap, mid=f=>(xs[f-1]+xs[f])/2;
+  let s=`<rect x="0" y="${top-12}" width="${W}" height="${5*gap+24}" fill="#3a271d"/>`;
+  [3,5,7,9,15].forEach(f=>s+=`<circle cx="${mid(f)}" cy="${y(2.5)}" r="6" fill="#cfc6b0" opacity=".4"/>`);
+  s+=`<circle cx="${mid(12)}" cy="${y(1.5)}" r="6" fill="#cfc6b0" opacity=".4"/><circle cx="${mid(12)}" cy="${y(3.5)}" r="6" fill="#cfc6b0" opacity=".4"/>`;
+  xs.forEach((fx,i)=>s+=`<rect x="${fx-(i?1.5:4)}" y="${top-12}" width="${i?3:8}" height="${5*gap+24}" fill="${i?'#8d8273':'#f3eee2'}"/>`);
+  for(let i=0;i<6;i++) s+=`<rect x="0" y="${y(i)-(0.6+i*0.25)}" width="${W}" height="${1.2+i*0.5}" fill="#d9d0bd" opacity=".85"/>`;
+  // Cメジャー（x32010）：5弦3F=R, 4弦2F=3, 2弦1F=R
+  [[4,3,'R','#eaa53b'],[3,2,'3','#7db0e3'],[1,1,'R','#eaa53b']].forEach(([st,f,l,c])=>{
+    s+=`<circle cx="${mid(f)}" cy="${y(st)}" r="9.5" fill="${c}"/><text x="${mid(f)}" y="${y(st)+3.5}" text-anchor="middle" font-size="10" font-weight="700" fill="#1c1406" font-family="sans-serif">${l}</text>`;});
+  svg.innerHTML=s;
+})();
+</script>
+</body>
+</html>

@@ -51,4 +51,6 @@ cat > www/manifest.webmanifest <<'MAN'
 }
 MAN
 sed "s/__VERSION__/$VERSION/" tools/sw.template.js > www/sw.js
+# 紹介ページなど、アプリ以外の静的ページ
+cp -R site/. www/
 echo "built www/ (cache fretlab-$VERSION)"

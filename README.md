@@ -17,11 +17,17 @@
 | パス | 内容 |
 |---|---|
 | `fretlab.html` | アプリ本体（ここを編集する） |
+| `site/about/` | 紹介ページ（LP）。公開URL `/fretlab/about/` |
+| `tools/shots.js` | 紹介ページ用のアプリ画面スクリーンショットを撮る |
 | `tools/build.sh` | `www/` に PWA 一式（index.html・manifest・service worker・アイコン）を生成 |
 | `tools/sw.template.js` | service worker（オフライン対応） |
 | `tools/make_icons.py` | アイコン画像の生成（Pillow） |
 | `android/` `ios/` | Capacitor のネイティブプロジェクト（マイク権限設定済み） |
 | `.github/workflows/` | GitHub Pages 公開、Android APK ビルド |
+
+## 公開URL
+- アプリ：https://kuzuboshi4mind-sudo.github.io/fretlab/
+- 紹介ページ：https://kuzuboshi4mind-sudo.github.io/fretlab/about/
 
 ## 使い方
 

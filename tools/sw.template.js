@@ -14,9 +14,12 @@ self.addEventListener('fetch', e => {
   const isFont = url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
   if (url.origin !== location.origin && !isFont) return;
   if (req.mode === 'navigate') {
-    // ページはネット優先（更新をすぐ反映）、オフラインならキャッシュ
-    e.respondWith(fetch(req).then(r => { const cp = r.clone(); caches.open(CACHE).then(c => c.put('index.html', cp)); return r; })
-      .catch(() => caches.match('index.html')));
+    // ページはネット優先（更新をすぐ反映）、オフラインならキャッシュ。
+    // ページごとに別々に保存する（紹介ページ about/ がアプリ本体を上書きしないように）
+    const isApp = /\/(index\.html)?$/.test(url.pathname) && !url.pathname.includes('/about/');
+    const key = isApp ? 'index.html' : req.url;
+    e.respondWith(fetch(req).then(r => { if (r.ok) { const cp = r.clone(); caches.open(CACHE).then(c => c.put(key, cp)); } return r; })
+      .catch(() => caches.match(key).then(hit => hit || caches.match('index.html'))));
     return;
   }
   e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(r => {
