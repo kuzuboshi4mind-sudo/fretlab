@@ -1,4 +1,5 @@
 <title>Fretlab ギター練習帳</title>
+<script>try{const t=JSON.parse(localStorage.getItem('fretlab.theme'));if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -247,9 +248,7 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .scale-notes{display:flex;gap:6px;flex-wrap:wrap}
 
 /* tips */
-.tips-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
-.tips-grid.lore{grid-template-columns:minmax(0,1fr)}
-.tips-grid.lore .routine{display:none}
+.tips-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}
 .tips-grid.lore #tipList{columns:2 340px;column-gap:32px}
 .tips-grid.lore .tip{break-inside:avoid}
 .tip{border-top:1px solid var(--line);padding-block:14px}
@@ -260,14 +259,6 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .tip h3{font-size:16.5px;margin-block:2px 4px}
 .tip p{margin:0;color:var(--fg);max-width:62ch}
 .tip .btn{margin-top:8px;min-height:34px;padding:4px 12px;font-size:13px}
-.routine li{display:flex;gap:10px;align-items:flex-start;padding-block:8px;border-top:1px solid var(--line)}
-.routine li:first-child{border-top:0}
-.routine ol{list-style:none;margin:0;padding:0}
-.routine .min{font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:auto;white-space:nowrap}
-.routine label{cursor:pointer}
-.routine input:checked + span{color:var(--muted);text-decoration:line-through}
-.progress{height:6px;background:var(--panel);border-radius:3px;overflow:hidden;margin-top:12px}
-.progress i{display:block;height:100%;background:var(--good);width:0;transition:width .2s}
 
 
 /* AI teacher */
@@ -456,7 +447,13 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);border-radius:10px;padding:10px 12px 10px 16px;display:flex;gap:12px;align-items:center;z-index:20;box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:calc(100% - 32px);font-size:14px}
 .toast .btn{background:var(--bg);color:var(--fg);border-color:var(--bg);min-height:34px;padding:4px 12px}
-.install-btn{margin-left:auto}
+.top{align-items:center}
+.top-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.theme-btn{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:4px 14px 4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:13px;cursor:pointer;transition:background .2s,border-color .2s}
+.theme-btn:hover{border-color:var(--muted)}
+.theme-btn:focus-visible{outline:2px solid var(--cobalt-b);outline-offset:2px}
+.theme-btn .ti{width:16px;height:16px;border-radius:50%;background:linear-gradient(90deg,var(--fg) 50%,transparent 50%);border:1.5px solid var(--fg);transition:transform .3s}
+:root[data-theme="dark"] .theme-btn .ti{transform:rotate(180deg)}
 
 @media (max-width:860px){
   .prog,.log-grid{grid-template-columns:minmax(0,1fr)}
@@ -472,7 +469,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 @media (max-width:760px){
   .tabs{justify-content:space-between;column-gap:0}
   .tab{padding:10px 5px 7px;font-size:12.5px;letter-spacing:.02em}
-  .metro,.tuner,.scale-info,.tips-grid{grid-template-columns:minmax(0,1fr)}
+  .metro,.tuner,.scale-info{grid-template-columns:minmax(0,1fr)}
   .bpm output{font-size:88px}
   .chord-name{font-size:52px}
 }
@@ -508,7 +505,10 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 <div class="wrap">
   <header class="top">
     <div class="mark">FRET<span>LAB</span></div>
-    <button class="btn install-btn" id="installBtn" hidden>アプリとしてインストール</button>
+    <div class="top-actions">
+      <button class="btn install-btn" id="installBtn" hidden>アプリとしてインストール</button>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="外観を切り替え"><span class="ti" aria-hidden="true"></span><span class="tl"></span></button>
+    </div>
   </header>
 
   <nav class="tabs" role="tablist" aria-label="機能">
@@ -878,13 +878,6 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
     <p class="msg" style="margin:-6px 0 14px">音源：Fluid (R3) General MIDI SoundFont（Frank Wen, MIT License）を使用しています。</p>
     <div class="tips-grid" id="tipsGrid">
       <div class="card" id="tipList"></div>
-      <div class="card routine">
-        <b>今日の30分メニュー</b>
-        <div class="msg" id="routineDate"></div>
-        <ol id="routine"></ol>
-        <div class="progress"><i id="routineBar"></i></div>
-        <div class="msg" id="routineMsg" style="margin-top:8px"></div>
-      </div>
     </div>
   </section>
 </div>
@@ -1097,6 +1090,13 @@ function pluck(midi,when=0,gain=0.55,opt={}){
 }
 
 /* ---------- tabs ---------- */
+/* ---------- appearance (light / dark) ---------- */
+const darkMQ=matchMedia('(prefers-color-scheme: dark)');
+function curTheme(){return document.documentElement.dataset.theme||(darkMQ.matches?'dark':'light');}
+function paintTheme(){const t=curTheme();$('#themeBtn .tl').textContent=t==='dark'?'ダーク':'ライト';$('#themeBtn').setAttribute('aria-pressed',String(t==='dark'));$('#themeBtn').title=t==='dark'?'ライト表示に切り替え':'ダーク表示に切り替え';const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='dark'?'#121412':'#f7f7f3';}
+$('#themeBtn').addEventListener('click',()=>{const t=curTheme()==='dark'?'light':'dark';document.documentElement.dataset.theme=t;store.set('theme',t);paintTheme();});
+darkMQ.addEventListener('change',paintTheme); paintTheme();
+
 const TABS=['metronome','tuner','chords','progressions','fretboard','scales','songs','tab','log','ai','tips'];
 function showTab(id){
   if(!TABS.includes(id)) id='metronome';
@@ -2467,11 +2467,6 @@ const LORE=[
   {c:'雑学',t:'ピックの昔と今',b:'昔はべっ甲（ウミガメの甲羅）のピックが使われていましたが、今は保護のため使われません。セルロイド、ナイロン、ポリアセタールなど、素材ごとに音と弾き心地が違います。'},
 ];
 
-const ROUTINE=[
-  {t:'チューニング',m:1},{t:'ストレッチと指慣らし（クロマチック 1-2-3-4）',m:5},
-  {t:'コード進行（今週の1パターンをドラムに合わせて）',m:5},{t:'スケール（今週の1ポジション、メトロノームで）',m:7},
-  {t:'リズム（8分・16分のカッティング）',m:5},{t:'曲・フレーズ練習 / 耳コピ',m:7},
-];
 let tipCat='すべて', tipMode='tips';
 function renderTips(){
   const src=tipMode==='tips'?TIPS:LORE;
@@ -2486,18 +2481,8 @@ function renderTips(){
     list.appendChild(d);
   });
 }
-function renderRoutine(){
-  const today=ymd(new Date()); const done=store.get('routine-'+today,[]);
-  $('#routineDate').textContent=new Date().toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'short'})+'　チェックはこの端末に保存されます';
-  const ol=$('#routine'); ol.innerHTML='';
-  ROUTINE.forEach((r,i)=>{const li=document.createElement('li');li.innerHTML=`<label class="check"><input type="checkbox" id="rt${i}" ${done.includes(i)?'checked':''}><span>${r.t}</span></label><span class="min">${r.m}分</span>`;
-    li.querySelector('input').addEventListener('change',e=>{const d=new Set(store.get('routine-'+today,[]));e.target.checked?d.add(i):d.delete(i);store.set('routine-'+today,[...d]);renderRoutine();});ol.appendChild(li);});
-  const mins=ROUTINE.reduce((a,r,i)=>a+(done.includes(i)?r.m:0),0), tot=ROUTINE.reduce((a,r)=>a+r.m,0);
-  $('#routineBar').style.width=(mins/tot*100)+'%';
-  $('#routineMsg').textContent=mins===tot?'今日のメニュー完了。おつかれさまでした！':`${mins} / ${tot} 分`;
-}
 segInit($('#tipMode'),'tips',v=>{tipMode=v;tipCat='すべて';renderTips();});
-renderTips(); renderRoutine();
+renderTips();
 
 /* ---------- AI先生 ---------- */
 // AI の API（worker/）の公開URL。空のあいだは「準備中」と表示する
