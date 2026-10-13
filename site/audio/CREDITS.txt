@@ -1,0 +1,3 @@
+音源: Fluid (R3) General MIDI SoundFont by Frank Wen
+Released under the MIT license ("I hereby release Fluid under the MIT license").
+Rendered with FluidSynth by tools/render_samples.py.

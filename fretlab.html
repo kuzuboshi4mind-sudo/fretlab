@@ -596,6 +596,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
   <section data-panel="tips" hidden>
     <div class="panel-head"><div><h2>練習Tips</h2><p>上達が早い人がやっている習慣と、毎日30分のメニュー例。<a href="https://kuzuboshi4mind-sudo.github.io/fretlab/about/" target="_blank" rel="noopener">Fretlab について →</a></p></div>
       <div class="chips" id="tipCats"></div></div>
+    <p class="msg" style="margin:-6px 0 14px">音源：Fluid (R3) General MIDI SoundFont（Frank Wen, MIT License）を使用しています。</p>
     <div class="tips-grid">
       <div class="card" id="tipList"></div>
       <div class="card routine">
@@ -712,9 +713,42 @@ const store={get(k,d){try{const v=localStorage.getItem('fretlab.'+k);return v===
 /* ---------- audio ---------- */
 let ctx=null, master=null, a4=440;
 function ac(){
-  if(!ctx){ctx=new (window.AudioContext||window.webkitAudioContext)();master=ctx.createGain();master.gain.value=0.9;master.connect(ctx.destination);}
+  if(!ctx){
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    // 和音で音が割れないよう、最後にコンプレッサーを通す
+    const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-10; comp.knee.value=12; comp.ratio.value=6; comp.attack.value=0.003; comp.release.value=0.15;
+    master=ctx.createGain(); master.gain.value=0.9; master.connect(comp); comp.connect(ctx.destination);
+    loadSamples();
+  }
   if(ctx.state==='suspended') ctx.resume();
   return ctx;
+}
+/* ---------- 録音した楽器音（FluidR3_GM, MIT License）。読み込めないときは合成音で鳴らす ---------- */
+const SMP={man:null,buf:{},loading:null,voices:{}};
+function loadSamples(){
+  if(SMP.loading) return SMP.loading;
+  SMP.loading=fetch('audio/manifest.json').then(r=>r.ok?r.json():Promise.reject(new Error('no audio'))).then(man=>{
+    SMP.man=man;
+    const files=[...man.guitar.map(n=>'guitar-'+n),...Object.keys(man.drums).map(k=>'drum-'+k),...man.marimba.map(n=>'marimba-'+n),...man.bass.map(n=>'bass-'+n),...man.nylon.map(n=>'nylon-'+n)];
+    return Promise.all(files.map(f=>fetch('audio/'+f+'.mp3').then(r=>r.arrayBuffer()).then(b=>new Promise((ok,ng)=>ctx.decodeAudioData(b,ok,ng))).then(buf=>{SMP.buf[f]=buf;}).catch(()=>{})));
+  }).catch(()=>{});
+  return SMP.loading;
+}
+function playBuf(name,t,gain,rate=1){
+  const b=SMP.buf[name]; if(!b) return null;
+  const c=ac(), s=c.createBufferSource(), g=c.createGain(); s.buffer=b; s.playbackRate.value=rate; g.gain.value=gain;
+  s.connect(g); g.connect(master); s.start(Math.max(t,c.currentTime)); return {s,g};
+}
+// 同じ弦の前の音は止める（本物のギターと同じ）
+function choke(key,t){const v=SMP.voices[key]; if(v){try{v.g.gain.setTargetAtTime(0,Math.max(t,ctx.currentTime),0.03);v.s.stop(Math.max(t,ctx.currentTime)+0.3);}catch(e){}} }
+function sampleNote(kind,midi,t,gain,key){
+  const arr=SMP.man&&SMP.man[kind]; if(!arr) return false;
+  let best=arr[0]; for(const n of arr) if(Math.abs(n-midi)<Math.abs(best-midi)) best=n;
+  if(!SMP.buf[kind+'-'+best]) return false;
+  if(key) choke(key,t);
+  const v=playBuf(kind+'-'+best,t,gain,Math.pow(2,(midi-best)/12)*(a4/440));
+  if(v&&key) SMP.voices[key]=v;
+  return !!v;
 }
 const mfreq=m=>a4*Math.pow(2,(m-69)/12);
 const ksCache=new Map();
@@ -729,8 +763,11 @@ function pluckBuffer(freq){
   for(let i=len-2000;i<len;i++) d[i]*=(len-i)/2000;
   ksCache.set(key,buf); return buf;
 }
-function pluck(midi,when=0,gain=0.55){
-  const c=ac(); const src=c.createBufferSource(); src.buffer=pluckBuffer(mfreq(midi));
+// kind: guitar / bass / nylon、str: 弦番号（同じ弦の音を止めるため）
+function pluck(midi,when=0,gain=0.55,opt={}){
+  const c=ac(), kind=opt.kind||'guitar';
+  if(sampleNote(kind,midi,c.currentTime+when,gain*1.1,opt.str!=null?kind+opt.str:null)) return;
+  const src=c.createBufferSource(); src.buffer=pluckBuffer(mfreq(midi));
   const g=c.createGain(); g.gain.value=gain; src.connect(g); g.connect(master); src.start(c.currentTime+when);
 }
 
@@ -808,6 +845,21 @@ const DRUMS=[
   {id:'waltz',name:'ワルツ（3/4）',beats:3,steps:6,rows:{h:'x-x-x-',s:'--x-x-',k:'X-----'}},
   {id:'six8',name:'6/8 バラード',beats:2,steps:6,rows:{h:'xoxxox',s:'---X--',k:'x-----'},note:'BPMは付点4分音符（1小節に2拍）で数えます。'},
 ];
+// 録音音源の割り当て（[アクセント, 拍, 細分]）。null の音色は合成音のまま
+const SOUND_SMP=[['drum-metrobell','drum-metroclick','drum-metroclick',1],null,['drum-woodhi','drum-woodlo','drum-woodlo',1],['drum-cowbell','drum-cowbell','drum-cowbell',.9],
+  ['drum-claves','drum-claves','drum-claves',1],['drum-sidestick','drum-sidestick','drum-sidestick',1],['drum-openhat','drum-hat','drum-hat',.9],null,
+  ['marimba-84','marimba-79','marimba-76',.9],['drum-triopen','drum-trimute','drum-trimute',.8]];
+function metroHit(idx,t,l,v){
+  const m=SOUND_SMP[idx];
+  if(m&&SMP.buf[m[l]]){ const g=[1,.7,.38][l]*v*m[3]; if(m[0]==='drum-openhat') choke('hh',t); const r=playBuf(m[l],t,g); if(m[0]==='drum-openhat'&&r) SMP.voices.hh=r; return; }
+  SOUNDS[idx].fn(t,l,v);
+}
+const DRUM_SMP={k:['drum-kick',1],s:['drum-snare',.85],R:['drum-sidestick',.8],c:['drum-clap',.8],h:['drum-hat',.55],O:['drum-openhat',.5],r:['drum-ride',.5],t:['drum-tom',.8],z:['drum-shaker',.5]};
+function drumHit(k,t,a){
+  const m=DRUM_SMP[k];
+  if(m&&SMP.buf[m[0]]){ if(k==='h'||k==='O') choke('hh',t); const r=playBuf(m[0],t,a*m[1]); if((k==='h'||k==='O')&&r) SMP.voices.hh=r; return; }
+  DRUM_VOICES[k].fn(t,a);
+}
 function rhythmOptions(sel){
   sel.innerHTML='';sel.add(new Option('クリックのみ','click'));
   const og=document.createElement('optgroup');og.label='ドラムパターン';DRUMS.forEach(d=>og.appendChild(new Option(d.name,d.id)));sel.appendChild(og);
@@ -849,11 +901,11 @@ function schedule(){
     const g=grid(), d=drum(), t=M.next;
     if(d){
       const i=M.beat*g.tpb+M.subI;
-      for(const k in d.rows){const ch=d.rows[k][i];if(ch&&ch!=='-') DRUM_VOICES[k].fn(t,(ch==='X'?1:ch==='x'?.75:.35)*M.vol);}
-      if(M.layer&&M.subI===0) SOUNDS[M.sound].fn(t,M.beat===0?0:1,M.vol*.8);
+      for(const k in d.rows){const ch=d.rows[k][i];if(ch&&ch!=='-') drumHit(k,t,(ch==='X'?1:ch==='x'?.75:.35)*M.vol);}
+      if(M.layer&&M.subI===0) metroHit(M.sound,t,M.beat===0?0:1,M.vol*.8);
     } else {
       const level=M.subI>0?2:(M.beat===0&&M.accent?0:1);
-      SOUNDS[M.sound].fn(t,level,M.vol);
+      metroHit(M.sound,t,level,M.vol);
     }
     const info={beat:M.beat,subI:M.subI,bar:M.bar,tpb:g.tpb,beats:g.beats,step:M.beat*g.tpb+M.subI};
     tickHooks.forEach(h=>h(t,info));
@@ -921,7 +973,7 @@ function setRhythm(v){
   segInit(bs,M.beats,v=>{M.beats=+v;M.beat=0;store.set('beats',M.beats);drawBeats();});
   segInit($('#subSeg'),1,v=>{M.sub=+v;M.subI=0;});
   const ss=$('#soundSel'); SOUNDS.forEach((s,i)=>ss.add(new Option(s.name,i))); ss.value=M.sound;
-  ss.addEventListener('change',()=>{M.sound=+ss.value;store.set('sound',M.sound);SOUNDS[M.sound].fn(ac().currentTime+0.02,0,M.vol);});
+  ss.addEventListener('change',()=>{M.sound=+ss.value;store.set('sound',M.sound);metroHit(M.sound,ac().currentTime+0.02,0,M.vol);});
   rhythmOptions($('#rhythmSel'));
   $('#rhythmSel').addEventListener('change',e=>setRhythm(e.target.value));
   $('#layerChk').addEventListener('change',e=>M.layer=e.target.checked);
@@ -980,8 +1032,8 @@ function renderStrings(){
 function markString(){document.querySelectorAll('#stringBtns .sbtn').forEach(b=>b.classList.toggle('hit',+b.dataset.i===T.target));}
 function syncAuto(){$('#autoBtn').setAttribute('aria-pressed',String(T.auto));}
 function playRef(m){
-  clearInterval(T.loop); pluck(m,0,0.7);
-  if($('#loopChk').checked) T.loop=setInterval(()=>pluck(m,0,0.7),2200);
+  clearInterval(T.loop); const kind=T.inst.startsWith('bass')?'bass':T.inst==='uke'?'nylon':'guitar'; pluck(m,0,0.7,{kind,str:'ref'});
+  if($('#loopChk').checked) T.loop=setInterval(()=>pluck(m,0,0.7,{kind,str:'ref'}),2200);
 }
 function setA4(v){a4=Math.max(430,Math.min(450,v));$('#a4Out').textContent=a4;ksCache.clear();renderStrings();store.set('a4',a4);}
 function autoCorrelate(b,sr){
@@ -1104,7 +1156,7 @@ function renderBoard(el,dotFn,onPick,tuning=STD){
   el.innerHTML=s+'</svg>';
   el.querySelector('svg').addEventListener('click',e=>{
     const h=e.target.closest('.hit'); if(!h) return; const st=+h.dataset.s,f=+h.dataset.f;
-    pluck(tuning[st]+f); onPick&&onPick(st,f);
+    pluck(tuning[st]+f,0,0.55,{str:st}); onPick&&onPick(st,f);
   });
 }
 const kindOf=semi=>semi===0?'root':(semi===3||semi===4)?'third':semi===7?'fifth':'other';
@@ -1135,7 +1187,7 @@ function diagram(frets,root,type){
   });
   return s+'</svg>';
 }
-function strum(frets){frets.forEach((f,i)=>{if(f!==null) pluck(STD[i]+f,i*0.035,0.4);});}
+function strum(frets){frets.forEach((f,i)=>{if(f!==null) pluck(STD[i]+f,i*0.035,0.4,{str:i});});}
 function renderChord(){
   const ch=CHORDS.find(c=>c.id===C.type), r=C.root;
   $('#chordName').textContent=nn(r,r)+ch.sym;
@@ -1331,7 +1383,7 @@ function showNowNext(bi,ci){
 function progToggle(){ if(M.playing&&M.owner==='prog') transportStop(); else {P.lastChord=null;transportStart('prog');} }
 function strumAt(t,frets,{up=false,gain=.3,spread=.022}={}){
   const c=ac(); const idx=frets.map((f,i)=>f===null?null:i).filter(i=>i!==null); if(up) idx.reverse();
-  idx.forEach((s,j)=>pluck(STD[s]+frets[s],Math.max(0,t-c.currentTime)+j*spread,gain*(up?.7:1)));
+  idx.forEach((s,j)=>pluck(STD[s]+frets[s],Math.max(0,t-c.currentTime)+j*spread,gain*(up?.7:1),{str:s}));
 }
 const countBars=()=>$('#progCount').checked?1:0;
 tickHooks.push((t,info)=>{
@@ -1347,7 +1399,7 @@ tickHooks.push((t,info)=>{
     case 'eighth': strumAt(t,v.frets,{gain:info.beat===0?.3:.22,spread:.012}); strumAt(t+half,v.frets,{up:true,gain:.22,spread:.012}); break;
     case 'arp': {
       const strs=v.frets.map((f,i)=>f===null?null:i).filter(i=>i!==null), order=[strs[0],...strs.slice(1),...strs.slice(1,-1).reverse()];
-      const n=info.beat*2; [0,1].forEach(k=>{const s=order[(n+k)%order.length];pluck(STD[s]+v.frets[s],Math.max(0,t-ctx.currentTime)+k*half,.42);});
+      const n=info.beat*2; [0,1].forEach(k=>{const s=order[(n+k)%order.length];pluck(STD[s]+v.frets[s],Math.max(0,t-ctx.currentTime)+k*half,.42,{str:s});});
       break;}
   }
 });
@@ -1552,7 +1604,7 @@ function renderScale(){
   segInit($('#scRange'),'0-15',v=>{S.range=v.split('-').map(Number);renderScale();});
   $('#scPlay').addEventListener('click',()=>{
     const sc=SCALES.find(x=>x.id===S.type); const base=48+S.root+(S.root>7?-12:0);
-    [...sc.iv,12].forEach((iv,i)=>pluck(base+iv,i*0.28,0.5));
+    [...sc.iv,12].forEach((iv,i)=>pluck(base+iv,i*0.28,0.5,{str:'scale'}));
   });
   renderScale();
 })();
