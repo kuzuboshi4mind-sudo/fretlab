@@ -218,6 +218,25 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .progress i{display:block;height:100%;background:var(--good);width:0;transition:width .2s}
 
 
+/* AI teacher */
+.ai-chat{display:flex;flex-direction:column;gap:12px;max-width:760px}
+.ai-char{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center}
+.ai-avatar{width:64px;height:64px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-family:var(--serif);font-size:30px;background:var(--accent-soft);color:var(--third)}
+.ai-name{font-family:var(--serif);font-size:22px;font-weight:700;letter-spacing:.06em}
+.ai-catch{font-family:var(--display);font-style:italic;font-size:18px;color:var(--root)}
+.ai-tools{display:flex;flex-direction:column;gap:6px}
+.ai-tools .btn{min-height:34px;padding:4px 14px;font-size:13px}
+.ai-log{display:flex;flex-direction:column;gap:10px;min-height:120px}
+.bubble{max-width:85%;padding:12px 16px;border-radius:18px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75}
+.bubble.t{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-top-left-radius:6px}
+.bubble.u{align-self:flex-end;background:var(--fg);color:var(--bg);border-top-right-radius:6px}
+.bubble.t.wait::after{content:"…";animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.2}}
+.ai-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px));background:var(--bg);padding-top:6px}
+.ai-form textarea{resize:none}
+.ai-note{font-size:12px}
+@media (max-width:760px){.ai-char{grid-template-columns:auto minmax(0,1fr)}.ai-tools{grid-column:1/-1;flex-direction:row}}
+
 /* drum grid */
 .drumgrid-scroll{overflow-x:auto}
 .drumgrid{display:grid;gap:3px;font-family:var(--mono);font-size:11px;align-items:center;min-width:max-content}
@@ -348,6 +367,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
     <button class="tab" role="tab" data-tab="fretboard">指板音程表</button>
     <button class="tab" role="tab" data-tab="scales">スケール</button>
     <button class="tab" role="tab" data-tab="log">練習記録</button>
+    <button class="tab" role="tab" data-tab="ai">AI先生</button>
     <button class="tab" role="tab" data-tab="tips">練習Tips</button>
   </nav>
 
@@ -592,6 +612,39 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 
   <div class="toast" id="toast" hidden></div>
 
+  <!-- AI TEACHER -->
+  <section data-panel="ai" hidden>
+    <div class="panel-head"><div><h2>AI先生</h2><p>自分好みの先生キャラクターを作って、練習の悩みを相談できます。練習記録の内容も見ながら、具体的なメニューを提案してくれます。</p></div></div>
+    <div class="card ai-off" id="aiOff" hidden>
+      <b>AI先生は準備中です</b>
+      <p class="msg">管理者がAIの接続を設定すると使えるようになります。</p>
+    </div>
+    <div class="card stack" id="aiSetup" hidden>
+      <div><span class="label">先生のタイプ</span><div class="chips" id="aiPresets"></div></div>
+      <div><label class="label" for="aiWish">こんな先生がいい（自由に書いてください）</label>
+        <textarea id="aiWish" class="search" rows="3" maxlength="400" placeholder="例：褒めて伸ばしてくれる。ブルースが好き。初心者にもやさしく教えてほしい。"></textarea></div>
+      <div class="row"><button class="btn primary big" id="aiMake">先生を作る</button><span class="msg" id="aiMakeMsg"></span></div>
+    </div>
+    <div class="ai-chat" id="aiChat" hidden>
+      <div class="card ai-char">
+        <div class="ai-avatar" id="aiAvatar"></div>
+        <div class="ai-prof">
+          <div class="ai-name" id="aiName"></div>
+          <div class="ai-catch" id="aiCatch"></div>
+          <div class="msg" id="aiSpec"></div>
+        </div>
+        <div class="ai-tools"><button class="btn" id="aiReset">会話を消す</button><button class="btn" id="aiRemake">先生を作り直す</button></div>
+      </div>
+      <div class="ai-log" id="aiLog" aria-live="polite"></div>
+      <div class="chips" id="aiQuick"></div>
+      <form class="ai-form" id="aiForm">
+        <textarea id="aiInput" class="search" rows="2" maxlength="2000" placeholder="先生に相談する（例：Fコードがきれいに鳴りません）" aria-label="メッセージ"></textarea>
+        <button class="btn primary" id="aiSend" type="submit">送信</button>
+      </form>
+      <p class="msg ai-note">AIの回答はまちがうこともあります。体の痛みが続くときは練習を休んでください。</p>
+    </div>
+  </section>
+
   <!-- TIPS -->
   <section data-panel="tips" hidden>
     <div class="panel-head"><div><h2>練習Tips</h2><p>上達が早い人がやっている習慣と、毎日30分のメニュー例。<a href="https://kuzuboshi4mind-sudo.github.io/fretlab/about/" target="_blank" rel="noopener">Fretlab について →</a></p></div>
@@ -772,7 +825,7 @@ function pluck(midi,when=0,gain=0.55,opt={}){
 }
 
 /* ---------- tabs ---------- */
-const TABS=['metronome','tuner','chords','progressions','fretboard','scales','log','tips'];
+const TABS=['metronome','tuner','chords','progressions','fretboard','scales','log','ai','tips'];
 function showTab(id){
   if(!TABS.includes(id)) id='metronome';
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',String(t.dataset.tab===id)));
@@ -1660,6 +1713,68 @@ function renderRoutine(){
   $('#routineMsg').textContent=mins===tot?'今日のメニュー完了。おつかれさまでした！':`${mins} / ${tot} 分`;
 }
 renderTips(); renderRoutine();
+
+/* ---------- AI先生 ---------- */
+// AI の API（worker/）の公開URL。空のあいだは「準備中」と表示する
+const AI_ENDPOINT='';
+const AI={char:store.get('aiChar',null),hist:store.get('aiHist',[]),busy:false,preset:'おまかせ'};
+const AI_PRESETS=['おまかせ','優しい先輩','熱血コーチ','落ち着いたジャズ講師','関西弁のロック兄さん','物知りな音楽博士','褒め上手なお姉さん'];
+const AI_QUICK=['今日の30分メニューを考えて','Fコードがきれいに鳴らない','王道進行をスムーズに弾くコツ','リズム感を良くしたい','速弾きの練習法を教えて'];
+function aiContext(){
+  const tot=dayTotals(), d=new Date(); let week=0; for(let i=0;i<7;i++){const x=new Date(d);x.setDate(x.getDate()-i);week+=tot[ymd(x)]||0;}
+  let streak=0; const x=new Date(d); if(!tot[ymd(x)]) x.setDate(x.getDate()-1); while(tot[ymd(x)]){streak++;x.setDate(x.getDate()-1);}
+  const recent=[...new Set(LOG.entries.slice(-12).reverse().map(e=>e.cat))].slice(0,5);
+  return {streak,week_minutes:week,recent,instrument:INSTR[T.inst].name};
+}
+function aiRender(){
+  const ready=!!AI_ENDPOINT;
+  $('#aiOff').hidden=ready; $('#aiSetup').hidden=!ready||!!AI.char; $('#aiChat').hidden=!ready||!AI.char;
+  if(!AI.char) return;
+  $('#aiAvatar').textContent=AI.char.symbol||AI.char.name[0];
+  $('#aiName').textContent=AI.char.name; $('#aiCatch').textContent='“'+AI.char.catchphrase+'”';
+  $('#aiSpec').textContent=`得意：${AI.char.specialty}　／　${AI.char.personality}`;
+  const log=$('#aiLog'); log.innerHTML='';
+  const first=document.createElement('div'); first.className='bubble t'; first.textContent=AI.char.greeting; log.appendChild(first);
+  AI.hist.forEach(m=>{const b=document.createElement('div');b.className='bubble '+(m.role==='user'?'u':'t');b.textContent=m.content;log.appendChild(b);});
+}
+async function aiMake(){
+  if(AI.busy) return; AI.busy=true; const btn=$('#aiMake'), msg=$('#aiMakeMsg'); btn.disabled=true; msg.textContent='先生を呼んでいます…';
+  try{
+    const r=await fetch(AI_ENDPOINT+'/character',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({preset:AI.preset==='おまかせ'?undefined:AI.preset,wish:$('#aiWish').value.trim()||undefined})});
+    if(r.status===429) throw new Error('混み合っています。1分ほど待ってからもう一度押してください。');
+    const j=await r.json(); if(!r.ok||!j.character) throw new Error('先生を作れませんでした。書き方を変えてもう一度お試しください。');
+    AI.char=j.character; AI.hist=[]; store.set('aiChar',AI.char); store.set('aiHist',AI.hist); msg.textContent=''; aiRender();
+  }catch(e){ msg.textContent=e.message.startsWith('混み')||e.message.startsWith('先生')?e.message:'通信できませんでした。電波の良い場所でもう一度お試しください。'; }
+  finally{ AI.busy=false; btn.disabled=false; }
+}
+async function aiSend(text){
+  text=(text||'').trim(); if(!text||AI.busy) return;
+  AI.busy=true; $('#aiSend').disabled=true; $('#aiInput').value='';
+  AI.hist.push({role:'user',content:text}); aiRender();
+  const log=$('#aiLog'), b=document.createElement('div'); b.className='bubble t wait'; log.appendChild(b); b.scrollIntoView({block:'end',behavior:'smooth'});
+  let reply='';
+  try{
+    const r=await fetch(AI_ENDPOINT+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({character:AI.char,messages:AI.hist.slice(-20),context:aiContext()})});
+    if(r.status===429) throw new Error('rate');
+    if(!r.ok||!r.body) throw new Error('http');
+    const rd=r.body.getReader(), dec=new TextDecoder();
+    for(;;){ const {done,value}=await rd.read(); if(done) break; reply+=dec.decode(value,{stream:true}); b.classList.remove('wait'); b.textContent=reply; }
+  }catch(e){ reply=reply||(e.message==='rate'?'少し質問が多すぎたみたい。1分ほど待ってからもう一度送ってね。':'通信できませんでした。電波の良い場所でもう一度送ってください。'); b.textContent=reply; }
+  b.classList.remove('wait');
+  AI.hist.push({role:'assistant',content:reply}); if(AI.hist.length>40) AI.hist=AI.hist.slice(-40);
+  if(AI.hist[0]&&AI.hist[0].role!=='user') AI.hist.shift();
+  store.set('aiHist',AI.hist); AI.busy=false; $('#aiSend').disabled=false;
+}
+(function initAI(){
+  const pc=$('#aiPresets'); AI_PRESETS.forEach(p=>{const b=document.createElement('button');b.className='chip';b.textContent=p;b.setAttribute('aria-pressed',String(p===AI.preset));b.addEventListener('click',()=>{AI.preset=p;pc.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',String(c===b)));});pc.appendChild(b);});
+  const q=$('#aiQuick'); AI_QUICK.forEach(t=>{const b=document.createElement('button');b.className='chip';b.textContent=t;b.addEventListener('click',()=>aiSend(t));q.appendChild(b);});
+  $('#aiMake').addEventListener('click',aiMake);
+  $('#aiForm').addEventListener('submit',e=>{e.preventDefault();aiSend($('#aiInput').value);});
+  $('#aiInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();aiSend($('#aiInput').value);}});
+  $('#aiReset').addEventListener('click',()=>{AI.hist=[];store.set('aiHist',AI.hist);aiRender();});
+  $('#aiRemake').addEventListener('click',()=>{AI.char=null;AI.hist=[];store.set('aiChar',null);store.set('aiHist',[]);aiRender();});
+  aiRender();
+})();
 
 /* ---------- PWA ---------- */
 let installEvt=null;

@@ -1,0 +1,16 @@
+# Fretlab の AI先生 用 API（Cloudflare Workers）
+# デプロイは GitHub Actions（.github/workflows/ai-worker.yml）から行う
+name = "fretlab-ai"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# アプリを開くことが許されたページの送信元（カンマ区切り）
+ALLOWED_ORIGINS = "https://kuzuboshi4mind-sudo.github.io,capacitor://localhost,https://localhost,http://localhost:8080"
+
+# 1人（IPアドレス）あたり 60秒に20回まで
+[[ratelimits]]
+name = "LIMITER"
+namespace_id = "1001"
+simple = { limit = 20, period = 60 }
