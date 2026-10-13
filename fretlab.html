@@ -130,6 +130,18 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .tnote-row{display:flex;align-items:flex-end;justify-content:center;gap:18px;margin-top:6px}
 .tnote{font-family:var(--display);font-weight:300;font-size:104px;line-height:.9;font-variant-numeric:lining-nums;transition:color .2s}
 .tnote.ok{color:var(--good)}
+.tnote-row{position:relative}
+.tnote-row::before{content:"";position:absolute;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;border:2px solid var(--good);opacity:0;pointer-events:none}
+.tuner-main.locked .tnote-row::before{animation:lockring 1s ease-out}
+.tuner-main.locked .tnote{color:var(--good);text-shadow:0 0 24px color-mix(in srgb,var(--good) 60%,transparent);animation:lockpop .5s ease-out}
+.tuner-main.locked #trace{box-shadow:inset 0 0 0 1px var(--good)}
+@keyframes lockring{0%{opacity:.9;transform:scale(.6)}100%{opacity:0;transform:scale(1.6)}}
+@keyframes lockpop{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+.sbtn{position:relative}
+.sbtn.tuned::after{content:"✓";position:absolute;top:-6px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--good);color:#0e100f;font-size:11px;font-weight:700;display:grid;place-items:center}
+.tstate.all{font-size:17px;animation:lockpop .6s ease-out}
+@media (prefers-reduced-motion:reduce){.tuner-main.locked .tnote,.tuner-main.locked .tnote-row::before,.tstate.all{animation:none}}
+
 .tnote sub{font-size:32px;color:var(--muted);font-weight:400}
 .tmeta{padding-bottom:10px}
 .ttarget{font-size:13px;color:var(--muted);letter-spacing:.06em}
@@ -143,7 +155,8 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .tstate.good{color:var(--good)} .tstate.warn{color:var(--warn)}
 .msg{font-size:13px;color:var(--muted);max-width:46ch}
 .strings-row{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
-.sbtn{display:flex;flex-direction:column;align-items:center;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 0 6px;cursor:pointer;width:48px;color:var(--fg)}
+.sbtn{display:flex;flex-direction:column;align-items:center;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 0 6px;cursor:pointer;width:46px;color:var(--fg)}
+@media (max-width:420px){.sbtn{width:42px}.sbtn .nn{font-size:21px}.strings-row{gap:4px}}
 .sbtn:hover{border-color:var(--muted)}
 .sbtn.hit{border-color:var(--fg);background:var(--fg);color:var(--bg)}
 .sbtn.hit .sn,.sbtn.hit .nn sub{color:inherit;opacity:.75}
@@ -325,6 +338,28 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .log-more{margin-top:16px}
 @media (max-width:860px){.pomo{grid-template-columns:minmax(0,1fr)}}
 
+/* recorder */
+.rec-card{margin-top:16px;display:flex;flex-direction:column;gap:14px}
+.rec-ctrl{display:flex;align-items:center;gap:18px}
+.rec-btn{width:72px;height:72px;border-radius:50%;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;flex:0 0 auto}
+.rec-btn i{display:block;width:30px;height:30px;border-radius:50%;background:#c8463a;transition:all .2s}
+.rec-btn.on{border-color:#c8463a}
+.rec-btn.on i{width:24px;height:24px;border-radius:5px;animation:recblink 1.2s infinite}
+@keyframes recblink{50%{opacity:.5}}
+.rec-info{flex:1;min-width:0}
+.rec-time{font-family:var(--display);font-size:40px;font-weight:400;line-height:1;font-variant-numeric:lining-nums tabular-nums}
+.rec-level{height:6px;border-radius:3px;background:var(--panel);overflow:hidden;margin-block:8px 4px}
+.rec-level i{display:block;height:100%;width:0;background:var(--good);transition:width .08s}
+.rec-list{display:flex;flex-direction:column}
+.rec-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding-block:10px;border-top:1px solid var(--line)}
+.rec-item .rn{font-weight:500;overflow-wrap:anywhere}
+.rec-item .rd{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.rec-item audio{grid-column:1/-1;width:100%;height:36px}
+.rec-item .ra{display:flex;gap:6px}
+.rec-item .ra .btn{min-height:34px;padding:4px 12px;font-size:13px}
+.rec-item .ra .btn.confirm{color:var(--bad);border-color:var(--bad)}
+@media (prefers-reduced-motion:reduce){.rec-btn.on i{animation:none}}
+
 /* drum grid */
 .drumgrid-scroll{overflow-x:auto}
 .drumgrid{display:grid;gap:3px;font-family:var(--mono);font-size:11px;align-items:center;min-width:max-content}
@@ -457,8 +492,8 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
     <button class="tab" role="tab" data-tab="scales">スケール</button>
     <button class="tab" role="tab" data-tab="songs">練習曲</button>
     <button class="tab" role="tab" data-tab="tab">TAB</button>
-    <button class="tab" role="tab" data-tab="log">記録</button>
-    <button class="tab" role="tab" data-tab="ai">AI先生</button>
+    <button class="tab" role="tab" data-tab="log">マイ記録</button>
+    <button class="tab" role="tab" data-tab="ai">レッスンコーチ</button>
     <button class="tab" role="tab" data-tab="tips">Tips</button>
   </nav>
 
@@ -717,7 +752,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 
   <!-- PRACTICE LOG -->
   <section data-panel="log" hidden>
-    <div class="panel-head"><div><h2>練習記録</h2><p>時間を選んでスタートするだけ。練習した時間はそのまま記録されます。途中でやめても、やった分はちゃんと残ります。</p></div></div>
+    <div class="panel-head"><div><h2>マイ記録</h2><p>時間を選んでスタートするだけ。練習した時間はそのまま記録されます。途中でやめても、やった分はちゃんと残ります。</p></div></div>
     <div class="pomo">
       <div class="card pomo-main">
         <div class="seg" id="pomoLen"><button data-v="5">5分</button><button data-v="15">15分</button><button data-v="25">25分</button><button data-v="45">45分</button></div>
@@ -749,6 +784,16 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
         </div>
       </div>
     </div>
+    <div class="card rec-card">
+      <div class="rec-head">
+        <div><b>録音</b><p class="msg" style="margin:2px 0 0">自分の演奏を録って聴き返しましょう。メトロノームや練習曲を鳴らしながらでも録れます。</p></div>
+      </div>
+      <div class="rec-ctrl">
+        <button class="rec-btn" id="recBtn" aria-label="録音を開始"><i></i></button>
+        <div class="rec-info"><div class="rec-time" id="recTime">00:00</div><div class="rec-level"><i id="recLevel"></i></div><div class="msg" id="recMsg">赤いボタンで録音開始</div></div>
+      </div>
+      <div class="rec-list" id="recList"></div>
+    </div>
     <details class="card log-more">
       <summary>これまでの記録とバックアップ</summary>
       <div class="row" style="margin-top:12px"><label class="msg" for="goalSel">1日の目標</label><select id="goalSel"><option>15</option><option>30</option><option>45</option><option>60</option><option>90</option></select><span class="msg">分</span></div>
@@ -763,16 +808,16 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 
   <!-- AI TEACHER -->
   <section data-panel="ai" hidden>
-    <div class="panel-head"><div><h2>AI先生</h2><p>自分好みの先生キャラクターを作って、練習の悩みを相談できます。練習記録の内容も見ながら、具体的なメニューを提案してくれます。</p></div></div>
+    <div class="panel-head"><div><h2>レッスンコーチ</h2><p>自分好みのコーチを作って、練習の悩みを相談できます。マイ記録の内容も見ながら、具体的なメニューを提案してくれます。</p></div></div>
     <div class="card ai-off" id="aiOff" hidden>
-      <b>AI先生は準備中です</b>
+      <b>レッスンコーチは準備中です</b>
       <p class="msg">管理者がAIの接続を設定すると使えるようになります。</p>
     </div>
     <div class="card stack" id="aiSetup" hidden>
-      <div><span class="label">先生のタイプ</span><div class="chips" id="aiPresets"></div></div>
-      <div><label class="label" for="aiWish">こんな先生がいい（自由に書いてください）</label>
+      <div><span class="label">コーチのタイプ</span><div class="chips" id="aiPresets"></div></div>
+      <div><label class="label" for="aiWish">こんなコーチがいい（自由に書いてください）</label>
         <textarea id="aiWish" class="search" rows="3" maxlength="400" placeholder="例：褒めて伸ばしてくれる。ブルースが好き。初心者にもやさしく教えてほしい。"></textarea></div>
-      <div class="row"><button class="btn primary big" id="aiMake">先生を作る</button><span class="msg" id="aiMakeMsg"></span></div>
+      <div class="row"><button class="btn primary big" id="aiMake">コーチを作る</button><span class="msg" id="aiMakeMsg"></span></div>
     </div>
     <div class="ai-chat" id="aiChat" hidden>
       <div class="card ai-char">
@@ -782,12 +827,12 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
           <div class="ai-catch" id="aiCatch"></div>
           <div class="msg" id="aiSpec"></div>
         </div>
-        <div class="ai-tools"><button class="btn" id="aiReset">会話を消す</button><button class="btn" id="aiRemake">先生を作り直す</button></div>
+        <div class="ai-tools"><button class="btn" id="aiReset">会話を消す</button><button class="btn" id="aiRemake">コーチを作り直す</button></div>
       </div>
       <div class="ai-log" id="aiLog" aria-live="polite"></div>
       <div class="chips" id="aiQuick"></div>
       <form class="ai-form" id="aiForm">
-        <textarea id="aiInput" class="search" rows="2" maxlength="2000" placeholder="先生に相談する（例：Fコードがきれいに鳴りません）" aria-label="メッセージ"></textarea>
+        <textarea id="aiInput" class="search" rows="2" maxlength="2000" placeholder="コーチに相談する（例：Fコードがきれいに鳴りません）" aria-label="メッセージ"></textarea>
         <button class="btn primary" id="aiSend" type="submit">送信</button>
       </form>
       <p class="msg ai-note">AIの回答はまちがうこともあります。体の痛みが続くときは練習を休んでください。</p>
@@ -1219,7 +1264,7 @@ const INSTR={
   uke:{name:'ウクレレ',dec:1,min:180,max:1200,tunings:[
     {name:'スタンダード High-G（GCEA）',m:[67,60,64,69]},{name:'Low-G（GCEA）',m:[55,60,64,69]},{name:'D調（ADF♯B）',m:[69,62,66,71]}]},
 };
-const T={inst:store.get('tInst','guitar'),tuning:0,stream:null,analyser:null,buf:null,hist:[],loop:null,target:null,auto:true,trace:[],raf:0};
+const T={inst:store.get('tInst','guitar'),tuning:0,stream:null,analyser:null,buf:null,hist:[],loop:null,target:null,auto:true,trace:[],raf:0,ema:null,lockAt:0,locked:null,tuned:new Set(),silent:0,muteUntil:0};
 if(!INSTR[T.inst]) T.inst='guitar';
 const curTuning=()=>INSTR[T.inst].tunings[T.tuning]||INSTR[T.inst].tunings[0];
 function noteLabel(m){return `${NOTES_S[((m%12)+12)%12]}<sub>${Math.floor(m/12)-1}</sub>`}
@@ -1238,55 +1283,80 @@ function renderStrings(){
   });
   markString();
 }
-function markString(){document.querySelectorAll('#stringBtns .sbtn').forEach(b=>b.classList.toggle('hit',+b.dataset.i===T.target));}
+function markString(){document.querySelectorAll('#stringBtns .sbtn').forEach(b=>{b.classList.toggle('hit',+b.dataset.i===T.target);b.classList.toggle('tuned',T.tuned.has(+b.dataset.i));});}
 function syncAuto(){$('#autoBtn').setAttribute('aria-pressed',String(T.auto));}
 function playRef(m){
   stopAllPlayback(); const kind=T.inst.startsWith('bass')?'bass':T.inst==='uke'?'nylon':'guitar'; pluck(m,0,0.7,{kind,str:'ref'});
   if($('#loopChk').checked) T.loop=setInterval(()=>pluck(m,0,0.7,{kind,str:'ref'}),2200);
 }
 function setA4(v){a4=Math.max(430,Math.min(450,v));$('#a4Out').textContent=a4;ksCache.clear();renderStrings();store.set('a4',a4);}
-function autoCorrelate(b,sr){
-  let n=b.length,rms=0; for(let i=0;i<n;i++) rms+=b[i]*b[i]; rms=Math.sqrt(rms/n); if(rms<0.008) return -1;
-  let r1=0,r2=n-1; const th=0.2;
-  for(let i=0;i<n/2;i++) if(Math.abs(b[i])<th){r1=i;break;}
-  for(let i=1;i<n/2;i++) if(Math.abs(b[n-i])<th){r2=n-i;break;}
-  b=b.slice(r1,r2); n=b.length;
-  const c=new Float32Array(n);
-  for(let lag=0;lag<n;lag++){let s=0;for(let j=0;j<n-lag;j++) s+=b[j]*b[j+lag];c[lag]=s;}
-  let d=0; while(d<n-1&&c[d]>c[d+1]) d++;
-  let mx=-1,mp=-1; for(let i=d;i<n;i++) if(c[i]>mx){mx=c[i];mp=i;}
-  if(mp<1||mp>=n-1) return -1;
-  const x1=c[mp-1],x2=c[mp],x3=c[mp+1],a=(x1+x3-2*x2)/2,bb=(x3-x1)/2;
-  const T0=a?mp-bb/(2*a):mp; return sr/T0;
+// YIN 法：自己相関より誤検出（オクターブ違い）が少なく、小さな音でも安定しやすい
+function yin(x,sr,fmin,fmax){
+  const N=x.length; let rms=0; for(let i=0;i<N;i++) rms+=x[i]*x[i]; rms=Math.sqrt(rms/N);
+  if(rms<0.0025) return null;
+  const tauMin=Math.max(2,Math.floor(sr/fmax)), tauMax=Math.min(Math.floor(sr/fmin),Math.floor(N/2)), W=N-tauMax;
+  const d=new Float32Array(tauMax+2);
+  for(let tau=1;tau<=tauMax+1&&tau<N-W;tau++){ let s=0; for(let j=0;j<W;j++){ const v=x[j]-x[j+tau]; s+=v*v; } d[tau]=s; }
+  let run=0; const dp=new Float32Array(tauMax+2); dp[0]=1;
+  for(let tau=1;tau<=tauMax+1;tau++){ run+=d[tau]; dp[tau]=run?d[tau]*tau/run:1; }
+  let tau=-1;
+  for(let t=tauMin;t<=tauMax;t++){ if(dp[t]<0.12){ while(t+1<=tauMax&&dp[t+1]<dp[t]) t++; tau=t; break; } }
+  if(tau<0){ let mi=tauMin; for(let t=tauMin;t<=tauMax;t++) if(dp[t]<dp[mi]) mi=t; if(dp[mi]>0.3) return null; tau=mi; }
+  const a=dp[tau-1]??dp[tau], b=dp[tau], c=dp[tau+1]??dp[tau], den=a+c-2*b;
+  const tt=den?tau+(a-c)/(2*den):tau;
+  return {f:sr/tt,conf:1-b,rms};
 }
 // 低音ほど間引いて（平均して）長い時間を解析する：ベースの最低音 B0≒31Hz まで読める
 function detectPitch(){
   const I=INSTR[T.inst], d=I.dec, N=d===2?4096:2048, full=T.buf;
   const src=full.subarray(full.length-N*d); let x=src;
   if(d>1){ x=new Float32Array(N); for(let i=0;i<N;i++){let s=0;for(let k=0;k<d;k++) s+=src[i*d+k]; x[i]=s/d;} }
-  const f=autoCorrelate(x,ctx.sampleRate/d);
-  return (f>=I.min&&f<=I.max)?f:-1;
+  const r=yin(x,ctx.sampleRate/d,I.min,I.max);
+  return r&&r.f>=I.min&&r.f<=I.max?r:null;
+}
+function tunerChime(m){
+  const c=ac(), t=c.currentTime+.02;
+  [[1318.5,0],[1975.5,.09]].forEach(([f,dl])=>{const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.value=f;
+    g.gain.setValueAtTime(0.0001,t+dl);g.gain.exponentialRampToValueAtTime(.18,t+dl+.01);g.gain.exponentialRampToValueAtTime(0.0001,t+dl+.7);o.connect(g);g.connect(master);o.start(t+dl);o.stop(t+dl+.8);});
+  T.muteUntil=performance.now()+700;   // 自分のチャイムを拾わないように少し待つ
+  try{navigator.vibrate&&navigator.vibrate([30,40,30]);}catch(e){}
+}
+function setLocked(on){
+  const main=document.querySelector('.tuner-main'); if(!main) return;
+  if(on){ main.classList.remove('locked'); void main.offsetWidth; main.classList.add('locked'); } else main.classList.remove('locked');
 }
 let frame=0;
 function tunerLoop(){
   if(!T.analyser) return;
   T.raf=requestAnimationFrame(tunerLoop);
-  if(++frame%2) return;
+  if(performance.now()<(T.muteUntil||0)) return;
   T.analyser.getFloatTimeDomainData(T.buf);
-  const f=detectPitch();
-  if(f<0){ T.hist=[]; T.trace.unshift(null); trimTrace(); drawTrace(); return; }
-  T.hist.push(f); if(T.hist.length>5) T.hist.shift();
+  const r=detectPitch();
+  if(!r){ if(++T.silent>6){ T.hist=[]; T.ema=null; T.lockAt=0; } T.trace.unshift(null); trimTrace(); drawTrace(); return; }
+  T.silent=0;
+  T.hist.push(r.f); if(T.hist.length>7) T.hist.shift();
   const fm=[...T.hist].sort((a,b)=>a-b)[Math.floor(T.hist.length/2)];
   const ms=curTuning().m, mf=69+12*Math.log2(fm/a4);
-  if(T.auto){ let bi=0; ms.forEach((m,i)=>{ if(Math.abs(mf-m)<Math.abs(mf-ms[bi])) bi=i; }); if(bi!==T.target){T.trace.unshift(null);} T.target=bi; markString(); }
-  const tm=ms[T.target??0], cents=Math.round((mf-tm)*100), n=ms.length;
+  if(T.auto){ let bi=0; ms.forEach((m,i)=>{ if(Math.abs(mf-m)<Math.abs(mf-ms[bi])) bi=i; }); if(bi!==T.target){T.trace.unshift(null);T.ema=null;T.lockAt=0;setLocked(false);} T.target=bi; markString(); }
+  const tm=ms[T.target??0], raw=(mf-tm)*100;
+  T.ema=T.ema==null?raw:T.ema+(raw-T.ema)*.35;
+  const cents=Math.round(T.ema), n=ms.length;
   $('#tNote').innerHTML=noteLabel(tm);
   $('#tTarget').textContent=`${n-(T.target??0)}弦をチューニング中${T.auto?'（自動）':''}`;
   $('#tCents').textContent=(cents>0?'+ ':cents<0?'− ':'± ')+Math.min(999,Math.abs(cents))+' cent';
   $('#tHz').textContent=fm.toFixed(1)+' Hz';
+  // ±3セント以内が0.6秒続いたら「合った」
+  const now=performance.now(), near=Math.abs(T.ema)<=3;
+  if(near){ if(!T.lockAt) T.lockAt=now; } else if(Math.abs(T.ema)>8){ T.lockAt=0; if(T.locked===T.target){ T.locked=null; setLocked(false); } }
+  if(near&&T.lockAt&&now-T.lockAt>600&&T.locked!==T.target){
+    T.locked=T.target; T.tuned.add(T.target); setLocked(true); tunerChime(tm); markString();
+    if(T.tuned.size===ms.length){ $('#tState').className='tstate good all'; $('#tState').textContent='全弦チューニング完了！ いい音で弾けます'; T.trace.unshift(cents); trimTrace(); drawTrace(); return; }
+  }
   const ok=Math.abs(cents)<=5, st=$('#tState');
-  st.className='tstate '+(ok?'good':'warn');
-  st.textContent= ok?'✓ チューニングOK':Math.abs(cents)>150?(cents<0?'かなり低い ― 弦を確認してください':'かなり高い ― 弦を確認してください'):(cents<0?'← 低い：ペグを締めて上げる':'高い → 一度緩めてから合わせ直す');
+  if(!(st.classList.contains('all')&&ok)){
+    st.className='tstate '+(ok?'good':'warn');
+    st.textContent= ok?(T.locked===T.target?'✓ ぴったり！':'もう少し…そのまま'):Math.abs(cents)>150?(cents<0?'かなり低い ― 弦を確認してください':'かなり高い ― 弦を確認してください'):(cents<0?'← 低い：ペグを締めて上げる':'高い → 一度緩めてから合わせ直す');
+  }
   $('#tNote').classList.toggle('ok',ok);
   T.trace.unshift(cents); trimTrace(); drawTrace();
 }
@@ -1320,7 +1390,9 @@ async function micToggle(){
     if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) throw new Error('nomedia');
     T.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
     const src=ctx.createMediaStreamSource(T.stream); T.analyser=ctx.createAnalyser(); T.analyser.fftSize=8192;
-    T.buf=new Float32Array(T.analyser.fftSize); src.connect(T.analyser); T.hist=[]; T.trace=[];
+    // マイク感度を上げる（約4倍）＋楽器の音域以外のノイズを落とす
+    const pre=ctx.createGain(); pre.gain.value=4; const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=22; const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2200;
+    T.buf=new Float32Array(T.analyser.fftSize); src.connect(pre); pre.connect(hp); hp.connect(lp); lp.connect(T.analyser); T.tuned=new Set(); T.locked=null; T.lockAt=0; T.hist=[]; T.trace=[];
     btn.textContent='測定を止める'; msg.textContent='聴いています… 1本ずつ、はっきり弾いてください。'; tunerLoop();
   }catch(e){
     T.stream=null;
@@ -1328,9 +1400,9 @@ async function micToggle(){
   }
 }
 (function initTuner(){
-  segInit($('#instSeg'),T.inst,v=>{T.inst=v;store.set('tInst',v);T.tuning=0;T.target=null;T.auto=true;syncAuto();T.hist=[];T.trace=[];renderTunings();renderStrings();drawTrace();});
+  segInit($('#instSeg'),T.inst,v=>{T.inst=v;store.set('tInst',v);T.tuning=0;T.target=null;T.auto=true;T.tuned=new Set();T.locked=null;setLocked(false);syncAuto();T.hist=[];T.trace=[];renderTunings();renderStrings();drawTrace();});
   renderTunings();
-  $('#tuningSel').addEventListener('change',e=>{T.tuning=+e.target.value;T.target=null;renderStrings();});
+  $('#tuningSel').addEventListener('change',e=>{T.tuning=+e.target.value;T.target=null;T.tuned=new Set();T.locked=null;setLocked(false);renderStrings();});
   $('#autoBtn').addEventListener('click',()=>{T.auto=true;syncAuto();});
   $('#a4Down').addEventListener('click',()=>setA4(a4-1));
   $('#a4Up').addEventListener('click',()=>setA4(a4+1));
@@ -1737,7 +1809,7 @@ function renderSongList(){
   SONGS.forEach((s,i)=>{ if(SG.lang!=='all'&&s.lang!==SG.lang) return;
     const b=document.createElement('button'); b.className='prog-item'; b.setAttribute('aria-current',String(i===SG.idx));
     b.innerHTML=`<b></b><small></small>`; b.querySelector('b').textContent=s.t; b.querySelector('small').textContent=`${s.key} ・ ${s.ts||s.time+'拍子'} ・ ${s.mel?'メロディ＋伴奏':'伴奏のみ'}`;
-    b.addEventListener('click',()=>{songStop();SG.idx=i;SG.shift=0;store.set('sIdx',i);renderSongList();renderSong();if(innerWidth<860) $('#songTitle').scrollIntoView({behavior:'smooth'});});
+    b.addEventListener('click',()=>{songStop();SG.idx=i;SG.shift=0;SG.speed=100;$('#songSpeed').value=100;$('#songSpeedOut').textContent=100;store.set('sIdx',i);renderSongList();renderSong();if(innerWidth<860) $('#songTitle').scrollIntoView({behavior:'smooth'});});
     el.appendChild(b); });
 }
 function renderSong(){
@@ -2071,6 +2143,76 @@ function offerLog(mins,cat){
   pomoRender(); renderLog();
 })();
 
+/* ---------- 録音（端末内の IndexedDB に保存） ---------- */
+const REC={rec:null,stream:null,chunks:[],start:0,tick:null,raf:0,an:null,items:[],urls:{},del:null};
+function recDB(){return new Promise((ok,ng)=>{const r=indexedDB.open('fretlab-rec',1);r.onupgradeneeded=()=>r.result.createObjectStore('recs',{keyPath:'id'});r.onsuccess=()=>ok(r.result);r.onerror=()=>ng(r.error);});}
+async function recAll(){const db=await recDB();return new Promise((ok,ng)=>{const q=db.transaction('recs').objectStore('recs').getAll();q.onsuccess=()=>ok(q.result.sort((a,b)=>b.id-a.id));q.onerror=()=>ng(q.error);});}
+async function recPut(item){const db=await recDB();return new Promise((ok,ng)=>{const t=db.transaction('recs','readwrite');t.objectStore('recs').put(item);t.oncomplete=ok;t.onerror=()=>ng(t.error);});}
+async function recDel(id){const db=await recDB();return new Promise((ok,ng)=>{const t=db.transaction('recs','readwrite');t.objectStore('recs').delete(id);t.oncomplete=ok;t.onerror=()=>ng(t.error);});}
+const recFmt=ms=>{const s=Math.round(ms/1000);return pad(Math.floor(s/60))+':'+pad(s%60);};
+function recMime(){const c=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg'];return (window.MediaRecorder&&c.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t)))||'';}
+async function recToggle(){
+  if(REC.rec&&REC.rec.state==='recording'){ REC.rec.stop(); return; }
+  const msg=$('#recMsg');
+  try{
+    if(!window.MediaRecorder||!navigator.mediaDevices) throw new Error('unsupported');
+    REC.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:true}});
+    const mime=recMime(); REC.rec=new MediaRecorder(REC.stream,mime?{mimeType:mime}:undefined); REC.chunks=[];
+    REC.rec.ondataavailable=e=>{if(e.data&&e.data.size) REC.chunks.push(e.data);};
+    REC.rec.onstop=recSave;
+    REC.rec.start(250); REC.start=Date.now();
+    const c=ac(), src=c.createMediaStreamSource(REC.stream); REC.an=c.createAnalyser(); REC.an.fftSize=1024; src.connect(REC.an);
+    const buf=new Float32Array(REC.an.fftSize);
+    const lv=()=>{ if(!REC.an) return; REC.raf=requestAnimationFrame(lv); REC.an.getFloatTimeDomainData(buf); let pk=0; for(const v of buf) pk=Math.max(pk,Math.abs(v)); $('#recLevel').style.width=Math.min(100,pk*140)+'%'; };
+    lv(); REC.tick=setInterval(()=>$('#recTime').textContent=recFmt(Date.now()-REC.start),250);
+    $('#recBtn').classList.add('on'); $('#recBtn').setAttribute('aria-label','録音を停止'); msg.textContent='録音中… もう一度押すと止まります';
+  }catch(e){
+    msg.textContent=e.message==='unsupported'?'このブラウザは録音に対応していません。':'マイクを使えませんでした。マイクの使用を許可してください。';
+    recCleanup();
+  }
+}
+function recCleanup(){
+  clearInterval(REC.tick); cancelAnimationFrame(REC.raf); REC.an=null;
+  if(REC.stream) REC.stream.getTracks().forEach(t=>t.stop()); REC.stream=null;
+  $('#recBtn').classList.remove('on'); $('#recBtn').setAttribute('aria-label','録音を開始'); $('#recLevel').style.width='0';
+}
+async function recSave(){
+  const dur=Date.now()-REC.start, type=REC.rec.mimeType||REC.chunks[0]?.type||'audio/webm'; recCleanup();
+  if(dur<800||!REC.chunks.length){ $('#recMsg').textContent='短すぎるため保存しませんでした'; return; }
+  const d=new Date(), name=`練習 ${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const item={id:Date.now(),name,date:d.toISOString(),dur,type,blob:new Blob(REC.chunks,{type})};
+  try{ await recPut(item); $('#recMsg').textContent=`保存しました（${recFmt(dur)}）`; }
+  catch(e){ $('#recMsg').textContent='端末に保存できませんでした。空き容量を確認してください。'; REC.items.unshift(item); }
+  $('#recTime').textContent='00:00'; recRender();
+}
+function recExt(type){return /mp4|aac|m4a/.test(type)?'m4a':/ogg/.test(type)?'ogg':'webm';}
+async function recShare(it){
+  const fname=`fretlab-${it.name.replace(/[\/: ]/g,'-')}.${recExt(it.type)}`, file=new File([it.blob],fname,{type:it.type});
+  try{ if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:it.name}); return; } }catch(e){ if(e.name==='AbortError') return; }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=fname; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+}
+async function recRender(){
+  try{ const saved=await recAll(); const extra=REC.items.filter(x=>!saved.some(s=>s.id===x.id)); REC.items=[...extra,...saved]; }catch(e){}
+  const el=$('#recList'); el.innerHTML='';
+  Object.values(REC.urls).forEach(u=>URL.revokeObjectURL(u)); REC.urls={};
+  if(!REC.items.length){ el.innerHTML='<p class="msg">まだ録音はありません。</p>'; return; }
+  REC.items.forEach(it=>{
+    const r=document.createElement('div'); r.className='rec-item';
+    const url=URL.createObjectURL(it.blob); REC.urls[it.id]=url;
+    r.innerHTML=`<div><div class="rn"></div><div class="rd">${recFmt(it.dur)}</div></div><div class="ra"><button class="btn sv">保存</button><button class="btn dl">削除</button></div><audio controls preload="none"></audio>`;
+    r.querySelector('.rn').textContent=it.name; r.querySelector('audio').src=url;
+    r.querySelector('audio').addEventListener('play',()=>stopAllPlayback());
+    r.querySelector('.sv').addEventListener('click',()=>recShare(it));
+    const del=r.querySelector('.dl');
+    del.addEventListener('click',async()=>{
+      if(REC.del===it.id){ REC.del=null; try{await recDel(it.id);}catch(e){} REC.items=REC.items.filter(x=>x.id!==it.id); recRender(); return; }
+      REC.del=it.id; document.querySelectorAll('.rec-item .dl.confirm').forEach(b=>{b.classList.remove('confirm');b.textContent='削除';}); del.classList.add('confirm'); del.textContent='本当に削除';
+    });
+    el.appendChild(r);
+  });
+}
+(function initRec(){ $('#recBtn').addEventListener('click',recToggle); if(window.indexedDB) recRender(); else $('#recList').innerHTML='<p class="msg">この環境では録音を保存できません。</p>'; })();
+
 /* ---------- fretboard map + quiz ---------- */
 const F={mode:'name',key:0,find:-1,natural:false,quiz:null,score:0,total:0};
 const NAT=new Set([0,2,4,5,7,9,11]);
@@ -2162,7 +2304,7 @@ const TIPS=[
   {c:'リズム',t:'ドラムに合わせて弾く',b:'クリックだけより、ドラムパターンに合わせるとバンドでの「ノリ」が身につきます。8ビートとシャッフルは必ず両方練習しましょう。',a:{label:'シャッフルで鳴らす',fn:()=>{setRhythm('shuffle');setBpm(90);showTab('metronome');}}},
   {c:'理論',t:'コード進行は度数で覚える',b:'「王道進行＝IV–V–IIIm–VIm」のように度数で覚えると、どのキーでもすぐ弾けて、耳コピも速くなります。コード進行タブで「度数」表示に切り替えて練習を。',a:{label:'王道進行を開く',fn:()=>{P.idx=1;renderProgList();renderProg();showTab('progressions');}}},
   {c:'左手',t:'コードチェンジは次のコードを見ながら',b:'コード進行の再生中は「次のコード」を見て、小節の最後の拍で指を離し始めます。最初はBPM 60、伴奏「ジャーン」から。'},
-  {c:'習慣',t:'記録をつけると続く',b:'練習時間と内容を書き残すと、上達が目に見えて続けやすくなります。「連続練習」の日数を途切れさせないのが小さなモチベーションに。',a:{label:'練習記録へ',fn:()=>showTab('log')}},
+  {c:'習慣',t:'記録をつけると続く',b:'練習時間と内容を書き残すと、上達が目に見えて続けやすくなります。「連続練習」の日数を途切れさせないのが小さなモチベーションに。',a:{label:'マイ記録へ',fn:()=>showTab('log')}},
   {c:'メンテ',t:'弦は1〜3か月で交換',b:'古い弦は音程が合いにくく、チューニングが安定しません。弾き終わったらクロスで弦を拭くだけで寿命が延びます。'},
 ];
 const ROUTINE=[
@@ -2218,13 +2360,13 @@ function aiRender(){
   AI.hist.forEach(m=>{const b=document.createElement('div');b.className='bubble '+(m.role==='user'?'u':'t');b.textContent=m.content;log.appendChild(b);});
 }
 async function aiMake(){
-  if(AI.busy) return; AI.busy=true; const btn=$('#aiMake'), msg=$('#aiMakeMsg'); btn.disabled=true; msg.textContent='先生を呼んでいます…';
+  if(AI.busy) return; AI.busy=true; const btn=$('#aiMake'), msg=$('#aiMakeMsg'); btn.disabled=true; msg.textContent='コーチを呼んでいます…';
   try{
     const r=await fetch(AI_ENDPOINT+'/character',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({preset:AI.preset==='おまかせ'?undefined:AI.preset,wish:$('#aiWish').value.trim()||undefined})});
     if(r.status===429) throw new Error('混み合っています。1分ほど待ってからもう一度押してください。');
-    const j=await r.json(); if(!r.ok||!j.character) throw new Error('先生を作れませんでした。書き方を変えてもう一度お試しください。');
+    const j=await r.json(); if(!r.ok||!j.character) throw new Error('コーチを作れませんでした。書き方を変えてもう一度お試しください。');
     AI.char=j.character; AI.hist=[]; store.set('aiChar',AI.char); store.set('aiHist',AI.hist); msg.textContent=''; aiRender();
-  }catch(e){ msg.textContent=e.message.startsWith('混み')||e.message.startsWith('先生')?e.message:'通信できませんでした。電波の良い場所でもう一度お試しください。'; }
+  }catch(e){ msg.textContent=e.message.startsWith('混み')||e.message.startsWith('コーチ')?e.message:'通信できませんでした。電波の良い場所でもう一度お試しください。'; }
   finally{ AI.busy=false; btn.disabled=false; }
 }
 async function aiSend(text){

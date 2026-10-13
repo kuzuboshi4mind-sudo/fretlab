@@ -1,6 +1,6 @@
-// Fretlab「AI先生」API（Cloudflare Workers）
-//   POST /character  希望から先生キャラクターを作る（JSON を返す）
-//   POST /chat       先生キャラとして返事をする（テキストを少しずつ流す）
+// Fretlab「レッスンコーチ」API（Cloudflare Workers）
+//   POST /character  希望からコーチのキャラクターを作る（JSON を返す）
+//   POST /chat       コーチとして返事をする（テキストを少しずつ流す）
 // Anthropic の API キーはこのサーバーの secret（ANTHROPIC_API_KEY）にだけ置き、アプリには渡さない。
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
@@ -15,7 +15,7 @@ interface Env {
 const MODEL = "claude-opus-5-5";
 
 const CharacterSchema = z.object({
-  name: z.string().describe("先生の名前（日本語、2〜8文字程度）"),
+  name: z.string().describe("コーチの名前（日本語、2〜8文字程度）"),
   symbol: z.string().describe("アイコンに表示する1文字（漢字・ひらがな・英字のいずれか）"),
   catchphrase: z.string().describe("口癖やひとことキャッチコピー（30文字以内）"),
   personality: z.string().describe("性格と教え方の特徴（80文字以内）"),
@@ -46,7 +46,7 @@ const CharacterBody = z.object({
   wish: z.string().max(400).optional(),
 });
 
-const APP_GUIDE = `あなたはギター練習アプリ「Fretlab」に住んでいる先生キャラクターです。
+const APP_GUIDE = `あなたはギター練習アプリ「Fretlab」のレッスンコーチです。
 アプリには次の機能があります。必要なときだけ、具体的にどの画面で何をすればよいかを案内してください。
 - メトロノーム：BPM 30〜260、クリック音色10種、ドラムパターン15種（8ビート、シャッフル、ボサノヴァなど）、数小節ごとにテンポを上げるスピードトレーナー
 - チューナー：ギター・ベース4弦/5弦・ウクレレ。マイクで音程を測る
@@ -106,7 +106,7 @@ async function makeCharacter(client: Anthropic, body: z.infer<typeof CharacterBo
     max_tokens: 4000,
     output_config: { effort: "low", format: zodOutputFormat(CharacterSchema) },
     system:
-      "ギター練習アプリの先生キャラクターを1人作ってください。生徒の希望に合わせ、親しみやすく個性のある人物にします。実在の人物や既存作品のキャラクターは使わず、オリジナルにしてください。",
+      "ギター練習アプリのレッスンコーチのキャラクターを1人作ってください。生徒の希望に合わせ、親しみやすく個性のある人物にします。実在の人物や既存作品のキャラクターは使わず、オリジナルにしてください。",
     messages: [{ role: "user", content: wish }],
   });
   if (response.stop_reason === "refusal") return null;
