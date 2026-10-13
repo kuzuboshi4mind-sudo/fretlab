@@ -214,7 +214,20 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .tone{display:flex;flex-direction:column;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:4px 10px;min-width:48px}
 .tone b{font-family:var(--display);font-size:20px}
 .tone small{font-size:11px;color:var(--muted);font-family:var(--mono)}
-.voicings{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.voicings{display:flex;flex-direction:column;gap:12px}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.vhead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-top:10px}
+.vhead b{font-family:var(--serif);font-size:18px;letter-spacing:.06em}
+.voicing{position:relative}
+.vpos{position:absolute;top:10px;left:12px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.voicing.tri .vl{color:var(--third)}
+.voicing.featured{position:relative;padding:28px 22px 20px;border:1px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(135deg,var(--gold-a),var(--gold-b) 45%,var(--cobalt-a)) border-box;box-shadow:0 10px 30px color-mix(in srgb,var(--root) 18%,transparent)}
+.feat-badge{position:absolute;top:-11px;left:20px;background:linear-gradient(180deg,var(--gold-a),var(--gold-b));color:#1a140a;font-size:11.5px;font-weight:700;letter-spacing:.2em;padding:3px 12px;border-radius:999px}
+.feat-body{display:flex;gap:24px;align-items:center;flex-wrap:wrap;justify-content:center}
+.feat-body .diagram{width:260px}
+.feat-info{display:flex;flex-direction:column;gap:6px;min-width:0;align-items:flex-start}
+.feat-name{font-family:var(--display);font-size:44px;font-weight:500;line-height:1;background:linear-gradient(180deg,var(--cobalt-a),var(--cobalt-b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.feat-info .msg{margin:2px 0 6px}
 .voicing{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px}
 .voicing .vl{font-size:12px;color:var(--muted);text-align:center}
 .voicing .tab-str{font-family:var(--mono);font-size:12px;letter-spacing:.1em}
@@ -235,7 +248,13 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 
 /* tips */
 .tips-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
+.tips-grid.lore{grid-template-columns:minmax(0,1fr)}
+.tips-grid.lore .routine{display:none}
+.tips-grid.lore #tipList{columns:2 340px;column-gap:32px}
+.tips-grid.lore .tip{break-inside:avoid}
 .tip{border-top:1px solid var(--line);padding-block:14px}
+#tipMode{align-self:flex-start}
+.tip h3,.panel-head h2,.vhead b{word-break:auto-phrase}
 .tip:first-child{border-top:0;padding-top:0}
 .tip .cat{font-size:11.5px;letter-spacing:.08em;color:var(--root);font-weight:700}
 .tip h3{font-size:16.5px;margin-block:2px 4px}
@@ -503,7 +522,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
     <button class="tab" role="tab" data-tab="tab">TAB</button>
     <button class="tab" role="tab" data-tab="log">マイ記録</button>
     <button class="tab" role="tab" data-tab="ai">レッスンコーチ</button>
-    <button class="tab" role="tab" data-tab="tips">Tips</button>
+    <button class="tab" role="tab" data-tab="tips">ヒント</button>
   </nav>
 
   <!-- METRONOME -->
@@ -603,7 +622,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 
   <!-- CHORDS -->
   <section data-panel="chords" hidden>
-    <div class="panel-head"><div><h2>コード一覧</h2><p>ルートとコードタイプを選ぶと、押さえ方を3〜4通り表示します。丸の中は度数（R=ルート、3=3度、5=5度、♭7=短7度）。</p></div></div>
+    <div class="panel-head"><div><h2>コード一覧</h2><p>ルートとコードタイプを選ぶと、いちばん定番の押さえ方と、0〜12フレットのポジション別の押さえ方をすべて表示します。丸の中は度数（R=ルート、3=3度、5=5度、♭7=短7度）。</p></div></div>
     <div class="stack">
       <div><span class="label">ルート</span><div class="chips" id="chordRoots"></div></div>
       <div><span class="label">タイプ</span><div class="chips" id="chordTypes"></div></div>
@@ -851,10 +870,13 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 
   <!-- TIPS -->
   <section data-panel="tips" hidden>
-    <div class="panel-head"><div><h2>練習Tips</h2><p>上達が早い人がやっている習慣と、毎日30分のメニュー例。<a href="https://kuzuboshi4mind-sudo.github.io/fretlab/about/" target="_blank" rel="noopener">Fretlab について →</a></p></div>
-      <div class="chips" id="tipCats"></div></div>
+    <div class="panel-head"><div><h2>ヒント</h2><p>上達が早い人がやっている練習のコツと、知っておくとギターがもっと面白くなる豆知識。<a href="https://kuzuboshi4mind-sudo.github.io/fretlab/about/" target="_blank" rel="noopener">Fretlab について →</a></p></div></div>
+    <div class="stack" style="margin-bottom:14px">
+      <div class="seg" id="tipMode"><button data-v="tips">練習のヒント</button><button data-v="lore">ギター豆知識</button></div>
+      <div class="chips" id="tipCats"></div>
+    </div>
     <p class="msg" style="margin:-6px 0 14px">音源：Fluid (R3) General MIDI SoundFont（Frank Wen, MIT License）を使用しています。</p>
-    <div class="tips-grid">
+    <div class="tips-grid" id="tipsGrid">
       <div class="card" id="tipList"></div>
       <div class="card routine">
         <b>今日の30分メニュー</b>
@@ -960,6 +982,52 @@ function voicings(root,type){
     cands.push({frets:off.map(o=>o===null?null:r+o),label:(r===0?'オープンコード':`${sh.str}弦ルート（${k}フォーム）`),r});
   }
   cands.sort((a,b)=>a.r-b.r).forEach(c=>add(c.frets,c.label));
+  return out;
+}
+// C・G フォーム（CAGED の残り2つ）：ルートの弦の開放音 base、ルートフレットからのオフセット
+const EXTRA_SHAPES={
+  C:{base:9,str:5,maj:[null,0,-1,-3,-2,-3],m:[null,0,-2,-3,-2,0],'7':[null,0,-1,0,-2,-3],M7:[null,0,-1,-3,-3,-3]},
+  G:{base:4,str:6,maj:[0,-1,-3,-3,-3,0],'7':[0,-1,-3,-3,-3,-2],M7:[0,-1,-3,-3,-3,-1]},
+};
+const INV_NAME=['基本形','第1転回形','第2転回形','第3転回形'];
+// 0〜12フレットのあらゆるポジションの押さえ方（コード一覧用）
+function allVoicings(root,type){
+  const ch=CHORDS.find(c=>c.id===type), pcs=new Set(ch.iv.map(i=>(root+i)%12)), out=[], seen=new Set();
+  const add=(frets,label,fam)=>{const k=frets.join(',');if(seen.has(k))return;
+    const f=frets.filter(x=>x!==null&&x>0); if(f.length&&(Math.max(...f)>15||Math.min(...f)>12)) return;
+    seen.add(k); out.push({frets,label,fam,pos:f.length?Math.min(...f):0});};
+  if(OPEN[root]&&OPEN[root][type]) add(OPEN[root][type],'オープンコード','open');
+  const fams={...SHAPES,...EXTRA_SHAPES};
+  for(const k of ['E','A','D','C','G']){
+    const sh=fams[k], off=sh[type]; if(!off) continue;
+    const r0=(root-sh.base+12)%12;
+    for(const r of [r0,r0+12]){
+      if(off.some(o=>o!==null&&r+o<0)) continue;
+      const frets=off.map(o=>o===null?null:r+o);
+      add(frets,r===0&&k!=='C'&&k!=='G'?'オープンコード':`${k}フォーム（${sh.str}弦ルート）`,k);
+    }
+  }
+  // 弦3〜4本の形（トライアド／4和音）。ポジションを変えて指板全体に
+  const n=ch.iv.length;
+  const groups=n===3?[[3,4,5],[2,3,4]]:n===4?[[2,3,4,5]]:[];
+  const gname=g=>`${6-g[g.length-1]}〜${6-g[0]}弦`;
+  for(const g of groups){
+    for(let b=0;b<=12;b++){
+      const lo=b, hi=b+3;
+      const rec=(i,acc)=>{
+        if(i===g.length){
+          const fr=acc, mn=Math.min(...fr), mx=Math.max(...fr); if(mn!==b||mx-mn>3) return;
+          const ps=fr.map((f,j)=>(STD[g[j]]+f)%12); if(new Set(ps).size!==pcs.size||!ps.every(p=>pcs.has(p))) return;
+          const frets=[null,null,null,null,null,null]; g.forEach((s,j)=>frets[s]=fr[j]);
+          const bassIv=ch.iv.map(x=>x%12).indexOf((ps[0]-root+12)%12);
+          add(frets,`${gname(g)}・${INV_NAME[bassIv]??''}`,'tri');
+          return;
+        }
+        for(let f=lo;f<=hi;f++){ const p=(STD[g[i]]+f)%12; if(pcs.has(p)) rec(i+1,[...acc,f]); }
+      };
+      rec(0,[]);
+    }
+  }
   return out;
 }
 /*END*/
@@ -1493,11 +1561,22 @@ function renderChord(){
   $('#chordName').textContent=nn(r,r)+ch.sym;
   $('#chordTypeName').textContent=`${ch.name}　構成音`;
   $('#chordTones').innerHTML=ch.iv.map(i=>`<div class="tone"><b>${nn(r+i,r)}</b><small>${chordDeg(i,ch.id)}</small></div>`).join('');
-  const vs=voicings(r,ch.id), el=$('#voicings'); el.innerHTML='';
-  vs.forEach(v=>{
-    const d=document.createElement('div'); d.className='card voicing';
-    d.innerHTML=`${diagram(v.frets,r,ch.id)}<div class="tab-str">${v.frets.map(f=>f===null?'x':f).join('-')}</div><div class="vl">${v.label}</div><button class="btn">▶ 鳴らす</button>`;
-    d.querySelector('button').addEventListener('click',()=>strum(v.frets)); el.appendChild(d);
+  // いちばん定番の形を特別扱いで先頭に、残りはポジション（0〜12フレット）順に
+  const std=voicings(r,ch.id)[0], all=allVoicings(r,ch.id), el=$('#voicings'); el.innerHTML='';
+  const key=f=>f.join(','), rest=all.filter(v=>!std||key(v.frets)!==key(std.frets)).sort((a,b)=>a.pos-b.pos||(a.fam==='tri')-(b.fam==='tri'));
+  const tabStr=f=>f.map(x=>x===null?'x':x).join('-');
+  if(std){
+    const d=document.createElement('div'); d.className='card voicing featured';
+    d.innerHTML=`<div class="feat-badge">定番フォーム</div><div class="feat-body">${diagram(std.frets,r,ch.id)}<div class="feat-info"><div class="feat-name"></div><div class="vl">${std.label}</div><div class="tab-str">${tabStr(std.frets)}</div><p class="msg">いちばんよく使われる、まず覚えたい押さえ方です。</p><button class="btn primary">▶ 鳴らす</button></div></div>`;
+    d.querySelector('.feat-name').textContent=nn(r,r)+ch.sym;
+    d.querySelector('button').addEventListener('click',()=>strum(std.frets)); el.appendChild(d);
+  }
+  const h=document.createElement('div'); h.className='vhead'; h.innerHTML=`<b>ポジション別の押さえ方</b><span class="msg">0〜12フレット・${rest.length}通り</span>`; el.appendChild(h);
+  const grid=document.createElement('div'); grid.className='vgrid'; el.appendChild(grid);
+  rest.forEach(v=>{
+    const d=document.createElement('div'); d.className='card voicing'+(v.fam==='tri'?' tri':'');
+    d.innerHTML=`<div class="vpos">${v.pos===0?'開放':v.pos+'フレット'}</div>${diagram(v.frets,r,ch.id)}<div class="tab-str">${tabStr(v.frets)}</div><div class="vl">${v.label}</div><button class="btn">▶ 鳴らす</button>`;
+    d.querySelector('button').addEventListener('click',()=>strum(v.frets)); grid.appendChild(d);
   });
   const set=new Set(ch.iv.map(i=>(r+i)%12));
   renderBoard($('#chordBoard'),(s,f,m)=>{const pc=m%12;if(!set.has(pc))return null;const semi=(pc-r+12)%12;return {kind:kindOf(semi),label:chordDeg(semi,ch.id)};});
@@ -2325,18 +2404,82 @@ const TIPS=[
   {c:'左手',t:'コードチェンジは次のコードを見ながら',b:'コード進行の再生中は「次のコード」を見て、小節の最後の拍で指を離し始めます。最初はBPM 60、伴奏「ジャーン」から。'},
   {c:'習慣',t:'記録をつけると続く',b:'練習時間と内容を書き残すと、上達が目に見えて続けやすくなります。「連続練習」の日数を途切れさせないのが小さなモチベーションに。',a:{label:'マイ記録へ',fn:()=>showTab('log')}},
   {c:'メンテ',t:'弦は1〜3か月で交換',b:'古い弦は音程が合いにくく、チューニングが安定しません。弾き終わったらクロスで弦を拭くだけで寿命が延びます。'},
+  {c:'リズム',t:'メトロノームに声でカウントを重ねる',b:'「ワン・ツー・スリー・フォー」と声に出しながら弾くと、拍の頭が体に入ります。特に休符の多いフレーズで効果的です。'},
+  {c:'リズム',t:'16分は「1 e & a」で数える',b:'1拍を4つに割って「ワン・イー・エン・ア」と数えると、16分のカッティングやシンコペーションの位置が正確になります。'},
+  {c:'左手',t:'バレーコードは人差し指の「横側」で',b:'人差し指の腹の真ん中ではなく、親指側に少し倒した骨の硬い部分で押さえると、少ない力で全部の弦が鳴ります。肘を体に少し寄せるのもコツ。'},
+  {c:'左手',t:'親指はネックの裏の真ん中あたりに',b:'コードを押さえるときは親指をネック裏の中央付近に置くと、指が広がりやすくなります。単音のチョーキングでは親指をネックの上に出して握り込むと安定します。'},
+  {c:'左手',t:'チョーキングは3本の指で押し上げる',b:'薬指で弦を押し上げるとき、中指と人差し指も同じ弦に添えて3本で支えると、音程が安定します。目標の音（例：2フレット上の音）を先に鳴らして耳で確認しましょう。'},
+  {c:'左手',t:'ビブラートは手首で揺らす',b:'指だけで揺らすより、ドアノブを回すように手首ごと動かすと、ゆったり大きなビブラートになります。メトロノームに合わせて「4分で1回」から。'},
+  {c:'右手',t:'ピックは浅く持つ',b:'ピックの先が弦に2〜3mm当たる程度に短く持つと、引っかかりが減ってコントロールしやすくなります。親指と人差し指の横で、軽くつまむだけで十分です。'},
+  {c:'右手',t:'アップピッキングを鍛える',b:'ダウンより弱くなりがちなアップの音量をそろえると、演奏が一気に安定します。アップだけで8分を弾く練習を1日1分。'},
+  {c:'理論',t:'ダイアトニックコードを1つ覚える',b:'Cメジャーキーなら C・Dm・Em・F・G・Am・Bm7(♭5)。この7つの並び（メジャー・マイナー・マイナー・メジャー・メジャー・マイナー・ディミニッシュ）はどのキーでも同じです。'},
+  {c:'耳',t:'チューニングは耳でも確かめる',b:'5フレットと次の弦の開放（3弦→2弦だけは4フレット）を同時に鳴らし、音のうなり（ワウワウ揺れる音）が消えれば合っています。耳の訓練にもなります。'},
+  {c:'習慣',t:'練習の最初の5分は「できること」から',b:'いきなり難しい課題に入るより、弾ける曲やフレーズでウォームアップすると、指も気持ちもほぐれて集中しやすくなります。'},
+  {c:'習慣',t:'痛みが出たらすぐ休む',b:'指先の痛みは最初の数週間でおさまりますが、手首や腕の痛みは無理をすると長引きます。25分ごとに手を振ってほぐし、痛みが続くときは練習を休みましょう。',a:{label:'タイマーで区切る',fn:()=>showTab('log')}},
+  {c:'メンテ',t:'弦交換は1本ずつ',b:'全部外すとネックの張力が一気に変わります。1本ずつ交換すれば、ブリッジやナットの位置もずれにくく、チューニングも早く安定します。'},
+  {c:'メンテ',t:'湿度は40〜60%に',b:'乾燥しすぎると指板が縮んでフレットの端が出たり、木が割れたりします。湿度が高いとネックが反りやすくなります。ケースに湿度調整剤を入れるのも手です。'},
+  {c:'メンテ',t:'ネックの反りは12フレット付近で確認',b:'1フレットと最終フレットを押さえたまま、7〜9フレット付近の弦とフレットのすき間を見ます。名刺1枚ほどのわずかなすき間が一般的な目安です。トラスロッドの調整は少しずつ、自信がなければ楽器店に。'},
 ];
+// ギター豆知識（歴史・種類・木材・電装・弦とパーツ・アンプとエフェクト・雑学）
+const LORE=[
+  {c:'歴史',t:'ギターの祖先はリュートやビウエラ',b:'中東のウード、ヨーロッパのリュート、16世紀スペインのビウエラなどが祖先とされます。複弦（2本1組）の時代を経て、18世紀の終わりごろに今と同じ「単弦6本」の形が広まりました。'},
+  {c:'歴史',t:'現代のクラシックギターを形にしたトーレス',b:'19世紀スペインの製作家アントニオ・デ・トーレスが、大きめのボディと扇状の力木（ファン・ブレイシング）で、豊かに響く現代のクラシックギターの基準を作りました。'},
+  {c:'歴史',t:'スチール弦とX型の力木',b:'ドイツから渡米したC.F.マーティンが1833年にニューヨークで工房を開き、のちに強いスチール弦の張力に耐える「X型ブレイシング」を広めました。今のアコースティックギターの多くがこの構造です。'},
+  {c:'歴史',t:'「ドレッドノート」は戦艦の名前',b:'大きく低音豊かなボディ形状「ドレッドノート」は、イギリスの戦艦ドレッドノート号にちなんだ名前です。マーティン社が20世紀前半に作り、フォークやブルーグラスの定番になりました。'},
+  {c:'歴史',t:'エレキギターの始まり',b:'1930年代、バンドの中でギターの音を大きくするために電気で音を拾う工夫が始まりました。1931年ごろのリッケンバッカー「フライングパン」（ラップスチール）が、商業的に成功した初期の電気楽器として知られます。'},
+  {c:'歴史',t:'ソリッドボディの時代へ',b:'1950年ごろフェンダーが量産型のソリッドボディ（のちのテレキャスター）を発売し、1952年にギブソン・レスポール、1954年にストラトキャスターが登場。中が空洞でない板のボディは、大音量でもハウリングしにくいのが利点でした。'},
+  {c:'歴史',t:'ハムバッカーの誕生',b:'ギブソンの技術者セス・ラヴァーが、ノイズを打ち消す2コイルのピックアップを考案。1950年代後半から使われ、特許出願中を意味する「P.A.F.（Patent Applied For）」の呼び名で今も伝説的です。'},
+  {c:'歴史',t:'日本のエレキブーム',b:'1960年代半ば、ベンチャーズの来日などをきっかけに日本でエレキブームが起こりました。これを機に国内のギターメーカーも大きく成長しました。'},
+  {c:'種類',t:'クラシックギター',b:'ナイロン弦で、柔らかく丸い音。ネックが太く指板が平らで、指で弾くのが基本です。ネックとボディは12フレットでつながるものが一般的。'},
+  {c:'種類',t:'アコースティック（フォーク）ギター',b:'スチール弦で、明るく張りのある音。14フレットでボディとつながるものが主流です。ボディの形で響きが変わり、ドレッドノートは低音豊か、OMや000はバランス型、パーラーは小ぶりで甘い音。'},
+  {c:'種類',t:'エレアコ',b:'アコースティックギターにピックアップ（多くはブリッジの下のピエゾ式）とプリアンプを内蔵したもの。生音でも弾けて、アンプやPAにつなげばライブでも使えます。'},
+  {c:'種類',t:'ソリッド・セミホロウ・フルアコ',b:'ソリッドは中が詰まった板のボディで、ロックの定番。セミホロウ（ES-335など）は中央に芯材を入れた空洞ボディで、甘さとハウリングへの強さを両立。フルアコは完全な空洞ボディで、ジャズの温かい音に向きます。'},
+  {c:'種類',t:'スケール（弦長）の違い',b:'ナットからブリッジまでの長さを「スケール」と呼びます。フェンダー系は約648mm、ギブソン系は約628mm。短いほど弦の張りが弱く押さえやすく、音は少し太めになります。'},
+  {c:'種類',t:'12弦ギター',b:'6組の弦を2本ずつ張ったギター。低い4組はオクターブ違い、高い2組は同じ音で張るのが一般的で、きらびやかで広がりのある音になります。'},
+  {c:'種類',t:'エレキベースの誕生',b:'1951年にフェンダーが「プレシジョン・ベース」を発売。フレットがあるので音程を正確に（プレシジョン）弾けることが名前の由来です。標準チューニングはギターの低い4本（E・A・D・G）の1オクターブ下。'},
+  {c:'木材',t:'トップ材：スプルースとシダー',b:'アコギの表板（トップ）の代表はスプルース（松の仲間）とシダー（杉の仲間）。スプルースは硬く明るい音で立ち上がりが速く、シダーは柔らかく温かい音で、クラシックギターにも多く使われます。'},
+  {c:'木材',t:'サイド・バック材の個性',b:'ローズウッドは倍音が豊かで低音に深みがあり、マホガニーは中音域が太く温かい音、メイプルは輪郭がはっきりしたタイトな音になる傾向があります。'},
+  {c:'木材',t:'エレキのボディ材',b:'アルダーはバランスの良い音でストラトキャスターの定番、アッシュは明るくきらびやか。マホガニーにメイプルを貼り合わせたボディ（レスポールなど）は、太く甘い音と輪郭を両立します。'},
+  {c:'木材',t:'指板材で変わる手触りと音',b:'ローズウッドは温かい音でしっとりした手触り、メイプルは明るくアタックが強い音、エボニー（黒檀）は硬く引き締まった音で高級ギターに多く使われます。'},
+  {c:'木材',t:'単板と合板',b:'1枚の木から切り出した「単板」はよく振動し、弾き込むほど鳴りが育つといわれます。薄い板を張り合わせた「合板」は丈夫で、温度や湿度の変化に強いのが長所です。'},
+  {c:'木材',t:'ハカランダは特別な木',b:'ブラジリアン・ローズウッド（ハカランダ）は名器に使われた銘木ですが、資源保護のため1992年からワシントン条約で国際取引が厳しく制限されています。'},
+  {c:'電装',t:'ピックアップの仕組み',b:'磁石に細い銅線を何千回も巻いたものがピックアップです。弦（鉄）が振動すると磁界が揺れ、コイルに小さな電気が生まれます。これがアンプで大きくされて音になります。'},
+  {c:'電装',t:'シングルコイルとハムバッカー',b:'シングルコイルは明るくシャープな音ですが、電源などのノイズ（ハム）を拾いやすい性質があります。ハムバッカーは2つのコイルを逆向きに組み合わせてノイズを打ち消し、太く出力の大きい音になります。'},
+  {c:'電装',t:'P-90',b:'シングルコイルの一種ですが、幅が広くコイルの巻き数が多いため、シングルの明るさとハムバッカーに近い太さをあわせ持ちます。荒々しいロックやブルースで人気です。'},
+  {c:'電装',t:'磁石の種類：アルニコとセラミック',b:'アルニコ（アルミ・ニッケル・コバルトの合金）は柔らかく温かい音、セラミック磁石は出力が強くパワフルな音になる傾向があります。'},
+  {c:'電装',t:'ボリュームとトーンのつまみの中身',b:'つまみの中身は「ポット（可変抵抗）」で、シングルコイルには250kΩ、ハムバッカーには500kΩがよく使われます。トーンはポットとコンデンサーで高音を削る、シンプルなフィルターです。'},
+  {c:'電装',t:'ストラトの5ウェイスイッチ',b:'初期のストラトは3段階の切り替えでしたが、演奏者がスイッチを中間で止めて「ハーフトーン」を使うようになり、のちに5段階が標準になりました。'},
+  {c:'電装',t:'アクティブとパッシブ',b:'普通のピックアップは電池のいらない「パッシブ」。電池でプリアンプを動かす「アクティブ」は、ノイズが少なく出力が大きく安定します。電池が切れると音が出ないので注意。'},
+  {c:'電装',t:'弦をさわるとノイズが減るのはなぜ？',b:'弦はブリッジを通してアースにつながっています。体が弦にふれると、体が拾ったノイズがアースに逃げるため「ジー」という音が小さくなります。'},
+  {c:'電装',t:'シールドが長いと音がこもる',b:'ケーブル（シールド）は長いほど電気をためる性質（静電容量）が大きくなり、高音が少し削られます。パッシブのギターでは、必要以上に長いケーブルを使わないのがコツです。'},
+  {c:'弦・パーツ',t:'弦のゲージ（太さ）',b:'エレキは「09-42」や「10-46」（1弦と6弦の太さ、1/1000インチ）が定番。太い弦は音が太く張りが強く、細い弦はチョーキングしやすく押さえやすくなります。'},
+  {c:'弦・パーツ',t:'ナットとサドル',b:'弦を支える上下の小さなパーツで、牛骨・人工素材・プラスチックなどがあります。小さな部品ですが、音の伸びや明るさ、チューニングの安定に影響します。'},
+  {c:'弦・パーツ',t:'トラスロッド',b:'ネックの中に入っている金属の棒で、弦の張力でネックが反るのを調整します。季節の変わり目には、ネックの状態を時々チェックしましょう。'},
+  {c:'弦・パーツ',t:'オクターブ調整',b:'12フレットのハーモニクスと、12フレットを押さえた音が同じになるように、サドルの位置を前後に動かす調整です。ずれていると、ハイポジションでコードが濁ります。'},
+  {c:'弦・パーツ',t:'弦高',b:'12フレットでの弦とフレットのすき間。低いほど押さえやすく、低すぎると音がビビります。エレキで1.5〜2mm前後、アコギで2〜2.5mm前後（6弦側）が一般的な目安です。'},
+  {c:'アンプ・エフェクト',t:'真空管アンプの魅力',b:'真空管アンプは音量を上げたときの歪み方が自然で、弾き方の強弱に反応しやすいのが特徴です。最近はその特性を再現したモデリングアンプも高性能になっています。'},
+  {c:'アンプ・エフェクト',t:'歪みの3兄弟',b:'オーバードライブはアンプを押し上げたような自然な歪み、ディストーションは深く濃い歪み、ファズは音を四角い波形に近づけたような荒く太い歪みです。'},
+  {c:'アンプ・エフェクト',t:'エフェクターのつなぐ順番',b:'定番は「チューナー → ワウ → コンプ → 歪み → モジュレーション（コーラスなど）→ ディレイ → リバーブ」。音を作る系を前に、空間系を後ろに置くのが基本です。'},
+  {c:'雑学',t:'12フレットは弦のちょうど真ん中',b:'弦の長さの半分の位置が12フレット。ここを押さえると開放弦のちょうど1オクターブ上の音になります。だからフレットの間隔は、ボディに近づくほど狭くなっていきます。'},
+  {c:'雑学',t:'標準チューニングの「例外」',b:'隣り合う弦の音程はほとんどが完全4度（5フレット分）ですが、3弦と2弦の間だけが長3度（4フレット分）。そのおかげでコードが押さえやすくなっています。'},
+  {c:'雑学',t:'ハーモニクスが出る場所',b:'12・7・5フレットの真上に軽く触れて弾くと、鈴のような倍音（ハーモニクス）が鳴ります。弦の長さを1/2・1/3・1/4に分ける位置です。'},
+  {c:'雑学',t:'基準の音はA＝440Hz',b:'多くの音楽で、ラ（A4）を440Hzに合わせるのが国際的な標準です。オーケストラでは441〜442Hzに合わせることもあり、チューナーの「基準ピッチ」で変えられます。',a:{label:'チューナーへ',fn:()=>showTab('tuner')}},
+  {c:'雑学',t:'ピックの昔と今',b:'昔はべっ甲（ウミガメの甲羅）のピックが使われていましたが、今は保護のため使われません。セルロイド、ナイロン、ポリアセタールなど、素材ごとに音と弾き心地が違います。'},
+];
+
 const ROUTINE=[
   {t:'チューニング',m:1},{t:'ストレッチと指慣らし（クロマチック 1-2-3-4）',m:5},
   {t:'コード進行（今週の1パターンをドラムに合わせて）',m:5},{t:'スケール（今週の1ポジション、メトロノームで）',m:7},
   {t:'リズム（8分・16分のカッティング）',m:5},{t:'曲・フレーズ練習 / 耳コピ',m:7},
 ];
-let tipCat='すべて';
+let tipCat='すべて', tipMode='tips';
 function renderTips(){
-  const cats=['すべて',...new Set(TIPS.map(t=>t.c))];
+  const src=tipMode==='tips'?TIPS:LORE;
+  $('#tipsGrid').classList.toggle('lore',tipMode==='lore');
+  const cats=['すべて',...new Set(src.map(t=>t.c))];
   $('#tipCats').innerHTML=''; cats.forEach(c=>{const b=document.createElement('button');b.className='chip';b.textContent=c;b.setAttribute('aria-pressed',String(c===tipCat));b.addEventListener('click',()=>{tipCat=c;renderTips();});$('#tipCats').appendChild(b);});
   const list=$('#tipList'); list.innerHTML='';
-  TIPS.filter(t=>tipCat==='すべて'||t.c===tipCat).forEach(t=>{
+  src.filter(t=>tipCat==='すべて'||t.c===tipCat).forEach(t=>{
     const d=document.createElement('div');d.className='tip';
     d.innerHTML=`<div class="cat">${t.c}</div><h3>${t.t}</h3><p>${t.b}</p>`;
     if(t.a){const b=document.createElement('button');b.className='btn';b.textContent=t.a.label+' →';b.addEventListener('click',t.a.fn);d.appendChild(b);}
@@ -2353,6 +2496,7 @@ function renderRoutine(){
   $('#routineBar').style.width=(mins/tot*100)+'%';
   $('#routineMsg').textContent=mins===tot?'今日のメニュー完了。おつかれさまでした！':`${mins} / ${tot} 分`;
 }
+segInit($('#tipMode'),'tips',v=>{tipMode=v;tipCat='すべて';renderTips();});
 renderTips(); renderRoutine();
 
 /* ---------- AI先生 ---------- */
