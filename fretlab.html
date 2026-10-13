@@ -112,6 +112,14 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .mini label{font-size:12px;color:var(--muted)}
 .mini input{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-family:var(--mono)}
 
+/* tuner：この画面だけは明るい表示でも黒地に白 */
+[data-panel="tuner"]{
+  --bg:#0e100f; --surface:#161917; --panel:#1e221f; --line:#2c312d;
+  --fg:#f3f5f2; --muted:#9ba39c; --accent:#f3f5f2; --accent-ink:#0e100f; --accent-soft:#232a24;
+  --good:#7fd69a; --warn:#f0b35a; --root:#d9b56c;
+  color-scheme:dark; color:var(--fg); background:var(--bg); border-radius:22px; padding:20px 16px 22px; margin-inline:-4px}
+[data-panel="tuner"] .panel-head p{color:var(--muted)}
+[data-panel="tuner"] .card{background:var(--surface)}
 /* tuner */
 .tuner{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px;align-items:start}
 .tuner-main{display:flex;flex-direction:column;gap:12px}
@@ -251,6 +259,14 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .seg-c .ch:hover{color:var(--root)}
 .seg-c .ly{font-size:17px;line-height:1.5}
 .sheet.en .seg-c .ly{font-family:var(--display);font-size:20px}
+.seg-c .ch.now{color:var(--root)}
+.sline{border-radius:8px;transition:background .15s;padding-inline:4px;margin-inline:-4px}
+.sline.now{background:color-mix(in srgb,var(--root) 10%,transparent)}
+.capo-badge{display:flex;gap:14px;align-items:center;padding:10px 14px;border:1px solid var(--root);border-radius:12px;background:color-mix(in srgb,var(--root) 8%,transparent)}
+.capo-badge svg{width:110px;flex:0 0 auto}
+.capo-badge .cb-neck{fill:var(--wood)} .capo-badge .cb-fret{stroke:var(--fretwire);stroke-width:2} .capo-badge .cb-bar{fill:var(--root)}
+.capo-badge b{display:block;font-family:var(--display);font-size:26px;font-weight:600;letter-spacing:.08em;color:var(--root);line-height:1}
+.capo-badge span{font-size:13px;color:var(--muted)}
 .song-chords{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .song-chords .card{padding:10px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
 .song-chords .cn{font-family:var(--display);font-size:24px;font-weight:500}
@@ -269,6 +285,45 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .tabsheet .tabclef{font-family:var(--display);font-size:13px;font-weight:600;fill:var(--muted);letter-spacing:.1em}
 .tabsheet .dur{stroke:var(--muted);stroke-width:1}
 .tabsheet .cnt{font-family:var(--mono);font-size:10px;fill:var(--muted);text-anchor:middle}
+
+/* practice log (pomodoro) */
+.pomo{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:start}
+.pomo-main{display:flex;flex-direction:column;align-items:center;gap:16px;padding-block:22px}
+.ring-wrap{position:relative;width:min(260px,72vw);aspect-ratio:1;max-width:100%}
+.ring{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:8}
+.ring-bg{stroke:var(--line)}
+.ring-fg{stroke:var(--root);stroke-linecap:round;stroke-dasharray:603.2;stroke-dashoffset:603.2;transition:stroke-dashoffset .9s linear,stroke .3s}
+.pomo-main.done .ring-fg{stroke:var(--good)}
+.pomo-main.break .ring-fg{stroke:var(--third)}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pomo-time{font-family:var(--display);font-weight:300;font-size:64px;line-height:1;font-variant-numeric:lining-nums tabular-nums}
+.pomo-state{font-size:12px;letter-spacing:.2em;color:var(--muted);margin-top:6px}
+.pomo-msg{min-height:1.7em;font-weight:500;text-align:center}
+.pomo-msg .btn{margin-left:8px;min-height:34px;padding:4px 14px}
+.today-total{display:flex;align-items:baseline;gap:4px}
+.today-total b{font-family:var(--display);font-weight:400;font-size:64px;line-height:1;font-variant-numeric:lining-nums}
+.today-total small{color:var(--muted)}
+.today-dots{display:flex;flex-wrap:wrap;gap:6px;min-height:18px;margin-block:6px 12px}
+.today-dots i{display:block;width:14px;height:14px;border-radius:50%;background:var(--root)}
+.today-dots i.s{width:10px;height:10px;margin-top:2px;opacity:.7}
+.today-dots i.pop{animation:pop .6s ease-out}
+@keyframes pop{0%{transform:scale(0)}60%{transform:scale(1.5)}100%{transform:scale(1)}}
+.goal-bar{height:6px;border-radius:3px;background:var(--panel);overflow:hidden}
+.goal-bar i{display:block;height:100%;width:0;background:var(--root);transition:width .4s}
+.goal-bar.met i{background:var(--good)}
+.mini-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.mini-stats b{font-family:var(--display);font-size:34px;font-weight:400;font-variant-numeric:lining-nums}
+.mini-stats small{color:var(--muted);margin-left:2px}
+.week-bars{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:end;height:110px;margin-top:14px}
+.week-bars .wb{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px}
+.week-bars .wb i{display:block;width:100%;max-width:26px;border-radius:4px 4px 0 0;background:var(--line);min-height:2px}
+.week-bars .wb.on i{background:var(--root)}
+.week-bars .wb.met i{background:var(--good)}
+.week-bars .wb span{font-size:10.5px;color:var(--muted);font-family:var(--mono)}
+.week-bars .wb.today span{color:var(--fg);font-weight:600}
+.log-more{margin-top:16px}
+@media (max-width:860px){.pomo{grid-template-columns:minmax(0,1fr)}}
 
 /* drum grid */
 .drumgrid-scroll{overflow-x:auto}
@@ -390,7 +445,6 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 <div class="wrap">
   <header class="top">
     <div class="mark">FRET<span>LAB</span></div>
-    <div class="sub">ギター練習帳 ― メトロノーム・チューナー・コード・進行・指板・スケール・記録</div>
     <button class="btn install-btn" id="installBtn" hidden>アプリとしてインストール</button>
   </header>
 
@@ -606,7 +660,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 
   <!-- SONGS -->
   <section data-panel="songs" hidden>
-    <div class="panel-head"><div><h2>練習曲</h2><p>著作権の保護期間が終わった名曲と伝承曲だけを集めた、歌詞つきのコード譜です。キーの変更やカポの提案、使うコードの押さえ方つき。コードは弾きやすさを優先した一例です。</p></div></div>
+    <div class="panel-head"><div><h2>練習曲</h2><p>著作権の保護期間が終わった名曲と伝承曲だけを集めた、歌詞つきのコード譜です。再生するとメロディと伴奏が流れ、今のコードが光ります。キーを変えると演奏も移調されます。コードは弾きやすさを優先した一例です。</p></div></div>
     <div class="songs">
       <div class="card song-list-card">
         <div class="seg" id="songLang"><button data-v="all">すべて</button><button data-v="ja">日本の歌</button><button data-v="en">海外の歌</button></div>
@@ -622,7 +676,11 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
           <div class="row prog-controls">
             <div><span class="label">キー</span><div class="bpm-mini"><button class="btn" id="songKeyDown" aria-label="キーを下げる">−</button><output id="songKey" class="song-key">C</output><button class="btn" id="songKeyUp" aria-label="キーを上げる">+</button></div></div>
             <div><span class="label">表示</span><div class="seg" id="songMode"><button data-v="real">実際のコード</button><button data-v="capo">カポで簡単に</button></div></div>
-            <div><span class="label">テンポ</span><button class="btn" id="songTempo">♩ テンポを鳴らす</button></div>
+          </div>
+          <div class="row">
+            <button class="btn primary big" id="songPlay">▶ 再生</button>
+            <div style="flex:1;min-width:180px"><span class="label">速さ <b id="songSpeedOut">100</b>%（♩=<span id="songBpm"></span>）</span><input type="range" id="songSpeed" min="50" max="120" step="5" value="100" aria-label="速さ"></div>
+            <label class="check"><input type="checkbox" id="songLoop"> ループ</label>
           </div>
           <div class="msg" id="songCapo"></div>
         </div>
@@ -659,45 +717,46 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 
   <!-- PRACTICE LOG -->
   <section data-panel="log" hidden>
-    <div class="panel-head"><div><h2>練習記録</h2><p>タイマーで計るか、あとから手入力。記録はこの端末のブラウザに保存されます（バックアップ欄でコピーして保管できます）。</p></div></div>
-    <div class="stats" id="logStats"></div>
-    <div class="log-grid">
-      <div class="card stack">
-        <b>練習タイマー</b>
-        <div class="timer" id="timerOut">00:00</div>
-        <div class="row">
-          <select id="timerCat" aria-label="練習内容"></select>
-          <button class="btn primary" id="timerBtn">開始</button>
-          <button class="btn" id="timerSave" disabled>記録する</button>
-          <button class="btn" id="timerReset" disabled>リセット</button>
+    <div class="panel-head"><div><h2>練習記録</h2><p>時間を選んでスタートするだけ。練習した時間はそのまま記録されます。途中でやめても、やった分はちゃんと残ります。</p></div></div>
+    <div class="pomo">
+      <div class="card pomo-main">
+        <div class="seg" id="pomoLen"><button data-v="5">5分</button><button data-v="15">15分</button><button data-v="25">25分</button><button data-v="45">45分</button></div>
+        <div class="ring-wrap">
+          <svg class="ring" viewBox="0 0 220 220" aria-hidden="true"><circle class="ring-bg" cx="110" cy="110" r="96"/><circle class="ring-fg" id="ringFg" cx="110" cy="110" r="96"/></svg>
+          <div class="ring-center"><div class="pomo-time" id="pomoTime">25:00</div><div class="pomo-state" id="pomoState">準備OK</div></div>
         </div>
-        <input type="text" id="timerMemo" class="search" placeholder="メモ（例：Aマイナーペンタ 1ポジション、BPM 100まで）" aria-label="メモ">
-        <details>
-          <summary>手入力で追加</summary>
-          <div class="row" style="margin-top:10px">
-            <input type="date" id="manDate" class="search" style="width:auto" aria-label="日付">
-            <input type="number" id="manMin" class="search" style="width:90px" min="1" max="600" value="30" aria-label="分"> 分
-            <select id="manCat" aria-label="練習内容"></select>
-            <button class="btn" id="manAdd">追加</button>
+        <div class="row" style="justify-content:center">
+          <button class="btn primary big" id="pomoStart">スタート</button>
+          <button class="btn big" id="pomoStop" disabled>終了して記録</button>
+        </div>
+        <div class="pomo-msg" id="pomoMsg" aria-live="polite"></div>
+      </div>
+      <div class="stack">
+        <div class="card today-card">
+          <span class="label">今日の練習</span>
+          <div class="today-total"><b id="todayMin">0</b><small>分</small></div>
+          <div class="today-dots" id="todayDots"></div>
+          <div class="goal-bar"><i id="goalFill"></i></div>
+          <div class="msg" id="goalMsg"></div>
+        </div>
+        <div class="card">
+          <div class="mini-stats">
+            <div><span class="label">連続</span><b id="stStreak">0</b><small>日</small></div>
+            <div><span class="label">この7日</span><b id="stWeek">0</b><small>分</small></div>
+            <div><span class="label">これまで</span><b id="stAll">0</b><small id="stAllU">分</small></div>
           </div>
-        </details>
-      </div>
-      <div class="card">
-        <div class="row" style="justify-content:space-between"><b>直近14日間（分）</b>
-          <label class="msg">1日の目標 <input type="number" id="goalMin" min="5" max="600" value="30" class="search" style="width:70px;padding:4px 6px"> 分</label></div>
-        <div id="logChart" class="log-chart"></div>
+          <div class="week-bars" id="weekBars"></div>
+        </div>
       </div>
     </div>
-    <div class="card" style="margin-top:16px">
-      <b>履歴</b>
+    <details class="card log-more">
+      <summary>これまでの記録とバックアップ</summary>
+      <div class="row" style="margin-top:12px"><label class="msg" for="goalSel">1日の目標</label><select id="goalSel"><option>15</option><option>30</option><option>45</option><option>60</option><option>90</option></select><span class="msg">分</span></div>
       <div id="logList" class="log-list"></div>
-      <details style="margin-top:12px">
-        <summary>バックアップ / 復元</summary>
-        <p class="msg">下のテキストをコピーして保管。復元するときは貼り付けて「復元」を押します（今の記録は置き換わります）。</p>
-        <textarea id="backupTxt" rows="4" class="search" style="width:100%;font-family:var(--mono);font-size:12px" aria-label="バックアップデータ"></textarea>
-        <div class="row"><button class="btn" id="backupCopy">コピー</button><button class="btn" id="backupLoad">復元</button><span class="msg" id="backupMsg"></span></div>
-      </details>
-    </div>
+      <p class="msg">バックアップ：下のテキストをコピーして保管。貼り付けて「復元」を押すと戻せます。</p>
+      <textarea id="backupTxt" rows="3" class="search" style="width:100%;font-family:var(--mono);font-size:12px" aria-label="バックアップデータ"></textarea>
+      <div class="row"><button class="btn" id="backupCopy">コピー</button><button class="btn" id="backupLoad">復元</button><span class="msg" id="backupMsg"></span></div>
+    </details>
   </section>
 
   <div class="toast" id="toast" hidden></div>
@@ -1008,6 +1067,13 @@ function rhythmOptions(sel){
   const og=document.createElement('optgroup');og.label='ドラムパターン';DRUMS.forEach(d=>og.appendChild(new Option(d.name,d.id)));sel.appendChild(og);
 }
 
+/* ---------- 再生は常に1つだけ ---------- */
+function stopAllPlayback(){
+  if(M.playing) transportStop();
+  if(typeof TB!=='undefined'&&TB.playing) tabStop();
+  if(typeof SP!=='undefined'&&SP.playing) songStop();
+  if(typeof T!=='undefined'&&T.loop){clearInterval(T.loop);T.loop=null;}
+}
 /* ---------- transport (metronome / drums / progression) ---------- */
 const M={bpm:store.get('bpm',96),beats:store.get('beats',4),sub:1,accent:true,vol:0.7,sound:store.get('sound',0),rhythm:store.get('rhythm','click'),layer:false,
   playing:false,next:0,beat:0,subI:0,bar:0,timer:null,queue:[],owner:null,startedAt:0,
@@ -1086,7 +1152,7 @@ function drawLoop(){
 }
 function transportStart(owner){
   const c=ac();
-  if(M.playing) transportStop();
+  stopAllPlayback();
   M.owner=owner;M.playing=true;M.beat=0;M.subI=0;M.bar=0;M.tr.bars=0;M.next=c.currentTime+0.08;M.queue=[];M.startedAt=Date.now();
   M.timer=setInterval(schedule,25);schedule();
   syncPlayButtons();trainerStatus();requestAnimationFrame(drawLoop);
@@ -1098,8 +1164,7 @@ function transportStop(){
   document.querySelectorAll('#drumGrid .st.cur').forEach(e=>e.classList.remove('cur'));
   const mins=Math.round((Date.now()-M.startedAt)/60000), owner=M.owner; M.owner=null;
   syncPlayButtons(); drawHooks.forEach(h=>h(null));
-  if(mins>=2&&!LOG.timer.running) offerLog(mins,owner==='prog'?'コード進行':owner==='song'?'曲の練習':'リズム・メトロノーム');
-  const st=document.getElementById('songTempo'); if(st) st.textContent='♩ テンポを鳴らす';
+  if(mins>=2&&LOG.pomo.state!=='run') offerLog(mins,owner==='prog'?'コード進行':owner==='song'?'曲の練習':'リズム・メトロノーム');
 }
 function syncPlayButtons(){
   $('#metroPlay').textContent=M.playing&&M.owner==='metro'?'ストップ':'スタート';
@@ -1176,7 +1241,7 @@ function renderStrings(){
 function markString(){document.querySelectorAll('#stringBtns .sbtn').forEach(b=>b.classList.toggle('hit',+b.dataset.i===T.target));}
 function syncAuto(){$('#autoBtn').setAttribute('aria-pressed',String(T.auto));}
 function playRef(m){
-  clearInterval(T.loop); const kind=T.inst.startsWith('bass')?'bass':T.inst==='uke'?'nylon':'guitar'; pluck(m,0,0.7,{kind,str:'ref'});
+  stopAllPlayback(); const kind=T.inst.startsWith('bass')?'bass':T.inst==='uke'?'nylon':'guitar'; pluck(m,0,0.7,{kind,str:'ref'});
   if($('#loopChk').checked) T.loop=setInterval(()=>pluck(m,0,0.7,{kind,str:'ref'}),2200);
 }
 function setA4(v){a4=Math.max(430,Math.min(450,v));$('#a4Out').textContent=a4;ksCache.clear();renderStrings();store.set('a4',a4);}
@@ -1231,7 +1296,7 @@ function drawTrace(){
   const cv=$('#trace'); if(!cv) return; const dpr=window.devicePixelRatio||1, W=cv.clientWidth, H=cv.clientHeight; if(!W) return;
   if(cv.width!==Math.round(W*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);}
   const g=cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,W,H);
-  const cs=getComputedStyle(document.documentElement), col=k=>cs.getPropertyValue(k).trim();
+  const cs=getComputedStyle(cv), col=k=>cs.getPropertyValue(k).trim();
   const X=c=>W/2+Math.max(-55,Math.min(55,c))/50*(W/2-14);
   g.fillStyle=col('--good'); g.globalAlpha=.14; g.fillRect(X(-5),0,X(5)-X(-5),H); g.globalAlpha=1;
   [-50,-25,25,50].forEach(c=>{g.strokeStyle=col('--line');g.lineWidth=1;g.beginPath();g.moveTo(X(c)+.5,0);g.lineTo(X(c)+.5,H);g.stroke();});
@@ -1579,79 +1644,124 @@ drawHooks.push(cur=>{
 })();
 
 /* ---------- 練習曲（パブリックドメインの歌） ---------- */
-// lines：[コード]歌詞 の形。空行の代わりに '#' で始まる行は小見出し
+// lines：[コード]歌詞。seq：コードごとの長さ（拍、lines に出てくる順）。pre：最初のコードより前の拍数。
+// mel：メロディ（音名:拍）。メロディを確認できていない曲は mel なし（伴奏のみ）
 const SONGS=[
-  {id:'furusato',lang:'ja',t:'ふるさと（故郷）',c:'作詞 高野辰之（1947年没）／作曲 岡野貞一（1941年没）・1914年',key:'C',time:3,bpm:84,part:'1番',strum:'3拍子：↓ ↓ ↓ （1拍目を強く）',
-   lines:['[C]うさぎ[G7]おいし [C]かのやま','[C]こぶな[F]つりし [G7]かの[C]かわ','[C]ゆめは[F]いまも [C]めぐ[G]りて','[F]わすれ[C]がたき [G7]ふるさ[C]と']},
-  {id:'akatombo',lang:'ja',t:'赤とんぼ',c:'作詞 三木露風（1964年没）／作曲 山田耕筰（1965年没）・1927年',key:'C',time:3,bpm:72,part:'1番',strum:'3拍子：↓ ↓↑ ↓↑ 、またはアルペジオ',
-   lines:['[C]ゆうやけ[F]こやけの [C]あかとん[G7]ぼ','[C]おわれて[F]みたのは [C]いつの[G7]ひ[C]か']},
+  {id:'furusato',lang:'ja',t:'ふるさと（故郷）',c:'作詞 高野辰之（1947年没）／作曲 岡野貞一（1941年没）・1914年',key:'C',time:3,bpm:84,part:'1番',strum:'3拍子：ベース → ジャン → ジャン',
+   lines:['[C]うさぎ[G7]おいし [C]かのやま','[C]こぶな[F]つりし [G7]かの[C]かわ','[C]ゆめは[F]いまも [C]めぐ[G]りて','[F]わすれ[C]がたき [G7]ふるさ[C]と'],
+   seq:[3,3,6, 3,3,3,3, 3,3,3,3, 3,3,3,3]},
+  {id:'akatombo',lang:'ja',t:'赤とんぼ',c:'作詞 三木露風（1964年没）／作曲 山田耕筰（1965年没）・1927年',key:'C',time:3,bpm:72,part:'1番',strum:'3拍子：ベース → ジャン → ジャン、またはアルペジオ',
+   lines:['[C]ゆうやけ[F]こやけの [C]あかとん[G7]ぼ','[C]おわれて[F]みたのは [C]いつの[G7]ひ[C]か'],
+   seq:[3,3,3,3, 3,3,3,1.5,1.5]},
   {id:'kojo',lang:'ja',t:'荒城の月',c:'作詞 土井晩翠（1952年没）／作曲 滝廉太郎（1903年没）・1901年',key:'Em',time:4,bpm:66,part:'1番',strum:'4拍子：アルペジオ（親指でルート→3弦→2弦→1弦）',
-   lines:['[Em]はるこうろうの [Am]はなの[Em]えん','[C]めぐる[Am]さかずき [B7]かげさして','[Em]ちよのまつが[Am]え [Em]わけいでし','[Am]むかしの[B7]ひかり いま[Em]いずこ']},
+   lines:['[Em]はるこうろうの [Am]はなの[Em]えん','[C]めぐる[Am]さかずき [B7]かげさして','[Em]ちよのまつが[Am]え [Em]わけいでし','[Am]むかしの[B7]ひかり いま[Em]いずこ'],
+   seq:[4,2,2, 2,2,4, 4,2,2, 2,2,4]},
   {id:'shabondama',lang:'ja',t:'しゃぼん玉',c:'作詞 野口雨情（1945年没）／作曲 中山晋平（1952年没）・1922年',key:'C',time:4,bpm:92,part:'1番',strum:'4拍子：↓ ↓ ↓↑ ↓',
-   lines:['[C]しゃぼんだま [G7]とんだ','[G7]やねまで [C]とんだ','[F]やねまで [C]とんで','[C]こわれて [G7]きえ[C]た']},
+   lines:['[C]しゃぼんだま [G7]とんだ','[G7]やねまで [C]とんだ','[F]やねまで [C]とんで','[C]こわれて [G7]きえ[C]た'],
+   seq:[4,4, 4,4, 4,4, 4,2,2]},
   {id:'nanatsunoko',lang:'ja',t:'七つの子',c:'作詞 野口雨情（1945年没）／作曲 本居長世（1945年没）・1921年',key:'C',time:4,bpm:80,part:'1番',strum:'4拍子：↓ ↓↑ ↓ ↓↑',
-   lines:['[C]からす なぜ[F]なくの[C]','[C]からすは [G7]やまに','[F]かわいい [C]ななつの','[C]こがある[G7]から[C]よ']},
+   lines:['[C]からす なぜ[F]なくの[C]','[C]からすは [G7]やまに','[F]かわいい [C]ななつの','[C]こがある[G7]から[C]よ'],
+   seq:[4,2,2, 4,4, 4,4, 4,2,2]},
   {id:'harugakita',lang:'ja',t:'春が来た',c:'作詞 高野辰之（1947年没）／作曲 岡野貞一（1941年没）・1910年',key:'C',time:4,bpm:96,part:'1番',strum:'4拍子：↓ ↓ ↓ ↓（元気よく）',
-   lines:['[C]はるがきた [G7]はるがきた [C]どこにきた','[F]やまに[C]きた [F]さとに[C]きた [G7]のにも[C]きた']},
+   lines:['[C]はるがきた [G7]はるがきた [C]どこにきた','[F]やまに[C]きた [F]さとに[C]きた [G7]のにも[C]きた'],
+   seq:[4,4,4, 2,2,2,2,2,2]},
   {id:'sakura',lang:'ja',t:'さくらさくら',c:'日本古謡（江戸時代の箏曲が元とされる）',key:'Am',time:4,bpm:60,part:'全体',strum:'4拍子：ゆったりアルペジオ。E の部分で少し間を取る',
-   lines:['[Am]さくら さくら','[Dm]やよいのそらは [Am]みわたすかぎり','[Dm]かすみかくもか [E]においぞいずる','[Am]いざや いざや [Dm]みに[E]ゆか[Am]ん']},
+   lines:['[Am]さくら さくら','[Dm]やよいのそらは [Am]みわたす[E]かぎり','[Dm]かすみかくもか [Am]においぞ[E]いずる','[Am]いざや いざや [Dm]みに[E]ゆか[Am]ん'],
+   seq:[8, 8,6,2, 8,6,2, 8,2,2,4],
+   mel:'A4 A4 B4:2 A4 A4 B4:2 A4 B4 C5 B4 A4 B4:.5 A4:.5 F4:2 E4 C4 E4 F4 E4 E4:.5 C4:.5 B3:2 A4 B4 C5 B4 A4 B4:.5 A4:.5 F4:2 E4 C4 E4 F4 E4 E4:.5 C4:.5 B3:2 A4 A4 B4:2 A4 A4 B4:2 E4 F4 B4:.5 A4:.5 F4 E4:4'},
   {id:'hotaru',lang:'ja',t:'蛍の光',c:'作詞 稲垣千穎（1913年没）／スコットランド民謡・1881年',key:'G',time:4,bpm:72,part:'1番',strum:'4拍子：↓ ↓↑ ↓ ↓↑',
-   lines:['[G]ほたるのひかり [D]まどのゆき','[G]ふみよむつきひ [C]かさねつつ','[G]いつしかとしも [D]すぎのとを','[Em]あけてぞ[C]けさは [D]わかれ[G]ゆく']},
-  {id:'amazing',lang:'en',t:'Amazing Grace',c:'Words: John Newton (1779) / Traditional American melody',key:'G',time:3,bpm:72,part:'Verse 1',strum:'3拍子：↓ ↓ ↓、慣れたら ↓ ↓↑ ↓↑',
-   lines:['A[G]mazing [G7]grace, how [C]sweet the [G]sound','That saved a wretch like [D]me','I [G]once was [G7]lost, but [C]now am [G]found','Was [Em]blind, but [D]now I [G]see']},
-  {id:'saints',lang:'en',t:'When the Saints Go Marching In',c:'Traditional（アメリカ・ゴスペル／ジャズの定番）',key:'G',time:4,bpm:112,part:'Chorus',strum:'4拍子：2・4拍目を強く（↓ ↑↓ ↓ ↑↓）',
-   lines:['Oh when the [G]saints go marching in','Oh when the saints go marching [D7]in','Oh Lord, I [G]want to [G7]be in that [C]number','When the [G]saints go [D7]marching [G]in']},
-  {id:'susanna',lang:'en',t:'Oh! Susanna',c:'Words & music: Stephen Foster (1848)',key:'C',time:4,bpm:108,part:'Chorus',strum:'4拍子：カントリー風（ベース↓ ↑ ベース↓ ↑）',
-   lines:['[F]Oh! Su[C]sanna, oh don\'t you cry for [G]me','For I\'ve [C]come from Alabama with my [G]banjo on my [C]knee']},
-  {id:'silent',lang:'en',t:'Silent Night',c:'Words: Joseph Mohr (1818), English: J. F. Young / Music: Franz Gruber',key:'C',time:3,bpm:66,part:'Verse 1',strum:'3拍子：アルペジオ（ルート→3弦→2弦）',
-   lines:['[C]Silent night, holy night','[G7]All is calm, [C]all is bright','[F]Round yon Virgin [C]Mother and Child','[F]Holy Infant so [C]tender and mild','[G7]Sleep in heavenly [C]peace','[C]Sleep in [G7]heavenly [C]peace']},
-  {id:'jingle',lang:'en',t:'Jingle Bells',c:'Words & music: James Lord Pierpont (1857)',key:'G',time:4,bpm:120,part:'Chorus',strum:'4拍子：↓ ↑↓ ↑↓ ↑（軽快に）',
-   lines:['[G]Jingle bells, jingle bells, jingle all the way','[C]Oh what fun it [G]is to ride in a [A7]one-horse open [D7]sleigh, hey!','[G]Jingle bells, jingle bells, jingle all the way','[C]Oh what fun it [G]is to ride in a [D7]one-horse open [G]sleigh']},
+   lines:['[G]ほたるのひかり [D]まどのゆき','[G]ふみよむつきひ [C]かさねつつ','[G]いつしかとしも [D]すぎのとを','[Em]あけてぞけさは [D]わかれ[G]ゆく'],
+   pre:4, seq:[4,4, 4,4, 4,4, 2,2,4],
+   mel:'r:3 D4 G4:1.5 G4:.5 G4 B4 A4:1.5 G4:.5 A4 B4 G4:1.5 G4:.5 B4 D5 E5:3 E5 D5:1.5 B4:.5 B4 G4 A4:1.5 G4:.5 A4 B4 G4:1.5 E4:.5 E4 D4 G4:3 r'},
+  {id:'amazing',lang:'en',t:'Amazing Grace',c:'Words: John Newton (1779) / Traditional American melody',key:'G',time:3,bpm:76,part:'Verse 1',strum:'3拍子：ベース → ジャン → ジャン',
+   lines:['A[G]mazing [G7]grace, how [C]sweet the [G]sound','That saved a wretch like [D]me','I [G]once was [G7]lost, but [C]now am [G]found','Was [Em]blind, but [D]now I [G]see'],
+   pre:3, seq:[3,3,3,9, 6, 3,3,3,3, 3,3,3],
+   mel:'r:2 D4 G4:2 B4:.5 G4:.5 B4:2 A4 G4:2 E4 D4:2 D4 G4:2 B4:.5 G4:.5 B4:2 A4 D5:3 D5:2 B4 D5:2 B4:.5 G4:.5 B4:2 A4 G4:2 E4 D4:2 D4 G4:2 B4:.5 G4:.5 B4:2 A4 G4:3'},
+  {id:'joyful',lang:'en',t:'Joyful, Joyful, We Adore Thee（歓喜の歌）',c:'Words: Henry van Dyke (1907) / Music: Beethoven, Symphony No. 9',key:'C',time:4,bpm:96,part:'Verse 1（前半）',strum:'4拍子：↓ ↓ ↓ ↓',
+   lines:['[C]Joyful, joyful, [G]we adore Thee','[C]God of glory, [G]Lord of love','[C]Hearts unfold like [G]flowers before Thee','[C]Opening to the [G]sun a[C]bove'],
+   seq:[4,4, 4,4, 4,4, 4,2,2],
+   mel:'E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 E4:1.5 D4:.5 D4:2 E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 D4:1.5 C4:.5 C4:2'},
+  {id:'saints',lang:'en',t:'When the Saints Go Marching In',c:'Traditional（アメリカ・ゴスペル／ジャズの定番）',key:'G',time:4,bpm:112,part:'Chorus',strum:'4拍子：↓ ↓↑ ↓ ↓↑（2・4拍目を強く）',
+   lines:['Oh when the [G]saints go marching in','Oh when the saints go marching [D7]in','Oh Lord, I [G]want to [G7]be in that [C]number','When the [G]saints go [D7]marching [G]in'],
+   pre:4, seq:[24,8, 4,4,8, 4,4,4],
+   mel:'r G4 B4 C5 D5:4 r G4 B4 C5 D5:4 r G4 B4 C5 D5:2 B4:2 G4:2 B4:2 A4:4 r B4 B4 A4 G4:3 G4 B4:2 D5 D5 C5:2 C5:2 r:2 B4 C5 D5:2 B4:2 G4:2 A4:2 G4:4'},
+  {id:'silent',lang:'en',t:'Silent Night',c:'Words: Joseph Mohr (1818), English: J. F. Young / Music: Franz Gruber',key:'C',time:3,bpm:72,part:'Verse 1',strum:'3拍子：ベース → ジャン → ジャン（やさしく）',
+   lines:['[C]Silent night, holy night','[G7]All is calm, [C]all is bright','[F]Round yon Virgin [C]Mother and Child','[F]Holy Infant so [C]tender and mild','[G7]Sleep in heavenly [C]peace','[C]Sleep in [G7]heavenly [C]peace'],
+   seq:[12, 6,6, 6,6, 6,6, 6,3, 6,3,3],
+   mel:'G4:1.5 A4:.5 G4 E4:3 G4:1.5 A4:.5 G4 E4:3 D5:2 D5 B4:3 C5:2 C5 G4:3 A4:2 A4 C5:1.5 B4:.5 A4 G4:1.5 A4:.5 G4 E4:3 A4:2 A4 C5:1.5 B4:.5 A4 G4:1.5 A4:.5 G4 E4:3 D5:2 D5 F5:1.5 D5:.5 B4 C5:3 E5:3 C5:1.5 G4:.5 E4 G4:1.5 F4:.5 D4 C4:3'},
+  {id:'jingle',lang:'en',t:'Jingle Bells',c:'Words & music: James Lord Pierpont (1857)',key:'G',time:4,bpm:120,part:'Chorus',strum:'4拍子：↓ ↓↑ ↓ ↓↑（軽快に）',
+   lines:['[G]Jingle bells, jingle bells, jingle all the way','[C]Oh what fun it [G]is to ride in a [A7]one-horse open [D7]sleigh, hey!','[G]Jingle bells, jingle bells, jingle all the way','[C]Oh what fun it [G]is to ride in a [D7]one-horse open [G]sleigh'],
+   seq:[16, 4,4,4,4, 16, 4,4,4,4],
+   mel:'B4 B4 B4:2 B4 B4 B4:2 B4 D5 G4:1.5 A4:.5 B4:4 C5 C5 C5:1.5 C5:.5 C5 B4 B4 B4:.5 B4:.5 B4 A4 A4 B4 A4:2 D5:2 B4 B4 B4:2 B4 B4 B4:2 B4 D5 G4:1.5 A4:.5 B4:4 C5 C5 C5 C5 C5 B4 B4 B4:.5 B4:.5 D5 D5 C5 A4 G4:4'},
   {id:'twinkle',lang:'en',t:'Twinkle, Twinkle, Little Star',c:'Words: Jane Taylor (1806) / French melody (18世紀)',key:'C',time:4,bpm:90,part:'全体',strum:'4拍子：↓ ↓ ↓ ↓',
-   lines:['[C]Twinkle, twinkle, [F]little [C]star','[F]How I [C]wonder [G]what you [C]are','[C]Up a[F]bove the [C]world so [G]high','[C]Like a [F]diamond [C]in the [G]sky','[C]Twinkle, twinkle, [F]little [C]star','[F]How I [C]wonder [G]what you [C]are']},
+   lines:['[C]Twinkle, twinkle, [F]little [C]star','[F]How I [C]wonder [G]what you [C]are','[C]Up a[F]bove the [C]world so [G]high','[C]Like a [F]diamond [C]in the [G]sky','[C]Twinkle, twinkle, [F]little [C]star','[F]How I [C]wonder [G]what you [C]are'],
+   seq:[4,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 4,2,2, 2,2,2,2],
+   mel:'C4 C4 G4 G4 A4 A4 G4:2 F4 F4 E4 E4 D4 D4 C4:2 G4 G4 F4 F4 E4 E4 D4:2 G4 G4 F4 F4 E4 E4 D4:2 C4 C4 G4 G4 A4 A4 G4:2 F4 F4 E4 E4 D4 D4 C4:2'},
+  {id:'rowboat',lang:'en',t:'Row, Row, Row Your Boat',c:'Words: Eliphalet Oram Lyte (1881) / Traditional',key:'C',time:2,ts:'6/8',bpm:56,part:'全体',strum:'6/8拍子：1拍（付点4分）ごとに ↓、慣れたら ↓ ↑',
+   lines:['[C]Row, row, row your boat','Gently down the stream','Merrily, merrily, merrily, merrily','[G]Life is but a [C]dream'],
+   seq:[12,2,2],
+   mel:'C4 C4 C4:.6667 D4:.3333 E4 E4:.6667 D4:.3333 E4:.6667 F4:.3333 G4:2 C5:.3333 C5:.3333 C5:.3334 G4:.3333 G4:.3333 G4:.3334 E4:.3333 E4:.3333 E4:.3334 C4:.3333 C4:.3333 C4:.3334 G4:.6667 F4:.3333 E4:.6667 D4:.3333 C4:2'},
+  {id:'susanna',lang:'en',t:'Oh! Susanna',c:'Words & music: Stephen Foster (1848)',key:'C',time:4,bpm:108,part:'Chorus',strum:'4拍子：カントリー風（ベース↓ ↑ ベース↓ ↑）',
+   lines:['[F]Oh! Su[C]sanna, oh don\'t you cry for [G]me','For I\'ve [C]come from Alabama with my [G]banjo on my [C]knee'],
+   seq:[2,4,2, 4,2,2]},
   {id:'scarborough',lang:'en',t:'Scarborough Fair',c:'Traditional English ballad（イギリス伝承）',key:'Am',time:3,bpm:84,part:'Verse 1',strum:'3拍子：アルペジオ（ドリアン調の D がポイント）',
-   lines:['[Am]Are you going to [G]Scarborough [Am]Fair?','[C]Parsley, [Am]sage, rose[D]mary and [Am]thyme','[Am]Remember [C]me to one who [G]lives there','[Am]She once was a [G]true love of [Am]mine']},
+   lines:['[Am]Are you going to [G]Scarborough [Am]Fair?','[C]Parsley, [Am]sage, rose[D]mary and [Am]thyme','[Am]Remember [C]me to one who [G]lives there','[Am]She once was a [G]true love of [Am]mine'],
+   seq:[6,3,3, 3,3,3,3, 3,6,3, 6,3,3]},
   {id:'swinglow',lang:'en',t:'Swing Low, Sweet Chariot',c:'Traditional African-American spiritual（19世紀）',key:'G',time:4,bpm:76,part:'Chorus',strum:'4拍子：ゆったり ↓ ↓↑ ↓ ↓↑',
-   lines:['[G]Swing low, sweet [C]chari[G]ot','Coming for to carry me [D]home','[G]Swing low, sweet [C]chari[G]ot','Coming [D]for to carry me [G]home']},
+   lines:['[G]Swing low, sweet [C]chari[G]ot','Coming for to carry me [D]home','[G]Swing low, sweet [C]chari[G]ot','Coming [D]for to carry me [G]home'],
+   seq:[4,2,6,4, 4,2,6,4,4]},
 ];
+
 const QUAL_MAP={'':'maj',m:'m','7':'7',M7:'M7',maj7:'M7',m7:'m7',mM7:'mM7','6':'6',m6:'m6',sus2:'sus2',sus4:'sus4','7sus4':'7sus4',add9:'add9','9':'9',dim:'dim',dim7:'dim7',m7b5:'m7b5',aug:'aug'};
 const NAME_PC={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
 function parseChord(ch){const m=/^([A-G])([#b♯♭]?)(.*)$/.exec(ch);if(!m) return null;let pc=NAME_PC[m[1]]+(m[2]==='#'||m[2]==='♯'?1:m[2]==='b'||m[2]==='♭'?-1:0);return {pc:(pc+12)%12,q:m[3]};}
 const keyRoot=k=>parseChord(k).pc, keyMinor=k=>/m$/.test(k);
-const SG={idx:store.get('sIdx',0),lang:'all',shift:0,mode:'real'};
-function songKeyName(song,shift){const r=(keyRoot(song.key)+shift+12)%12;return (FLAT_ROOTS.has(r)?NOTES_F:NOTES_S)[r]+(keyMinor(song.key)?'m':'');}
-// 開放弦で弾きやすいキー（メジャー／マイナー）
+const SG={idx:store.get('sIdx',0),lang:'all',shift:0,mode:'real',speed:100};
+function songKeyName(song,shift){const r=(keyRoot(song.key)+shift+120)%12;return (FLAT_ROOTS.has(r)?NOTES_F:NOTES_S)[r]+(keyMinor(song.key)?'m':'');}
 const EASY_MAJ=[0,7,2,9,4], EASY_MIN=[9,4,2];
 function capoFor(song,shift){
-  const r=(keyRoot(song.key)+shift+12)%12, easy=keyMinor(song.key)?EASY_MIN:EASY_MAJ;
+  const r=(keyRoot(song.key)+shift+120)%12, easy=keyMinor(song.key)?EASY_MIN:EASY_MAJ;
   for(let c=0;c<=7;c++){ if(easy.includes((r-c+12)%12)) return c; } return 0;
 }
 function chordName(pc,q,keyPc){return (FLAT_ROOTS.has(keyPc)?NOTES_F:NOTES_S)[pc]+(q==='m7b5'?'m7(♭5)':q);}
+const songCapo=()=>SG.mode==='capo'?capoFor(SONGS[SG.idx],SG.shift):0;
+// コード進行のタイムライン（実際に鳴る音の高さ）
+function songTimeline(song){
+  const marks=song.lines.join(' ').match(/\[[^\]]+\]/g).map(x=>parseChord(x.slice(1,-1)));
+  let t=song.pre||0; const ev=marks.map((m,k)=>{const e={k,t,d:song.seq[k],pc:(m.pc+SG.shift+120)%12,q:m.q};t+=song.seq[k];return e;});
+  if(song.pre&&ev.length) ev.unshift({k:-1,t:0,d:song.pre,pc:ev[0].pc,q:ev[0].q});
+  return {ev,len:t};
+}
 function renderSongList(){
   const el=$('#songList'); el.innerHTML='';
   SONGS.forEach((s,i)=>{ if(SG.lang!=='all'&&s.lang!==SG.lang) return;
     const b=document.createElement('button'); b.className='prog-item'; b.setAttribute('aria-current',String(i===SG.idx));
-    b.innerHTML=`<b></b><small></small>`; b.querySelector('b').textContent=s.t; b.querySelector('small').textContent=`${s.key} ・ ${s.time}拍子 ・ ${s.part}`;
-    b.addEventListener('click',()=>{SG.idx=i;SG.shift=0;store.set('sIdx',i);renderSongList();renderSong();if(innerWidth<860) $('#songTitle').scrollIntoView({behavior:'smooth'});});
+    b.innerHTML=`<b></b><small></small>`; b.querySelector('b').textContent=s.t; b.querySelector('small').textContent=`${s.key} ・ ${s.ts||s.time+'拍子'} ・ ${s.mel?'メロディ＋伴奏':'伴奏のみ'}`;
+    b.addEventListener('click',()=>{songStop();SG.idx=i;SG.shift=0;store.set('sIdx',i);renderSongList();renderSong();if(innerWidth<860) $('#songTitle').scrollIntoView({behavior:'smooth'});});
     el.appendChild(b); });
 }
 function renderSong(){
   const song=SONGS[SG.idx]; if(!song) return;
-  const keyPc=(keyRoot(song.key)+SG.shift+12)%12, capo=SG.mode==='capo'?capoFor(song,SG.shift):0, dispShift=SG.shift-capo, dispKeyPc=(keyRoot(song.key)+dispShift+12)%12;
-  $('#songMeta').textContent=`${song.lang==='ja'?'日本の歌':'海外の歌'} ・ ${song.part} ・ ${song.time}拍子 ・ ♩=${song.bpm}`;
+  const capo=songCapo(), dispShift=SG.shift-capo, dispKeyPc=(keyRoot(song.key)+dispShift+120)%12;
+  $('#songMeta').textContent=`${song.lang==='ja'?'日本の歌':'海外の歌'} ・ ${song.part} ・ ${song.ts||song.time+'拍子'} ・ ${song.mel?'メロディ＋伴奏':'伴奏のみ'}`;
   $('#songTitle').textContent=song.t; $('#songCredit').textContent=song.c+'（著作権の保護期間が終了／伝承曲）';
   $('#songKey').textContent=songKeyName(song,SG.shift);
+  $('#songBpm').textContent=Math.round(song.bpm*SG.speed/100);
   const cap=capoFor(song,SG.shift);
-  $('#songCapo').textContent= SG.mode==='capo' ? (capo?`カポ ${capo} フレットで、${songKeyName(song,dispShift)} の形で弾きます（鳴る音は ${songKeyName(song,SG.shift)}）。`:'このキーはカポなしで弾きやすいキーです。')
-    : (cap?`ヒント：カポ ${cap} フレットを付けると、${songKeyName(song,SG.shift-cap)} の簡単な形で弾けます。`:'');
+  $('#songCapo').textContent= SG.mode==='capo' ? (capo?'':'このキーはカポなしで弾きやすいキーです。')
+    : (cap?`ヒント：「カポで簡単に」にすると、カポ ${cap} フレット＋${songKeyName(song,SG.shift-cap)} の簡単な形で弾けます。`:'');
   $('#songStrum').textContent='ストロークの目安 ― '+song.strum;
   const used=[]; const sheet=$('#songSheet'); sheet.innerHTML=''; sheet.className='card sheet'+(song.lang==='en'?' en':'');
+  if(capo){ const cb=document.createElement('div'); cb.className='capo-badge';
+    cb.innerHTML=`<svg viewBox="0 0 120 40" aria-hidden="true"><rect x="2" y="8" width="116" height="24" rx="3" class="cb-neck"/>${[24,52,76,98].map(x=>`<line x1="${x}" y1="8" x2="${x}" y2="32" class="cb-fret"/>`).join('')}<rect x="${[0,10,38,64,87,106,112,116][Math.min(capo,7)]-3}" y="2" width="9" height="36" rx="3" class="cb-bar"/></svg><div><b>CAPO ${capo}</b><span>${capo}フレットにカポを付けて、下のコードの形で弾きます（鳴る音は ${songKeyName(song,SG.shift)}）</span></div>`;
+    sheet.appendChild(cb); }
+  let k=0;
   song.lines.forEach(line=>{
     const row=document.createElement('div'); row.className='sline';
     const parts=line.split(/(\[[^\]]+\])/).filter(x=>x!=='');
     let pend=null;
     const push=(ch,txt)=>{const sg=document.createElement('span');sg.className='seg-c';const c=document.createElement('span');c.className='ch';const l=document.createElement('span');l.className='ly';
-      if(ch){const p=parseChord(ch), pc=(p.pc+dispShift+12)%12, nm=chordName(pc,p.q,dispKeyPc); c.textContent=nm; c.dataset.pc=pc; c.dataset.q=p.q; if(!used.some(u=>u.nm===nm)) used.push({nm,pc,q:p.q}); c.addEventListener('click',()=>songStrum(pc,p.q,capo));}
+      if(ch){const p=parseChord(ch), pc=(p.pc+dispShift+120)%12, nm=chordName(pc,p.q,dispKeyPc); c.textContent=nm; c.dataset.k=k++; if(!used.some(u=>u.nm===nm)) used.push({nm,pc,q:p.q}); c.addEventListener('click',()=>songStrum(pc,p.q,capo));}
       l.textContent=txt||' '; sg.append(c,l); row.appendChild(sg);};
     parts.forEach(x=>{ if(x.startsWith('[')){ if(pend!==null) push(pend,''); pend=x.slice(1,-1);} else { push(pend,x); pend=null; } });
     if(pend!==null) push(pend,'');
@@ -1661,16 +1771,58 @@ function renderSong(){
   used.forEach(u=>{ const type=QUAL_MAP[u.q]??'maj'; const v=bestVoicing(u.pc,type); const d=document.createElement('div'); d.className='card';
     d.innerHTML=`<div class="cn"></div>${v?diagram(v.frets,u.pc,type):''}`; d.querySelector('.cn').textContent=u.nm; d.addEventListener('click',()=>songStrum(u.pc,u.q,capo)); ce.appendChild(d); });
 }
-function songStrum(pc,q,capo){ const type=QUAL_MAP[q]??'maj', v=bestVoicing(pc,type); if(!v) return; v.frets.forEach((f,i)=>{ if(f!==null) pluck(STD[i]+f+capo,i*0.03,0.4,{str:i}); }); }
+function songStrum(pc,q,capo){ stopAllPlayback(); const type=QUAL_MAP[q]??'maj', v=bestVoicing(pc,type); if(!v) return; v.frets.forEach((f,i)=>{ if(f!==null) pluck(STD[i]+f+capo,i*0.03,0.4,{str:i}); }); }
+/* 再生：伴奏（コード）＋メロディ。キーを変えると両方移調される */
+const SP={playing:false,srcs:[],timer:null,raf:0,t0:0,bd:0,passes:0,tl:null,cur:-2};
+function songSchedulePass(){
+  const song=SONGS[SG.idx], c=ac(), bd=SP.bd, {ev,len}=SP.tl, start=SP.t0+SP.passes*len*bd, beat=song.time===2?1:1;
+  const at=t=>Math.max(0,start+t*bd-c.currentTime), keep=s=>{if(s) SP.srcs.push(s);};
+  ev.forEach(e=>{
+    const type=QUAL_MAP[e.q]??'maj', v=bestVoicing(e.pc,type); if(!v) return;
+    const strs=v.frets.map((f,i)=>f===null?null:i).filter(i=>i!==null), bass=strs[0];
+    for(let b=0;b<e.d-1e-6;b+=beat){
+      const t=e.t+b, inBar=Math.round(t)%song.time;
+      if(song.time===3){
+        if(inBar===0) keep(pluck(STD[bass]+v.frets[bass],at(t),.5,{str:bass}));
+        else strs.slice(1).forEach((s,j)=>keep(pluck(STD[s]+v.frets[s],at(t)+j*.012,.24,{str:s})));
+      } else {
+        strs.forEach((s,j)=>keep(pluck(STD[s]+v.frets[s],at(t)+j*.016,inBar===0?.3:.22,{str:s})));
+        if(song.time===4&&(inBar===1||inBar===3)&&b+.5<e.d) strs.slice(2).reverse().forEach((s,j)=>keep(pluck(STD[s]+v.frets[s],at(t+.5)+j*.012,.16,{str:s})));
+      }
+    }
+  });
+  if(song.mel){ let t=0; song.mel.trim().split(/\s+/).forEach(tok=>{const [n,d]=tok.split(':'); const dur=d?+d:1;
+    if(n!=='r') keep(pluck(noteMidi(n)+SG.shift-(SG.shift>6?12:0),at(t),.8,{kind:'nylon',str:'mel'})); t+=dur; }); }
+  SP.passes++;
+}
+function songPlay(){
+  if(SP.playing){songStop();return;}
+  stopAllPlayback();
+  const song=SONGS[SG.idx], c=ac(); SP.bd=60/(song.bpm*SG.speed/100); SP.tl=songTimeline(song);
+  SP.playing=true; SP.passes=0; SP.srcs=[]; SP.cur=-2;
+  const capo=songCapo(); SP.t0=c.currentTime+0.15+song.time*SP.bd;
+  for(let k=0;k<song.time;k++) metroHit(M.sound,c.currentTime+0.15+k*SP.bd,k===0?0:1,M.vol*.7);
+  songSchedulePass(); $('#songPlay').textContent='■ 停止';
+  SP.timer=setInterval(()=>{ const len=SP.tl.len; if(c.currentTime>SP.t0+(SP.passes-1)*len*SP.bd-1){ if($('#songLoop').checked) songSchedulePass(); else if(c.currentTime>SP.t0+SP.passes*len*SP.bd+.3) songStop(); } },200);
+  const loop=()=>{ if(!SP.playing) return; SP.raf=requestAnimationFrame(loop);
+    const el=(c.currentTime-SP.t0)/SP.bd; let k=-2;
+    if(el>=0){ const pos=el%SP.tl.len; SP.tl.ev.forEach(e=>{ if(e.t<=pos+1e-6) k=e.k; }); }
+    if(k!==SP.cur){ SP.cur=k; document.querySelectorAll('#songSheet .ch.now').forEach(x=>x.classList.remove('now')); document.querySelectorAll('#songSheet .sline.now').forEach(x=>x.classList.remove('now'));
+      const ch=document.querySelector(`#songSheet .ch[data-k="${k}"]`); if(ch){ ch.classList.add('now'); const ln=ch.closest('.sline'); ln.classList.add('now'); } } };
+  loop();
+}
+function songStop(){
+  if(!SP.playing) return; SP.playing=false; clearInterval(SP.timer); cancelAnimationFrame(SP.raf);
+  const t=ctx?ctx.currentTime:0; SP.srcs.forEach(s=>{try{s.stop(t+0.05);}catch(e){}}); SP.srcs=[];
+  document.querySelectorAll('#songSheet .now').forEach(x=>x.classList.remove('now')); $('#songPlay').textContent='▶ 再生';
+}
 (function initSongs(){
   segInit($('#songLang'),'all',v=>{SG.lang=v;renderSongList();});
   segInit($('#songMode'),'real',v=>{SG.mode=v;renderSong();});
-  $('#songKeyDown').addEventListener('click',()=>{SG.shift=(SG.shift+11)%12;renderSong();});
-  $('#songKeyUp').addEventListener('click',()=>{SG.shift=(SG.shift+1)%12;renderSong();});
-  $('#songTempo').addEventListener('click',()=>{
-    if(M.playing&&M.owner==='song'){transportStop();$('#songTempo').textContent='♩ テンポを鳴らす';return;}
-    const song=SONGS[SG.idx]; setBpm(song.bpm); setRhythm('click'); M.beats=song.time; drawBeats(); transportStart('song'); $('#songTempo').textContent='■ テンポを止める';
-  });
+  $('#songKeyDown').addEventListener('click',()=>{songStop();SG.shift=SG.shift-1<-6?SG.shift+11:SG.shift-1;renderSong();});
+  $('#songKeyUp').addEventListener('click',()=>{songStop();SG.shift=SG.shift+1>6?SG.shift-11:SG.shift+1;renderSong();});
+  $('#songPlay').addEventListener('click',songPlay);
+  $('#songSpeed').addEventListener('input',e=>{SG.speed=+e.target.value;$('#songSpeedOut').textContent=SG.speed;$('#songBpm').textContent=Math.round(SONGS[SG.idx].bpm*SG.speed/100);songStop();});
   if(SG.idx>=SONGS.length) SG.idx=0;
   renderSongList(); renderSong();
 })();
@@ -1787,7 +1939,7 @@ function tabSchedule(){
 }
 function tabPlay(){
   if(TB.playing){tabStop();return;}
-  if(M.playing) transportStop();
+  stopAllPlayback();
   const p=TABS_DATA[TB.idx], c=ac(), bd=60/(p.bpm*TB.speed/100);
   TB.playing=true; TB.passes=0; TB.srcs=[]; TB.bd=bd; TB.t0=c.currentTime+0.15+p.beats*bd;
   for(let k=0;k<p.beats;k++) metroHit(M.sound,c.currentTime+0.15+k*bd,k===0?0:1,M.vol*.8);
@@ -1813,79 +1965,81 @@ function tabStop(){
   new ResizeObserver(()=>{ if(!$('[data-panel="tab"]').hidden) drawTab(); }).observe($('#tabSheet'));
 })();
 
-/* ---------- practice log ---------- */
-const LOG_CATS=['リズム・メトロノーム','コード','コード進行','スケール','指板・理論','曲の練習','耳コピ','その他'];
+/* ---------- practice log（ポモドーロ式タイマー） ---------- */
 const pad=n=>String(n).padStart(2,'0');
 const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-const LOG={entries:store.get('log',[]),timer:store.get('timer',{running:false,start:0,acc:0}),goal:store.get('goal',30),tick:null,del:null};
+const LOG={entries:store.get('log',[]),goal:store.get('goal',30),del:null,
+  pomo:store.get('pomo',{len:25,state:'idle',end:0,left:0,started:0,acc:0}),tick:null,lastDone:0};
 if(!Array.isArray(LOG.entries)) LOG.entries=[];
 const saveLog=()=>store.set('log',LOG.entries);
+const savePomo=()=>store.set('pomo',LOG.pomo);
 function addEntry(date,min,cat,memo){
-  LOG.entries.push({id:Date.now()+Math.random(),date,min:Math.max(1,Math.min(600,Math.round(min))),cat,memo:(memo||'').slice(0,200)});
+  LOG.entries.push({id:Date.now()+Math.random(),date,min:Math.max(1,Math.min(600,Math.round(min))),cat:cat||'練習',memo:(memo||'').slice(0,200)});
   saveLog(); renderLog();
 }
-function elapsed(){return LOG.timer.acc+(LOG.timer.running?Date.now()-LOG.timer.start:0);}
-function renderTimer(){
-  const s=Math.floor(elapsed()/1000), h=Math.floor(s/3600);
-  $('#timerOut').textContent=(h?h+':':'')+pad(Math.floor(s/60)%60)+':'+pad(s%60);
-  $('#timerOut').classList.toggle('run',LOG.timer.running);
-  $('#timerBtn').textContent=LOG.timer.running?'一時停止':(elapsed()>0?'再開':'開始');
-  $('#timerSave').disabled=$('#timerReset').disabled=elapsed()<1000;
-}
-function timerToggle(){
-  const t=LOG.timer;
-  if(t.running){t.acc+=Date.now()-t.start;t.running=false;clearInterval(LOG.tick);}
-  else{t.start=Date.now();t.running=true;LOG.tick=setInterval(renderTimer,1000);}
-  store.set('timer',t); renderTimer();
-}
-function timerReset(){clearInterval(LOG.tick);LOG.timer={running:false,start:0,acc:0};store.set('timer',LOG.timer);renderTimer();}
 function dayTotals(){const m={};LOG.entries.forEach(e=>m[e.date]=(m[e.date]||0)+e.min);return m;}
+// 経過時間（ミリ秒）：実行中は終了時刻から逆算、一時停止中は保存した残り時間から
+function pomoLeft(){const p=LOG.pomo; return p.state==='run'||p.state==='break'?Math.max(0,p.end-Date.now()):p.state==='pause'?p.left:p.len*60000;}
+function pomoElapsedMin(){const p=LOG.pomo; return (p.len*60000-pomoLeft())/60000;}
+function pomoRender(){
+  const p=LOG.pomo, left=pomoLeft(), total=(p.state==='break'?5:p.len)*60000, s=Math.ceil(left/1000);
+  $('#pomoTime').textContent=pad(Math.floor(s/60))+':'+pad(s%60);
+  $('#ringFg').style.strokeDashoffset=p.state==='done'?'0':(603.2*(left/total)).toFixed(1);
+  if(p.state==='done') $('#pomoTime').textContent=pad(p.len)+':00';
+  const main=document.querySelector('.pomo-main'); main.classList.toggle('break',p.state==='break'); main.classList.toggle('done',p.state==='done');
+  $('#pomoState').textContent={idle:'準備OK',run:'練習中',pause:'一時停止中',break:'休憩中',done:'達成！'}[p.state];
+  $('#pomoStart').textContent=p.state==='run'?'一時停止':p.state==='pause'?'再開':p.state==='break'?'休憩をやめる':'スタート';
+  $('#pomoStop').disabled=!(p.state==='run'||p.state==='pause');
+  document.querySelectorAll('#pomoLen button').forEach(b=>{b.disabled=p.state==='run'||p.state==='pause';b.setAttribute('aria-pressed',String(+b.dataset.v===p.len));});
+}
+function pomoChime(){ const c=ac(), t=c.currentTime+.05; [0,.18,.36].forEach((d,i)=>metroHit(8,t+d,i===2?0:1,.9)); }
+function pomoTick(){
+  const p=LOG.pomo;
+  if((p.state==='run'||p.state==='break')&&pomoLeft()<=0){
+    if(p.state==='run') pomoFinish(true); else { p.state='idle'; savePomo(); $('#pomoMsg').textContent='休憩おわり。次の1セットいきましょう！'; try{pomoChime();}catch(e){} }
+  }
+  pomoRender();
+}
+function pomoFinish(complete){
+  const p=LOG.pomo, min=complete?p.len:Math.floor(pomoElapsedMin());
+  if(min>=1){ addEntry(ymd(new Date()),min,'練習',''); LOG.lastDone=Date.now(); }
+  p.state=complete?'done':'idle'; p.left=0; savePomo();
+  const msg=$('#pomoMsg'); msg.textContent='';
+  if(min>=1){
+    msg.append(complete?`おつかれさま！ ＋${min}分 記録しました`:`＋${min}分 記録しました`);
+    if(complete){ try{pomoChime();}catch(e){} const b=document.createElement('button'); b.className='btn'; b.textContent='5分休憩'; b.addEventListener('click',pomoBreak); msg.appendChild(b); }
+  } else msg.textContent='1分未満のため記録しませんでした';
+  pomoRender();
+}
+function pomoBreak(){ const p=LOG.pomo; p.state='break'; p.end=Date.now()+5*60000; savePomo(); $('#pomoMsg').textContent='肩と指をゆるめて、深呼吸。'; pomoRender(); }
+function pomoStartPause(){
+  const p=LOG.pomo; ac();
+  if(p.state==='run'){ p.left=pomoLeft(); p.state='pause'; }
+  else if(p.state==='pause'){ p.end=Date.now()+p.left; p.state='run'; }
+  else if(p.state==='break'){ p.state='idle'; $('#pomoMsg').textContent=''; }
+  else { p.state='run'; p.end=Date.now()+p.len*60000; $('#pomoMsg').textContent=''; }
+  savePomo(); pomoRender();
+}
 function renderLog(){
-  const tot=dayTotals(), today=new Date(), td=ymd(today);
-  let week=0; for(let i=0;i<7;i++){const d=new Date(today);d.setDate(d.getDate()-i);week+=tot[ymd(d)]||0;}
-  let streak=0; const d=new Date(today); if(!tot[td]) d.setDate(d.getDate()-1);
-  while(tot[ymd(d)]){streak++;d.setDate(d.getDate()-1);}
+  const tot=dayTotals(), now=new Date(), td=ymd(now), today=tot[td]||0;
+  $('#todayMin').textContent=today;
+  const dots=$('#todayDots'); dots.innerHTML='';
+  LOG.entries.filter(e=>e.date===td).forEach((e,i,arr)=>{const d=document.createElement('i'); if(e.min<15) d.className='s'; if(i===arr.length-1&&Date.now()-LOG.lastDone<3000) d.classList.add('pop'); d.title=e.min+'分'; dots.appendChild(d);});
+  const pct=Math.min(100,today/LOG.goal*100); $('#goalFill').style.width=pct+'%'; document.querySelector('.goal-bar').classList.toggle('met',today>=LOG.goal);
+  $('#goalMsg').textContent= today>=LOG.goal?`今日の目標 ${LOG.goal}分 達成！`:`目標 ${LOG.goal}分まで あと${LOG.goal-today}分`;
+  let week=0; const days=[]; for(let i=6;i>=0;i--){const d=new Date(now); d.setDate(d.getDate()-i); const v=tot[ymd(d)]||0; week+=v; days.push({d,v,i});}
+  let streak=0; const d=new Date(now); if(!tot[td]) d.setDate(d.getDate()-1); while(tot[ymd(d)]){streak++;d.setDate(d.getDate()-1);}
   const all=LOG.entries.reduce((a,e)=>a+e.min,0);
-  const st=[['今日',tot[td]||0,'分'],['直近7日',week,'分'],['連続練習',streak,'日'],['累計',all>=60?(all/60).toFixed(1):all,all>=60?'時間':'分']];
-  $('#logStats').innerHTML=st.map(([l,v,u])=>`<div class="stat"><span class="label">${l}</span><div class="v">${v}<small>${u}</small></div></div>`).join('');
-  // chart: last 14 days
-  const days=[]; for(let i=13;i>=0;i--){const x=new Date(today);x.setDate(x.getDate()-i);days.push({d:x,v:tot[ymd(x)]||0});}
-  const W=560,H=210,l=34,r=8,t=20,b=26, max=Math.max(LOG.goal*1.25,...days.map(x=>x.v),10);
-  const nice=[15,30,60,90,120,180,240,360,480,600].find(n=>n>=max)||max; const y=v=>t+(H-t-b)*(1-v/nice);
-  const bw=(W-l-r)/14, ticks=[0,nice/2,nice];
-  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="直近14日間の練習時間">`;
-  ticks.forEach(v=>s+=`<line class="grid" x1="${l}" x2="${W-r}" y1="${y(v)}" y2="${y(v)}"/><text x="${l-6}" y="${y(v)+3}" text-anchor="end">${v}</text>`);
-  days.forEach((x,i)=>{
-    const cx=l+i*bw+bw/2, w=Math.min(22,bw-6), h=y(0)-y(x.v);
-    if(x.v>0){const rr=Math.min(4,h/2,w/2), x0=cx-w/2, y0=y(x.v);
-      s+=`<path class="b${x.v>=LOG.goal?' met':''}" data-i="${i}" d="M${x0} ${y(0)}V${y0+rr}Q${x0} ${y0} ${x0+rr} ${y0}H${x0+w-rr}Q${x0+w} ${y0} ${x0+w} ${y0+rr}V${y(0)}Z"/>`;}
-    s+=`<rect data-i="${i}" class="hitb" x="${l+i*bw}" y="${t}" width="${bw}" height="${H-t-b}" fill="transparent"/>`;
-    if(i%2===1||i===13) s+=`<text x="${cx}" y="${H-8}" text-anchor="middle">${i===13?'今日':(x.d.getMonth()+1)+'/'+x.d.getDate()}</text>`;
-  });
-  s+=`<line class="goal" x1="${l}" x2="${W-r}" y1="${y(LOG.goal)}" y2="${y(LOG.goal)}"/><text x="${l+4}" y="${y(LOG.goal)-5}">目標 ${LOG.goal}分</text>`;
-  s+=`<text class="tip-lbl" id="chartTip" x="0" y="0" text-anchor="middle"></text></svg>`;
-  const ch=$('#logChart'); ch.innerHTML=s;
-  ch.querySelectorAll('.hitb').forEach(rc=>{
-    rc.addEventListener('mouseenter',()=>{const i=+rc.dataset.i,x=days[i],tip=$('#chartTip');tip.textContent=`${x.d.getMonth()+1}/${x.d.getDate()}  ${x.v}分`;tip.setAttribute('x',Math.min(W-50,Math.max(l+40,l+i*bw+bw/2)));tip.setAttribute('y',y(x.v)-6);});
-    rc.addEventListener('mouseleave',()=>$('#chartTip').textContent='');
-  });
-  // list
+  $('#stStreak').textContent=streak; $('#stWeek').textContent=week;
+  $('#stAll').textContent=all>=60?(all/60).toFixed(1):all; $('#stAllU').textContent=all>=60?'時間':'分';
+  const mx=Math.max(LOG.goal,...days.map(x=>x.v),1), wb=$('#weekBars'); wb.innerHTML='';
+  days.forEach(x=>{const c=document.createElement('div'); c.className='wb'+(x.v?' on':'')+(x.v>=LOG.goal?' met':'')+(x.i===0?' today':'');
+    c.innerHTML=`<i style="height:${Math.round(x.v/mx*80)}%"></i><span>${x.i===0?'今日':'日月火水木金土'[x.d.getDay()]}</span>`; c.title=`${x.d.getMonth()+1}/${x.d.getDate()} ${x.v}分`; wb.appendChild(c);});
   const list=$('#logList'); list.innerHTML='';
-  const rows=LOG.entries.slice().sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:b.id-a.id).slice(0,60);
-  if(!rows.length) list.innerHTML='<p class="msg">まだ記録がありません。タイマーで計るか、「手入力で追加」から最初の記録をつけましょう。メトロノームやコード進行を2分以上鳴らすと、止めたときに記録を提案します。</p>';
-  rows.forEach(e=>{
-    const r=document.createElement('div');r.className='log-row';
-    const [yy,mm,dd]=e.date.split('-');
-    r.innerHTML=`<span class="d">${+mm}/${+dd}（${'日月火水木金土'[new Date(+yy,+mm-1,+dd).getDay()]}）</span><span class="m">${e.min}分</span><span><span class="tag"></span></span><span class="memo"></span><button class="del">削除</button>`;
-    r.querySelector('.tag').textContent=e.cat; r.querySelector('.memo').textContent=e.memo||'';
-    const del=r.querySelector('.del');
-    del.addEventListener('click',()=>{
-      if(LOG.del===e.id){LOG.entries=LOG.entries.filter(x=>x.id!==e.id);LOG.del=null;saveLog();renderLog();return;}
-      LOG.del=e.id; document.querySelectorAll('.log-row .del.confirm').forEach(b=>{b.classList.remove('confirm');b.textContent='削除';});
-      del.classList.add('confirm'); del.textContent='本当に削除';
-    });
-    list.appendChild(r);
-  });
+  const byDay=Object.entries(tot).sort((a,b)=>a[0]<b[0]?1:-1).slice(0,30);
+  if(!byDay.length) list.innerHTML='<p class="msg">まだ記録がありません。上のタイマーで最初の1セットを始めましょう。</p>';
+  byDay.forEach(([date,min])=>{const [yy,mm,dd]=date.split('-'), n=LOG.entries.filter(e=>e.date===date).length, r=document.createElement('div'); r.className='log-row';
+    r.innerHTML=`<span class="d">${+mm}/${+dd}（${'日月火水木金土'[new Date(+yy,+mm-1,+dd).getDay()]}）</span><span class="m">${min}分</span><span class="memo">${n}セット</span><span></span>`; list.appendChild(r);});
 }
 let toastTimer=null;
 function offerLog(mins,cat){
@@ -1896,25 +2050,25 @@ function offerLog(mins,cat){
   t.append(b,x); t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,15000);
 }
 (function initLog(){
-  [$('#timerCat'),$('#manCat')].forEach(s=>LOG_CATS.forEach(c=>s.add(new Option(c,c))));
-  $('#manDate').value=ymd(new Date());
-  $('#timerBtn').addEventListener('click',timerToggle);
-  $('#timerReset').addEventListener('click',timerReset);
-  $('#timerSave').addEventListener('click',()=>{const m=Math.max(1,Math.round(elapsed()/60000));addEntry(ymd(new Date()),m,$('#timerCat').value,$('#timerMemo').value);$('#timerMemo').value='';timerReset();});
-  $('#manAdd').addEventListener('click',()=>{const m=+$('#manMin').value;if(!m||m<1)return;addEntry($('#manDate').value||ymd(new Date()),m,$('#manCat').value,'');});
-  const g=$('#goalMin'); g.value=LOG.goal; g.addEventListener('change',()=>{LOG.goal=Math.max(5,Math.min(600,+g.value||30));store.set('goal',LOG.goal);renderLog();});
-  document.querySelector('[data-panel="log"] details:last-of-type').addEventListener('toggle',e=>{if(e.target.open) $('#backupTxt').value=JSON.stringify({app:'fretlab',v:1,log:LOG.entries});});
+  segInit($('#pomoLen'),String(LOG.pomo.len),v=>{ if(LOG.pomo.state==='run'||LOG.pomo.state==='pause') return; LOG.pomo.len=+v; LOG.pomo.state='idle'; savePomo(); $('#pomoMsg').textContent=''; pomoRender(); });
+  $('#pomoStart').addEventListener('click',pomoStartPause);
+  $('#pomoStop').addEventListener('click',()=>pomoFinish(false));
+  const g=$('#goalSel'); g.value=String(LOG.goal); g.addEventListener('change',()=>{LOG.goal=+g.value;store.set('goal',LOG.goal);renderLog();});
+  document.querySelector('.log-more').addEventListener('toggle',e=>{if(e.target.open) $('#backupTxt').value=JSON.stringify({app:'fretlab',v:1,log:LOG.entries});});
   $('#backupCopy').addEventListener('click',()=>{const t=$('#backupTxt');t.value=JSON.stringify({app:'fretlab',v:1,log:LOG.entries});
     navigator.clipboard.writeText(t.value).then(()=>$('#backupMsg').textContent='コピーしました').catch(()=>{t.select();$('#backupMsg').textContent='選択しました。手動でコピーしてください';});});
   $('#backupLoad').addEventListener('click',()=>{
     try{const o=JSON.parse($('#backupTxt').value);const arr=Array.isArray(o)?o:o.log;
       if(!Array.isArray(arr)||!arr.every(e=>e&&/^\d{4}-\d{2}-\d{2}$/.test(e.date)&&+e.min>0)) throw 0;
-      LOG.entries=arr.map(e=>({id:e.id||Date.now()+Math.random(),date:e.date,min:+e.min,cat:String(e.cat||'その他'),memo:String(e.memo||'')}));
+      LOG.entries=arr.map(e=>({id:e.id||Date.now()+Math.random(),date:e.date,min:+e.min,cat:String(e.cat||'練習'),memo:String(e.memo||'')}));
       saveLog();renderLog();$('#backupMsg').textContent=`${arr.length}件を復元しました`;
     }catch(e){$('#backupMsg').textContent='読み込めませんでした。コピーした文字列をそのまま貼り付けてください。';}
   });
-  if(LOG.timer.running) LOG.tick=setInterval(renderTimer,1000);
-  renderTimer(); renderLog();
+  // アプリを閉じている間に時間が来ていたら、ここで記録する
+  if(LOG.pomo.state==='run'&&pomoLeft()<=0) pomoFinish(true);
+  if(LOG.pomo.state==='break'&&pomoLeft()<=0){LOG.pomo.state='idle';savePomo();}
+  LOG.tick=setInterval(pomoTick,500);
+  pomoRender(); renderLog();
 })();
 
 /* ---------- fretboard map + quiz ---------- */
