@@ -15,6 +15,7 @@
   --good:#4f7a5a; --warn:#a8772e; --bad:#a5473a;
   --wood:#2b2826; --wood-hi:#353130; --fretwire:#bdb6a8; --string:#ddd6c6; --inlay:#e8e2d3; --nut:#f4f0e6;
   --leaf:#7f9a83; --wash:rgba(143,174,139,.10);
+  --cobalt-a:#2a5bc4; --cobalt-b:#163a8a; --gold-a:#d8b46a; --gold-b:#9c742a;
   --display:"Cormorant Garamond", "Times New Roman", serif;
   --serif:"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
   --body:"Noto Sans JP", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
@@ -30,6 +31,7 @@
   --good:#7fbf8f; --warn:#d9a55a; --bad:#d9776a;
   --wood:#1d1b19; --wood-hi:#262321; --fretwire:#8f897e; --string:#cbc4b4; --inlay:#bfb8a8; --nut:#d9d3c5;
   --leaf:#7f9a83; --wash:rgba(143,174,139,.07);
+  --cobalt-a:#7ea6f2; --cobalt-b:#4d7ad8; --gold-a:#ecd08e; --gold-b:#c09a4c;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#121412; --surface:#181b18; --panel:#1f231f; --line:#2c312c;
@@ -40,6 +42,7 @@
   --good:#7fbf8f; --warn:#d9a55a; --bad:#d9776a;
   --wood:#1d1b19; --wood-hi:#262321; --fretwire:#8f897e; --string:#cbc4b4; --inlay:#bfb8a8; --nut:#d9d3c5;
   --leaf:#7f9a83; --wash:rgba(143,174,139,.07);
+  --cobalt-a:#7ea6f2; --cobalt-b:#4d7ad8; --gold-a:#ecd08e; --gold-b:#c09a4c;
   color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -55,12 +58,12 @@ button,select,input{font:inherit;color:inherit}
 
 /* header + tabs */
 .top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding-block:18px 6px}
-.mark{font-family:var(--serif);font-weight:700;font-size:22px;letter-spacing:.32em;line-height:1}
-.mark span{color:inherit}
+.mark{font-family:var(--serif);font-weight:700;font-size:24px;letter-spacing:.3em;line-height:1.1;background:linear-gradient(180deg,var(--cobalt-a),var(--cobalt-b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.mark span{background:linear-gradient(180deg,var(--gold-a) 10%,var(--gold-b) 60%,var(--gold-a) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .sub{color:var(--muted);font-size:13px}
-.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:20px;scrollbar-width:none}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;column-gap:2px;border-bottom:1px solid var(--line);margin-bottom:20px}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex:0 0 auto;background:none;border:0;border-bottom:1.5px solid transparent;padding:14px 12px 10px;letter-spacing:.06em;cursor:pointer;color:var(--muted);font-weight:500;white-space:nowrap}
+.tab{flex:0 0 auto;background:none;border:0;border-bottom:1.5px solid transparent;padding:12px 10px 8px;letter-spacing:.06em;cursor:pointer;color:var(--muted);font-weight:500;white-space:nowrap}
 .tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--fg);font-weight:500}
 .tab:hover{color:var(--fg)}
 
@@ -237,6 +240,36 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .ai-note{font-size:12px}
 @media (max-width:760px){.ai-char{grid-template-columns:auto minmax(0,1fr)}.ai-tools{grid-column:1/-1;flex-direction:row}}
 
+/* songs */
+.songs{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:16px;align-items:start}
+.song-key{font-family:var(--display);font-size:30px;font-weight:500;min-width:2.6ch;text-align:center}
+.sheet{padding:22px 20px;display:flex;flex-direction:column;gap:18px}
+.sheet .sec{font-size:11px;letter-spacing:.24em;color:var(--muted)}
+.sline{display:flex;flex-wrap:wrap;align-items:flex-end;row-gap:6px}
+.seg-c{display:inline-flex;flex-direction:column;white-space:pre}
+.seg-c .ch{font-family:var(--display);font-weight:600;font-size:19px;color:var(--cobalt-b);line-height:1.1;min-height:1.1em;padding-right:.6em;cursor:pointer}
+.seg-c .ch:hover{color:var(--root)}
+.seg-c .ly{font-size:17px;line-height:1.5}
+.sheet.en .seg-c .ly{font-family:var(--display);font-size:20px}
+.song-chords{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.song-chords .card{padding:10px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.song-chords .cn{font-family:var(--display);font-size:24px;font-weight:500}
+.song-chords .diagram{width:150px}
+@media (max-width:860px){.songs{grid-template-columns:minmax(0,1fr)}}
+
+/* tab */
+.tabsheet{padding:14px 10px;overflow:hidden}
+.tabsheet svg{display:block;width:100%;height:auto}
+.tabsheet .tl{stroke:var(--line);stroke-width:1}
+.tabsheet .bl{stroke:var(--muted);stroke-width:1.2}
+.tabsheet .tn{font-family:var(--mono);font-size:13px;font-weight:500;fill:var(--fg);text-anchor:middle;dominant-baseline:central}
+.tabsheet .tnb{fill:var(--surface)}
+.tabsheet .on .tn{fill:var(--root-ink)}
+.tabsheet .on .tnb{fill:var(--root)}
+.tabsheet .tabclef{font-family:var(--display);font-size:13px;font-weight:600;fill:var(--muted);letter-spacing:.1em}
+.tabsheet .dur{stroke:var(--muted);stroke-width:1}
+.tabsheet .cnt{font-family:var(--mono);font-size:10px;fill:var(--muted);text-anchor:middle}
+
 /* drum grid */
 .drumgrid-scroll{overflow-x:auto}
 .drumgrid{display:grid;gap:3px;font-family:var(--mono);font-size:11px;align-items:center;min-width:max-content}
@@ -319,6 +352,8 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 }
 
 @media (max-width:760px){
+  .tabs{justify-content:space-between;column-gap:0}
+  .tab{padding:10px 5px 7px;font-size:12.5px;letter-spacing:.02em}
   .metro,.tuner,.scale-info,.tips-grid{grid-template-columns:minmax(0,1fr)}
   .bpm output{font-size:88px}
   .chord-name{font-size:52px}
@@ -362,13 +397,15 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
   <nav class="tabs" role="tablist" aria-label="機能">
     <button class="tab" role="tab" data-tab="metronome">メトロノーム</button>
     <button class="tab" role="tab" data-tab="tuner">チューナー</button>
-    <button class="tab" role="tab" data-tab="chords">コード一覧</button>
-    <button class="tab" role="tab" data-tab="progressions">コード進行</button>
-    <button class="tab" role="tab" data-tab="fretboard">指板音程表</button>
+    <button class="tab" role="tab" data-tab="chords">コード</button>
+    <button class="tab" role="tab" data-tab="progressions">進行</button>
+    <button class="tab" role="tab" data-tab="fretboard">指板</button>
     <button class="tab" role="tab" data-tab="scales">スケール</button>
-    <button class="tab" role="tab" data-tab="log">練習記録</button>
+    <button class="tab" role="tab" data-tab="songs">練習曲</button>
+    <button class="tab" role="tab" data-tab="tab">TAB</button>
+    <button class="tab" role="tab" data-tab="log">記録</button>
     <button class="tab" role="tab" data-tab="ai">AI先生</button>
-    <button class="tab" role="tab" data-tab="tips">練習Tips</button>
+    <button class="tab" role="tab" data-tab="tips">Tips</button>
   </nav>
 
   <!-- METRONOME -->
@@ -563,6 +600,59 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
           <div class="card nn-card"><span class="label">今のコード</span><div class="nn-name" id="nowName">–</div><div id="nowDia"></div></div>
           <div class="card nn-card"><span class="label">次のコード</span><div class="nn-name dim" id="nextName">–</div><div id="nextDia"></div></div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SONGS -->
+  <section data-panel="songs" hidden>
+    <div class="panel-head"><div><h2>練習曲</h2><p>著作権の保護期間が終わった名曲と伝承曲だけを集めた、歌詞つきのコード譜です。キーの変更やカポの提案、使うコードの押さえ方つき。コードは弾きやすさを優先した一例です。</p></div></div>
+    <div class="songs">
+      <div class="card song-list-card">
+        <div class="seg" id="songLang"><button data-v="all">すべて</button><button data-v="ja">日本の歌</button><button data-v="en">海外の歌</button></div>
+        <div class="prog-list" id="songList" style="margin-top:10px"></div>
+      </div>
+      <div class="stack" style="min-width:0">
+        <div class="card stack">
+          <div>
+            <div class="label" id="songMeta"></div>
+            <h3 class="prog-title" id="songTitle"></h3>
+            <p class="msg" id="songCredit" style="margin:4px 0 0"></p>
+          </div>
+          <div class="row prog-controls">
+            <div><span class="label">キー</span><div class="bpm-mini"><button class="btn" id="songKeyDown" aria-label="キーを下げる">−</button><output id="songKey" class="song-key">C</output><button class="btn" id="songKeyUp" aria-label="キーを上げる">+</button></div></div>
+            <div><span class="label">表示</span><div class="seg" id="songMode"><button data-v="real">実際のコード</button><button data-v="capo">カポで簡単に</button></div></div>
+            <div><span class="label">テンポ</span><button class="btn" id="songTempo">♩ テンポを鳴らす</button></div>
+          </div>
+          <div class="msg" id="songCapo"></div>
+        </div>
+        <div class="card sheet" id="songSheet"></div>
+        <div><span class="label">この曲で使うコード（タップで鳴る）</span><div class="song-chords" id="songChords"></div></div>
+        <p class="msg" id="songStrum"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB -->
+  <section data-panel="tab" hidden>
+    <div class="panel-head"><div><h2>TAB練習</h2><p>著作権の切れた名曲のメロディと、練習用のオリジナルのリフ・フレーズをTAB譜で練習します。再生すると今弾く音が光ります。数字は押さえるフレット、上の線が1弦です。</p></div></div>
+    <div class="songs">
+      <div class="card song-list-card">
+        <div class="seg" id="tabCat"><button data-v="all">すべて</button><button data-v="melody">メロディ</button><button data-v="riff">リフ・練習</button></div>
+        <div class="prog-list" id="tabList" style="margin-top:10px"></div>
+      </div>
+      <div class="stack" style="min-width:0">
+        <div class="card stack">
+          <div><div class="label" id="tabMeta"></div><h3 class="prog-title" id="tabTitle"></h3><p class="msg" id="tabDesc" style="margin:4px 0 0"></p></div>
+          <div class="row">
+            <button class="btn primary big" id="tabPlay">▶ 再生</button>
+            <div style="flex:1;min-width:180px"><span class="label">速さ <b id="tabSpeedOut">100</b>%（♩=<span id="tabBpm"></span>）</span><input type="range" id="tabSpeed" min="50" max="120" step="5" value="100" aria-label="速さ"></div>
+            <label class="check"><input type="checkbox" id="tabLoop" checked> ループ</label>
+            <label class="check"><input type="checkbox" id="tabClick" checked> クリック</label>
+          </div>
+        </div>
+        <div class="card tabsheet" id="tabSheet"></div>
+        <p class="msg" id="tabTip"></p>
       </div>
     </div>
   </section>
@@ -801,7 +891,7 @@ function sampleNote(kind,midi,t,gain,key){
   if(key) choke(key,t);
   const v=playBuf(kind+'-'+best,t,gain,Math.pow(2,(midi-best)/12)*(a4/440));
   if(v&&key) SMP.voices[key]=v;
-  return !!v;
+  return v;
 }
 const mfreq=m=>a4*Math.pow(2,(m-69)/12);
 const ksCache=new Map();
@@ -819,13 +909,13 @@ function pluckBuffer(freq){
 // kind: guitar / bass / nylon、str: 弦番号（同じ弦の音を止めるため）
 function pluck(midi,when=0,gain=0.55,opt={}){
   const c=ac(), kind=opt.kind||'guitar';
-  if(sampleNote(kind,midi,c.currentTime+when,gain*1.1,opt.str!=null?kind+opt.str:null)) return;
+  const sv=sampleNote(kind,midi,c.currentTime+when,gain*1.1,opt.str!=null?kind+opt.str:null); if(sv) return sv.s;
   const src=c.createBufferSource(); src.buffer=pluckBuffer(mfreq(midi));
-  const g=c.createGain(); g.gain.value=gain; src.connect(g); g.connect(master); src.start(c.currentTime+when);
+  const g=c.createGain(); g.gain.value=gain; src.connect(g); g.connect(master); src.start(c.currentTime+when); return src;
 }
 
 /* ---------- tabs ---------- */
-const TABS=['metronome','tuner','chords','progressions','fretboard','scales','log','ai','tips'];
+const TABS=['metronome','tuner','chords','progressions','fretboard','scales','songs','tab','log','ai','tips'];
 function showTab(id){
   if(!TABS.includes(id)) id='metronome';
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',String(t.dataset.tab===id)));
@@ -1008,7 +1098,8 @@ function transportStop(){
   document.querySelectorAll('#drumGrid .st.cur').forEach(e=>e.classList.remove('cur'));
   const mins=Math.round((Date.now()-M.startedAt)/60000), owner=M.owner; M.owner=null;
   syncPlayButtons(); drawHooks.forEach(h=>h(null));
-  if(mins>=2&&!LOG.timer.running) offerLog(mins,owner==='prog'?'コード進行':'リズム・メトロノーム');
+  if(mins>=2&&!LOG.timer.running) offerLog(mins,owner==='prog'?'コード進行':owner==='song'?'曲の練習':'リズム・メトロノーム');
+  const st=document.getElementById('songTempo'); if(st) st.textContent='♩ テンポを鳴らす';
 }
 function syncPlayButtons(){
   $('#metroPlay').textContent=M.playing&&M.owner==='metro'?'ストップ':'スタート';
@@ -1485,6 +1576,241 @@ drawHooks.push(cur=>{
   $('#progBpm').textContent=M.bpm;
   if(P.idx>=PROGS.length) P.idx=0;
   renderProgList(); renderProg();
+})();
+
+/* ---------- 練習曲（パブリックドメインの歌） ---------- */
+// lines：[コード]歌詞 の形。空行の代わりに '#' で始まる行は小見出し
+const SONGS=[
+  {id:'furusato',lang:'ja',t:'ふるさと（故郷）',c:'作詞 高野辰之（1947年没）／作曲 岡野貞一（1941年没）・1914年',key:'C',time:3,bpm:84,part:'1番',strum:'3拍子：↓ ↓ ↓ （1拍目を強く）',
+   lines:['[C]うさぎ[G7]おいし [C]かのやま','[C]こぶな[F]つりし [G7]かの[C]かわ','[C]ゆめは[F]いまも [C]めぐ[G]りて','[F]わすれ[C]がたき [G7]ふるさ[C]と']},
+  {id:'akatombo',lang:'ja',t:'赤とんぼ',c:'作詞 三木露風（1964年没）／作曲 山田耕筰（1965年没）・1927年',key:'C',time:3,bpm:72,part:'1番',strum:'3拍子：↓ ↓↑ ↓↑ 、またはアルペジオ',
+   lines:['[C]ゆうやけ[F]こやけの [C]あかとん[G7]ぼ','[C]おわれて[F]みたのは [C]いつの[G7]ひ[C]か']},
+  {id:'kojo',lang:'ja',t:'荒城の月',c:'作詞 土井晩翠（1952年没）／作曲 滝廉太郎（1903年没）・1901年',key:'Em',time:4,bpm:66,part:'1番',strum:'4拍子：アルペジオ（親指でルート→3弦→2弦→1弦）',
+   lines:['[Em]はるこうろうの [Am]はなの[Em]えん','[C]めぐる[Am]さかずき [B7]かげさして','[Em]ちよのまつが[Am]え [Em]わけいでし','[Am]むかしの[B7]ひかり いま[Em]いずこ']},
+  {id:'shabondama',lang:'ja',t:'しゃぼん玉',c:'作詞 野口雨情（1945年没）／作曲 中山晋平（1952年没）・1922年',key:'C',time:4,bpm:92,part:'1番',strum:'4拍子：↓ ↓ ↓↑ ↓',
+   lines:['[C]しゃぼんだま [G7]とんだ','[G7]やねまで [C]とんだ','[F]やねまで [C]とんで','[C]こわれて [G7]きえ[C]た']},
+  {id:'nanatsunoko',lang:'ja',t:'七つの子',c:'作詞 野口雨情（1945年没）／作曲 本居長世（1945年没）・1921年',key:'C',time:4,bpm:80,part:'1番',strum:'4拍子：↓ ↓↑ ↓ ↓↑',
+   lines:['[C]からす なぜ[F]なくの[C]','[C]からすは [G7]やまに','[F]かわいい [C]ななつの','[C]こがある[G7]から[C]よ']},
+  {id:'harugakita',lang:'ja',t:'春が来た',c:'作詞 高野辰之（1947年没）／作曲 岡野貞一（1941年没）・1910年',key:'C',time:4,bpm:96,part:'1番',strum:'4拍子：↓ ↓ ↓ ↓（元気よく）',
+   lines:['[C]はるがきた [G7]はるがきた [C]どこにきた','[F]やまに[C]きた [F]さとに[C]きた [G7]のにも[C]きた']},
+  {id:'sakura',lang:'ja',t:'さくらさくら',c:'日本古謡（江戸時代の箏曲が元とされる）',key:'Am',time:4,bpm:60,part:'全体',strum:'4拍子：ゆったりアルペジオ。E の部分で少し間を取る',
+   lines:['[Am]さくら さくら','[Dm]やよいのそらは [Am]みわたすかぎり','[Dm]かすみかくもか [E]においぞいずる','[Am]いざや いざや [Dm]みに[E]ゆか[Am]ん']},
+  {id:'hotaru',lang:'ja',t:'蛍の光',c:'作詞 稲垣千穎（1913年没）／スコットランド民謡・1881年',key:'G',time:4,bpm:72,part:'1番',strum:'4拍子：↓ ↓↑ ↓ ↓↑',
+   lines:['[G]ほたるのひかり [D]まどのゆき','[G]ふみよむつきひ [C]かさねつつ','[G]いつしかとしも [D]すぎのとを','[Em]あけてぞ[C]けさは [D]わかれ[G]ゆく']},
+  {id:'amazing',lang:'en',t:'Amazing Grace',c:'Words: John Newton (1779) / Traditional American melody',key:'G',time:3,bpm:72,part:'Verse 1',strum:'3拍子：↓ ↓ ↓、慣れたら ↓ ↓↑ ↓↑',
+   lines:['A[G]mazing [G7]grace, how [C]sweet the [G]sound','That saved a wretch like [D]me','I [G]once was [G7]lost, but [C]now am [G]found','Was [Em]blind, but [D]now I [G]see']},
+  {id:'saints',lang:'en',t:'When the Saints Go Marching In',c:'Traditional（アメリカ・ゴスペル／ジャズの定番）',key:'G',time:4,bpm:112,part:'Chorus',strum:'4拍子：2・4拍目を強く（↓ ↑↓ ↓ ↑↓）',
+   lines:['Oh when the [G]saints go marching in','Oh when the saints go marching [D7]in','Oh Lord, I [G]want to [G7]be in that [C]number','When the [G]saints go [D7]marching [G]in']},
+  {id:'susanna',lang:'en',t:'Oh! Susanna',c:'Words & music: Stephen Foster (1848)',key:'C',time:4,bpm:108,part:'Chorus',strum:'4拍子：カントリー風（ベース↓ ↑ ベース↓ ↑）',
+   lines:['[F]Oh! Su[C]sanna, oh don\'t you cry for [G]me','For I\'ve [C]come from Alabama with my [G]banjo on my [C]knee']},
+  {id:'silent',lang:'en',t:'Silent Night',c:'Words: Joseph Mohr (1818), English: J. F. Young / Music: Franz Gruber',key:'C',time:3,bpm:66,part:'Verse 1',strum:'3拍子：アルペジオ（ルート→3弦→2弦）',
+   lines:['[C]Silent night, holy night','[G7]All is calm, [C]all is bright','[F]Round yon Virgin [C]Mother and Child','[F]Holy Infant so [C]tender and mild','[G7]Sleep in heavenly [C]peace','[C]Sleep in [G7]heavenly [C]peace']},
+  {id:'jingle',lang:'en',t:'Jingle Bells',c:'Words & music: James Lord Pierpont (1857)',key:'G',time:4,bpm:120,part:'Chorus',strum:'4拍子：↓ ↑↓ ↑↓ ↑（軽快に）',
+   lines:['[G]Jingle bells, jingle bells, jingle all the way','[C]Oh what fun it [G]is to ride in a [A7]one-horse open [D7]sleigh, hey!','[G]Jingle bells, jingle bells, jingle all the way','[C]Oh what fun it [G]is to ride in a [D7]one-horse open [G]sleigh']},
+  {id:'twinkle',lang:'en',t:'Twinkle, Twinkle, Little Star',c:'Words: Jane Taylor (1806) / French melody (18世紀)',key:'C',time:4,bpm:90,part:'全体',strum:'4拍子：↓ ↓ ↓ ↓',
+   lines:['[C]Twinkle, twinkle, [F]little [C]star','[F]How I [C]wonder [G]what you [C]are','[C]Up a[F]bove the [C]world so [G]high','[C]Like a [F]diamond [C]in the [G]sky','[C]Twinkle, twinkle, [F]little [C]star','[F]How I [C]wonder [G]what you [C]are']},
+  {id:'scarborough',lang:'en',t:'Scarborough Fair',c:'Traditional English ballad（イギリス伝承）',key:'Am',time:3,bpm:84,part:'Verse 1',strum:'3拍子：アルペジオ（ドリアン調の D がポイント）',
+   lines:['[Am]Are you going to [G]Scarborough [Am]Fair?','[C]Parsley, [Am]sage, rose[D]mary and [Am]thyme','[Am]Remember [C]me to one who [G]lives there','[Am]She once was a [G]true love of [Am]mine']},
+  {id:'swinglow',lang:'en',t:'Swing Low, Sweet Chariot',c:'Traditional African-American spiritual（19世紀）',key:'G',time:4,bpm:76,part:'Chorus',strum:'4拍子：ゆったり ↓ ↓↑ ↓ ↓↑',
+   lines:['[G]Swing low, sweet [C]chari[G]ot','Coming for to carry me [D]home','[G]Swing low, sweet [C]chari[G]ot','Coming [D]for to carry me [G]home']},
+];
+const QUAL_MAP={'':'maj',m:'m','7':'7',M7:'M7',maj7:'M7',m7:'m7',mM7:'mM7','6':'6',m6:'m6',sus2:'sus2',sus4:'sus4','7sus4':'7sus4',add9:'add9','9':'9',dim:'dim',dim7:'dim7',m7b5:'m7b5',aug:'aug'};
+const NAME_PC={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+function parseChord(ch){const m=/^([A-G])([#b♯♭]?)(.*)$/.exec(ch);if(!m) return null;let pc=NAME_PC[m[1]]+(m[2]==='#'||m[2]==='♯'?1:m[2]==='b'||m[2]==='♭'?-1:0);return {pc:(pc+12)%12,q:m[3]};}
+const keyRoot=k=>parseChord(k).pc, keyMinor=k=>/m$/.test(k);
+const SG={idx:store.get('sIdx',0),lang:'all',shift:0,mode:'real'};
+function songKeyName(song,shift){const r=(keyRoot(song.key)+shift+12)%12;return (FLAT_ROOTS.has(r)?NOTES_F:NOTES_S)[r]+(keyMinor(song.key)?'m':'');}
+// 開放弦で弾きやすいキー（メジャー／マイナー）
+const EASY_MAJ=[0,7,2,9,4], EASY_MIN=[9,4,2];
+function capoFor(song,shift){
+  const r=(keyRoot(song.key)+shift+12)%12, easy=keyMinor(song.key)?EASY_MIN:EASY_MAJ;
+  for(let c=0;c<=7;c++){ if(easy.includes((r-c+12)%12)) return c; } return 0;
+}
+function chordName(pc,q,keyPc){return (FLAT_ROOTS.has(keyPc)?NOTES_F:NOTES_S)[pc]+(q==='m7b5'?'m7(♭5)':q);}
+function renderSongList(){
+  const el=$('#songList'); el.innerHTML='';
+  SONGS.forEach((s,i)=>{ if(SG.lang!=='all'&&s.lang!==SG.lang) return;
+    const b=document.createElement('button'); b.className='prog-item'; b.setAttribute('aria-current',String(i===SG.idx));
+    b.innerHTML=`<b></b><small></small>`; b.querySelector('b').textContent=s.t; b.querySelector('small').textContent=`${s.key} ・ ${s.time}拍子 ・ ${s.part}`;
+    b.addEventListener('click',()=>{SG.idx=i;SG.shift=0;store.set('sIdx',i);renderSongList();renderSong();if(innerWidth<860) $('#songTitle').scrollIntoView({behavior:'smooth'});});
+    el.appendChild(b); });
+}
+function renderSong(){
+  const song=SONGS[SG.idx]; if(!song) return;
+  const keyPc=(keyRoot(song.key)+SG.shift+12)%12, capo=SG.mode==='capo'?capoFor(song,SG.shift):0, dispShift=SG.shift-capo, dispKeyPc=(keyRoot(song.key)+dispShift+12)%12;
+  $('#songMeta').textContent=`${song.lang==='ja'?'日本の歌':'海外の歌'} ・ ${song.part} ・ ${song.time}拍子 ・ ♩=${song.bpm}`;
+  $('#songTitle').textContent=song.t; $('#songCredit').textContent=song.c+'（著作権の保護期間が終了／伝承曲）';
+  $('#songKey').textContent=songKeyName(song,SG.shift);
+  const cap=capoFor(song,SG.shift);
+  $('#songCapo').textContent= SG.mode==='capo' ? (capo?`カポ ${capo} フレットで、${songKeyName(song,dispShift)} の形で弾きます（鳴る音は ${songKeyName(song,SG.shift)}）。`:'このキーはカポなしで弾きやすいキーです。')
+    : (cap?`ヒント：カポ ${cap} フレットを付けると、${songKeyName(song,SG.shift-cap)} の簡単な形で弾けます。`:'');
+  $('#songStrum').textContent='ストロークの目安 ― '+song.strum;
+  const used=[]; const sheet=$('#songSheet'); sheet.innerHTML=''; sheet.className='card sheet'+(song.lang==='en'?' en':'');
+  song.lines.forEach(line=>{
+    const row=document.createElement('div'); row.className='sline';
+    const parts=line.split(/(\[[^\]]+\])/).filter(x=>x!=='');
+    let pend=null;
+    const push=(ch,txt)=>{const sg=document.createElement('span');sg.className='seg-c';const c=document.createElement('span');c.className='ch';const l=document.createElement('span');l.className='ly';
+      if(ch){const p=parseChord(ch), pc=(p.pc+dispShift+12)%12, nm=chordName(pc,p.q,dispKeyPc); c.textContent=nm; c.dataset.pc=pc; c.dataset.q=p.q; if(!used.some(u=>u.nm===nm)) used.push({nm,pc,q:p.q}); c.addEventListener('click',()=>songStrum(pc,p.q,capo));}
+      l.textContent=txt||' '; sg.append(c,l); row.appendChild(sg);};
+    parts.forEach(x=>{ if(x.startsWith('[')){ if(pend!==null) push(pend,''); pend=x.slice(1,-1);} else { push(pend,x); pend=null; } });
+    if(pend!==null) push(pend,'');
+    sheet.appendChild(row);
+  });
+  const ce=$('#songChords'); ce.innerHTML='';
+  used.forEach(u=>{ const type=QUAL_MAP[u.q]??'maj'; const v=bestVoicing(u.pc,type); const d=document.createElement('div'); d.className='card';
+    d.innerHTML=`<div class="cn"></div>${v?diagram(v.frets,u.pc,type):''}`; d.querySelector('.cn').textContent=u.nm; d.addEventListener('click',()=>songStrum(u.pc,u.q,capo)); ce.appendChild(d); });
+}
+function songStrum(pc,q,capo){ const type=QUAL_MAP[q]??'maj', v=bestVoicing(pc,type); if(!v) return; v.frets.forEach((f,i)=>{ if(f!==null) pluck(STD[i]+f+capo,i*0.03,0.4,{str:i}); }); }
+(function initSongs(){
+  segInit($('#songLang'),'all',v=>{SG.lang=v;renderSongList();});
+  segInit($('#songMode'),'real',v=>{SG.mode=v;renderSong();});
+  $('#songKeyDown').addEventListener('click',()=>{SG.shift=(SG.shift+11)%12;renderSong();});
+  $('#songKeyUp').addEventListener('click',()=>{SG.shift=(SG.shift+1)%12;renderSong();});
+  $('#songTempo').addEventListener('click',()=>{
+    if(M.playing&&M.owner==='song'){transportStop();$('#songTempo').textContent='♩ テンポを鳴らす';return;}
+    const song=SONGS[SG.idx]; setBpm(song.bpm); setRhythm('click'); M.beats=song.time; drawBeats(); transportStart('song'); $('#songTempo').textContent='■ テンポを止める';
+  });
+  if(SG.idx>=SONGS.length) SG.idx=0;
+  renderSongList(); renderSong();
+})();
+
+/* ---------- TAB練習 ---------- */
+// メロディは音名と長さ（拍）で書き、弦とフレットはポジションから自動で決める。
+// リフは [弦, フレット] を直接書く（弦：1=1弦…6=6弦）。'r' は休符。
+const TABS_DATA=[
+  {id:'twinkle',cat:'melody',t:'きらきら星',info:'フランス民謡（18世紀）',key:'C',beats:4,bpm:90,pos:0,
+   tip:'開放弦と1〜3フレットだけで弾けます。人差し指＝1フレット、中指＝2フレット、薬指＝3フレットを守りましょう。',
+   mel:'C4 C4 G4 G4 A4 A4 G4:2 F4 F4 E4 E4 D4 D4 C4:2 G4 G4 F4 F4 E4 E4 D4:2 G4 G4 F4 F4 E4 E4 D4:2 C4 C4 G4 G4 A4 A4 G4:2 F4 F4 E4 E4 D4 D4 C4:2'},
+  {id:'joy',cat:'melody',t:'歓喜の歌（第九）',info:'ベートーヴェン 交響曲第9番（1824年）',key:'C',beats:4,bpm:100,pos:0,
+   tip:'音が順番に上がり下がりするので、指を弦から離しすぎないのがコツ。付点のリズム（ミーレ）に注意。',
+   mel:'E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 E4:1.5 D4:.5 D4:2 E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 D4:1.5 C4:.5 C4:2'},
+  {id:'jingle',cat:'melody',t:'ジングルベル（サビ）',info:'J. L. ピアポント（1857年）',key:'C',beats:4,bpm:120,pos:0,
+   tip:'同じ音の連打は、ピックの振りを小さく一定に。',
+   mel:'E4 E4 E4:2 E4 E4 E4:2 E4 G4 C4:1.5 D4:.5 E4:4 F4 F4 F4:1.5 F4:.5 F4 E4 E4 E4:.5 E4:.5 E4 D4 D4 E4 D4:2 G4:2'},
+  {id:'saints',cat:'melody',t:'聖者の行進',info:'アメリカ民謡',key:'C',beats:4,bpm:110,pos:0,
+   tip:'「ド・ミ・ファ・ソー」の伸ばす音をしっかり4拍保ちましょう。',
+   mel:'r C4 E4 F4 G4:4 r C4 E4 F4 G4:4 r C4 E4 F4 G4:2 E4:2 C4:2 E4:2 D4:4 r E4 E4 D4 C4:3 C4 E4:2 G4:2 F4:4 r:2 E4 F4 G4:2 E4:2 C4:2 D4:2 C4:4'},
+  {id:'hotaru',cat:'melody',t:'蛍の光（オールド・ラング・サイン）',info:'スコットランド民謡',key:'G',beats:4,bpm:76,pos:0,
+   tip:'付点のリズム（タッ・タ）を正確に。最高音のミ（1弦開放）がメロディの山です。',
+   mel:'r:3 D3 G3:1.5 G3:.5 G3 B3 A3:1.5 G3:.5 A3 B3 G3:1.5 G3:.5 B3 D4 E4:3 E4 D4:1.5 B3:.5 B3 G3 A3:1.5 G3:.5 A3 B3 G3:1.5 E3:.5 E3 D3 G3:3 r'},
+  {id:'sakura',cat:'melody',t:'さくらさくら',info:'日本古謡',key:'Am',beats:4,bpm:66,pos:0,
+   tip:'日本の音階（ミヤコ節）。ファとシの半音が独特の響きを作ります。音を伸ばす所はしっかり余韻を。',
+   mel:'A3 A3 B3:2 A3 A3 B3:2 A3 B3 C4 B3 A3 B3:.5 A3:.5 F3:2 E3 C3 E3 F3 E3 E3:.5 C3:.5 B2:2 A3 B3 C4 B3 A3 B3:.5 A3:.5 F3:2 E3 C3 E3 F3 E3 E3:.5 C3:.5 B2:2 A3 A3 B3:2 A3 A3 B3:2 E3 F3 B3:.5 A3:.5 F3 E3:4'},
+  {id:'greensleeves',cat:'melody',t:'グリーンスリーブス',info:'イングランド民謡（16世紀）',key:'Am',beats:3,bpm:96,pos:0,
+   tip:'3拍子で「長・短」のリズムが続きます。G♯（ソ♯）が出てきたら、マイナーの切なさのポイント。',
+   mel:'r:2 A3 C4:2 D4 E4:1.5 F4:.5 E4 D4:2 B3 G3:1.5 A3:.5 B3 C4:2 A3 A3:1.5 G#3:.5 A3 B3:2 G#3 E3:2 A3 C4:2 D4 E4:1.5 F4:.5 E4 D4:2 B3 G3:1.5 A3:.5 B3 C4:1.5 B3:.5 A3 G#3:1.5 F#3:.5 G#3 A3:3'},
+  {id:'elise',cat:'melody',t:'エリーゼのために（冒頭）',info:'ベートーヴェン（1810年ごろ）',key:'Am',beats:3,ts:'3/8',bpm:132,pos:0,unit:.5,
+   tip:'8分音符が続く3/8拍子。ミとレ♯の往復は、2本の指を交互に素早く動かす練習になります。',
+   mel:'r:2 E4:.5 D#4:.5 E4:.5 D#4:.5 E4:.5 B3:.5 D4:.5 C4:.5 A3:1 r:.5 C3:.5 E3:.5 A3:.5 B3:1 r:.5 E3:.5 G#3:.5 B3:.5 C4:1 r:.5 E3:.5 E4:.5 D#4:.5 E4:.5 D#4:.5 E4:.5 B3:.5 D4:.5 C4:.5 A3:1 r:.5 C3:.5 E3:.5 A3:.5 B3:1 r:.5 E3:.5 C4:.5 B3:.5 A3:1 r:2'},
+  {id:'canon',cat:'melody',t:'カノン（ベースとメロディ）',info:'パッヘルベル（17世紀）',key:'D',beats:4,bpm:72,
+   tip:'低音（ベース）と高音（メロディ）を同時に弾きます。親指で低音、人差し指か中指で高音を弾く指弾きの入門に。',
+   riff:'4/0+1/2:2;5/0+1/0:2;5/2+2/3:2;6/2+2/2:2;6/3+2/0:2;4/0+3/2:2;6/3+2/0:2;5/0+2/2:2'.replace(/6\/x\+0 2\/x/,'4/0+1/2')},
+  {id:'mountainking',cat:'melody',t:'山の魔王の宮殿にて',info:'グリーグ（1875年）・ホ短調に移調',key:'Em',beats:4,bpm:100,pos:0,unit:.5,
+   tip:'ゆっくりから始めて、少しずつ速く。だんだん速くなる原曲のように、スピードトレーナー的に練習できます。',
+   mel:'E3:.5 F#3:.5 G3:.5 A3:.5 B3:.5 G3:.5 B3:1 A#3:.5 F#3:.5 A#3:1 A3:.5 F3:.5 A3:1 E3:.5 F#3:.5 G3:.5 A3:.5 B3:.5 G3:.5 B3:.5 E4:.5 D4:.5 B3:.5 G3:.5 B3:.5 D4:2'},
+  {id:'shuffle',cat:'riff',t:'ブルース・シャッフル（A）',info:'オリジナル練習リフ',key:'A',beats:4,bpm:90,swing:true,unit:.5,
+   tip:'5弦と4弦の2本だけを弾く定番のブギー。右手の手のひらで軽くミュートして、「タッ・タ」の跳ねるリズムで。',
+   riff:'5/0+4/2;5/0+4/2;5/0+4/4;5/0+4/4;5/0+4/2;5/0+4/2;5/0+4/4;5/0+4/4;4/0+3/2;4/0+3/2;4/0+3/4;4/0+3/4;5/0+4/2;5/0+4/2;5/0+4/4;5/0+4/4;6/0+5/2;6/0+5/2;6/0+5/4;6/0+5/4;4/0+3/2;4/0+3/2;5/0+4/2;6/0+5/2'},
+  {id:'penta',cat:'riff',t:'マイナーペンタの下降フレーズ（Am）',info:'オリジナル練習フレーズ・5フレット',key:'Am',beats:4,bpm:80,unit:.5,
+   tip:'人差し指は5フレットに置いたまま。小指（8フレット）と薬指（7フレット）を使い分けます。',
+   riff:'1/8;1/5;2/8;2/5;3/7;3/5;4/7;4/5;5/7;5/5;6/8;6/5;5/5;5/7;4/5:1;4/7;4/5;3/7;3/5;2/5;2/8;1/5;1/8;2/8;1/5;2/8:1;4/7:2'},
+  {id:'power',cat:'riff',t:'パワーコードのロックリフ（E）',info:'オリジナル練習リフ',key:'E',beats:4,bpm:100,unit:.5,
+   tip:'6弦と5弦の2音（パワーコード）。開放の E は8分で刻み、移動するときも左手の形を崩さないように。',
+   riff:'6/0+5/2:.5;6/0+5/2:.5;6/0+5/2:.5;6/3+5/5:.5;6/0+5/2:.5;6/0+5/2:.5;6/5+5/7:1;6/0+5/2:.5;6/0+5/2:.5;6/0+5/2:.5;6/3+5/5:.5;6/2+5/4:1;6/0+5/2:1'},
+  {id:'chromatic',cat:'riff',t:'クロマチック 1-2-3-4',info:'指慣らしの基本練習',key:'—',beats:4,bpm:72,unit:.5,
+   tip:'1フレット＝人差し指、2＝中指、3＝薬指、4＝小指。使わない指は弦の近くで待機。',
+   riff:'6/1:.5;6/2:.5;6/3:.5;6/4:.5;5/1:.5;5/2:.5;5/3:.5;5/4:.5;4/1:.5;4/2:.5;4/3:.5;4/4:.5;3/1:.5;3/2:.5;3/3:.5;3/4:.5;2/1:.5;2/2:.5;2/3:.5;2/4:.5;1/1:.5;1/2:.5;1/3:.5;1/4:.5'},
+  {id:'cmajor',cat:'riff',t:'Cメジャースケール（開放ポジション）',info:'基本のスケール',key:'C',beats:4,bpm:80,pos:0,
+   tip:'ドレミファソラシドを1オクターブ半。上りと下りで同じ指を使いましょう。',
+   mel:'C3 D3 E3 F3 G3 A3 B3 C4 D4 E4 F4 G4 F4 E4 D4 C4 B3 A3 G3 F3 E3 D3 C3:2'},
+];
+const PITCH={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+function noteMidi(n){const m=/^([A-G])(#|b)?(-?\d)$/.exec(n);return (+m[3]+1)*12+PITCH[m[1]]+(m[2]==='#'?1:m[2]==='b'?-1:0);}
+// ポジションの中心に近い押さえ方を選ぶ（開放弦も可）
+function fingerNote(midi,pos){
+  let best=null;
+  for(let s=0;s<6;s++){ const f=midi-STD[s]; if(f<0||f>15) continue;
+    const cost=Math.abs(f-(pos+1.5))+(f===0&&pos===0?-1.2:0)+(f>pos+4||(f<pos&&f!==0)?3:0);
+    if(!best||cost<best.cost||(cost===best.cost&&s>best.s)) best={s,f,cost}; }
+  return best;
+}
+function buildTab(p){
+  const ev=[];
+  if(p.mel){ p.mel.trim().split(/\s+/).forEach(tok=>{const [n,d]=tok.split(':'); const dur=d?+d:1;
+    if(n==='r'){ev.push({notes:[],d:dur});return;} const m=noteMidi(n), fp=fingerNote(m,p.pos||0); ev.push({notes:[{s:fp.s,f:fp.f}],d:dur});}); }
+  else { p.riff.split(';').forEach(tok=>{const [ns,d]=tok.split(':'); const notes=ns.split('+').map(x=>{const [str,f]=x.split('/');return {s:6-(+str),f:+f};}); ev.push({notes,d:d?+d:(p.unit||1)});}); }
+  let t=0; ev.forEach(e=>{e.t=t;t+=e.d;}); return {ev,len:t};
+}
+const TB={idx:store.get('tbIdx',0),cat:'all',speed:100,playing:false,srcs:[],timer:null,raf:0,cur:null,data:null,t0:0,bd:0,passes:0};
+function renderTabList(){
+  const el=$('#tabList'); el.innerHTML='';
+  TABS_DATA.forEach((p,i)=>{ if(TB.cat!=='all'&&p.cat!==TB.cat) return;
+    const b=document.createElement('button'); b.className='prog-item'; b.setAttribute('aria-current',String(i===TB.idx));
+    b.innerHTML='<b></b><small></small>'; b.querySelector('b').textContent=p.t; b.querySelector('small').textContent=`${p.cat==='melody'?'メロディ':'リフ・練習'} ・ ${p.info}`;
+    b.addEventListener('click',()=>{tabStop();TB.idx=i;store.set('tbIdx',i);renderTabList();renderTab();if(innerWidth<860) $('#tabTitle').scrollIntoView({behavior:'smooth'});});
+    el.appendChild(b); });
+}
+function renderTab(){
+  const p=TABS_DATA[TB.idx]; TB.data=buildTab(p);
+  $('#tabMeta').textContent=`${p.cat==='melody'?'メロディ':'リフ・練習'} ・ キー ${p.key} ・ ${p.ts||p.beats+'拍子'}${p.swing?'（シャッフル）':''}`;
+  $('#tabTitle').textContent=p.t; $('#tabDesc').textContent=p.info+(p.cat==='melody'&&!/オリジナル/.test(p.info)?'（著作権の保護期間が終了した曲）':'');
+  $('#tabTip').textContent='コツ ― '+p.tip; $('#tabBpm').textContent=Math.round(p.bpm*TB.speed/100);
+  drawTab();
+}
+function drawTab(){
+  const el=$('#tabSheet'), p=TABS_DATA[TB.idx], {ev,len}=TB.data, W=Math.max(300,el.clientWidth-20);
+  const unit=p.unit||1, px=Math.max(22,Math.min(46,W/((p.beats/unit)*2+1))), barW=p.beats/unit*px, left=34, perRow=Math.max(1,Math.floor((W-left)/barW));
+  const bars=Math.ceil(len/p.beats-1e-9), rows=Math.ceil(bars/perRow), gap=13, rowH=gap*5+52;
+  let s=`<svg viewBox="0 0 ${W} ${rows*rowH+8}" role="img" aria-label="TAB譜">`;
+  for(let r=0;r<rows;r++){
+    const y0=r*rowH+20, nb=Math.min(perRow,bars-r*perRow), x1=left+nb*barW;
+    for(let i=0;i<6;i++) s+=`<line class="tl" x1="${left-26}" y1="${y0+i*gap}" x2="${x1}" y2="${y0+i*gap}"/>`;
+    s+=`<text class="tabclef" x="${left-24}" y="${y0+gap*1.4}">T</text><text class="tabclef" x="${left-24}" y="${y0+gap*2.7}">A</text><text class="tabclef" x="${left-24}" y="${y0+gap*4}">B</text>`;
+    for(let b=0;b<=nb;b++) s+=`<line class="bl" x1="${left+b*barW}" y1="${y0}" x2="${left+b*barW}" y2="${y0+5*gap}"/>`;
+    for(let b=0;b<nb;b++) for(let k=0;k<p.beats;k++) s+=`<text class="cnt" x="${left+b*barW+(k/unit+.5)*px}" y="${y0+5*gap+18}">${k+1}</text>`;
+  }
+  ev.forEach((e,i)=>{
+    const bar=Math.floor(e.t/p.beats+1e-9), r=Math.floor(bar/perRow), y0=r*rowH+20, x=left+(bar-r*perRow)*barW+((e.t-bar*p.beats)/unit+.5)*px;
+    s+=`<g class="tev" data-i="${i}">`;
+    e.notes.forEach(n=>{const y=y0+(5-n.s)*gap; const w=String(n.f).length>1?18:12; s+=`<rect class="tnb" x="${x-w/2}" y="${y-7}" width="${w}" height="14" rx="3"/><text class="tn" x="${x}" y="${y}">${n.f}</text>`;});
+    s+='</g>';
+  });
+  el.innerHTML=s+'</svg>';
+}
+function tabSchedule(){
+  const p=TABS_DATA[TB.idx], c=ac(), bd=60/(p.bpm*TB.speed/100), {ev,len}=TB.data, start=TB.t0+TB.passes*len*bd;
+  const sw=t=>{ if(!p.swing) return t; const b=Math.floor(t), fr=t-b; return b+(Math.abs(fr-.5)<1e-6?2/3:fr); };
+  ev.forEach(e=>e.notes.forEach(n=>{const src=pluck(STD[n.s]+n.f,Math.max(0,start+sw(e.t)*bd-c.currentTime),e.notes.length>1?.4:.55,{str:n.s}); if(src) TB.srcs.push(src);}));
+  if($('#tabClick').checked) for(let k=0;k<Math.round(len);k++) metroHit(M.sound,start+k*bd,k%p.beats===0?0:1,M.vol*.55);
+  TB.passes++;
+}
+function tabPlay(){
+  if(TB.playing){tabStop();return;}
+  if(M.playing) transportStop();
+  const p=TABS_DATA[TB.idx], c=ac(), bd=60/(p.bpm*TB.speed/100);
+  TB.playing=true; TB.passes=0; TB.srcs=[]; TB.bd=bd; TB.t0=c.currentTime+0.15+p.beats*bd;
+  for(let k=0;k<p.beats;k++) metroHit(M.sound,c.currentTime+0.15+k*bd,k===0?0:1,M.vol*.8);
+  tabSchedule(); $('#tabPlay').textContent='■ 停止';
+  TB.timer=setInterval(()=>{ const len=TB.data.len; if(c.currentTime>TB.t0+(TB.passes-1)*len*bd-1){ if($('#tabLoop').checked) tabSchedule(); else if(c.currentTime>TB.t0+TB.passes*len*bd) tabStop(); } },200);
+  const loop=()=>{ if(!TB.playing) return; TB.raf=requestAnimationFrame(loop);
+    const len=TB.data.len, el=(c.currentTime-TB.t0)/bd; let pos=el>=0?el%len:-1; let idx=-1;
+    if(pos>=0) TB.data.ev.forEach((e,i)=>{ if(e.t<=pos+1e-6) idx=i; });
+    if(idx!==TB.cur){ document.querySelectorAll('#tabSheet .tev.on').forEach(g=>g.classList.remove('on')); const g=document.querySelector(`#tabSheet .tev[data-i="${idx}"]`); if(g) g.classList.add('on'); TB.cur=idx; } };
+  loop();
+}
+function tabStop(){
+  if(!TB.playing) return; TB.playing=false; clearInterval(TB.timer); cancelAnimationFrame(TB.raf);
+  const t=ctx?ctx.currentTime:0; TB.srcs.forEach(s=>{try{s.stop(t+0.05);}catch(e){}}); TB.srcs=[]; TB.cur=null;
+  document.querySelectorAll('#tabSheet .tev.on').forEach(g=>g.classList.remove('on')); $('#tabPlay').textContent='▶ 再生';
+}
+(function initTab(){
+  segInit($('#tabCat'),'all',v=>{TB.cat=v;renderTabList();});
+  $('#tabPlay').addEventListener('click',tabPlay);
+  $('#tabSpeed').addEventListener('input',e=>{TB.speed=+e.target.value;$('#tabSpeedOut').textContent=TB.speed;$('#tabBpm').textContent=Math.round(TABS_DATA[TB.idx].bpm*TB.speed/100); if(TB.playing){tabStop();}});
+  if(TB.idx>=TABS_DATA.length) TB.idx=0;
+  renderTabList(); renderTab();
+  new ResizeObserver(()=>{ if(!$('[data-panel="tab"]').hidden) drawTab(); }).observe($('#tabSheet'));
 })();
 
 /* ---------- practice log ---------- */
