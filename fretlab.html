@@ -128,9 +128,9 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 #instSeg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));flex:1 1 380px;border-radius:999px}
 @media (max-width:520px){
   #instSeg{grid-template-columns:repeat(6,minmax(0,1fr));border-radius:16px}
-  #instSeg button:nth-child(-n+3){grid-column:span 2}
-  #instSeg button:nth-child(n+4){grid-column:span 3;border-top:1px solid var(--line)}
-  #instSeg button:nth-child(3){border-right:0}
+  #instSeg button:nth-child(-n+2){grid-column:span 3}
+  #instSeg button:nth-child(n+3){grid-column:span 2;border-top:1px solid var(--line)}
+  #instSeg button:nth-child(2){border-right:0}
 }
 #instSeg button{padding:7px 4px;font-size:13px;white-space:nowrap}
 .tnote-row{display:flex;align-items:flex-end;justify-content:center;gap:18px;margin-top:6px}
@@ -564,7 +564,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
     <div class="tuner">
       <div class="card tuner-main">
         <div class="row inst-row">
-          <div class="seg" id="instSeg"><button data-v="guitar">ギター</button><button data-v="bass4">ベース4弦</button><button data-v="bass5">ベース5弦</button><button data-v="uke">ウクレレ</button><button data-v="chrom">クロマチック</button></div>
+          <div class="seg" id="instSeg"><button data-v="chrom">クロマチック</button><button data-v="guitar">ギター</button><button data-v="bass4">ベース4弦</button><button data-v="bass5">ベース5弦</button><button data-v="uke">ウクレレ</button></div>
           <select id="tuningSel" aria-label="チューニング"></select>
         </div>
         <div class="tnote-row">
@@ -1276,8 +1276,9 @@ const INSTR={
   // クロマチック：弦を決めず、鳴った音にいちばん近い半音（12音）に合わせる
   chrom:{name:'クロマチック',dec:2,min:30,max:1600,chromatic:true,tunings:[{name:'12音すべて（いちばん近い音）',m:[]}]},
 };
-const T={inst:store.get('tInst','guitar'),tuning:0,stream:null,analyser:null,buf:null,hist:[],loop:null,target:null,auto:true,trace:[],raf:0,ema:null,lockAt:0,locked:null,tuned:new Set(),silent:0,muteUntil:0};
-if(!INSTR[T.inst]) T.inst='guitar';
+// チューナーは毎回クロマチックで始める（楽器はその場で切り替え）
+const T={inst:'chrom',tuning:0,stream:null,analyser:null,buf:null,hist:[],loop:null,target:null,auto:true,trace:[],raf:0,ema:null,lockAt:0,locked:null,tuned:new Set(),silent:0,muteUntil:0};
+if(!INSTR[T.inst]) T.inst='chrom';
 const curTuning=()=>INSTR[T.inst].tunings[T.tuning]||INSTR[T.inst].tunings[0];
 function noteLabel(m){const n=NOTES_S[((m%12)+12)%12];return `${n[0]}${n.length>1?'<span class="acc">♯</span>':''}<sub>${Math.floor(m/12)-1}</sub>`}
 function renderTunings(){
@@ -1418,7 +1419,7 @@ async function micToggle(){
   }
 }
 (function initTuner(){
-  segInit($('#instSeg'),T.inst,v=>{T.inst=v;store.set('tInst',v);T.tuning=0;T.target=null;T.auto=true;T.tuned=new Set();T.locked=null;setLocked(false);syncAuto();T.hist=[];T.trace=[];renderTunings();renderStrings();drawTrace();});
+  segInit($('#instSeg'),T.inst,v=>{T.inst=v;T.tuning=0;T.target=null;T.auto=true;T.tuned=new Set();T.locked=null;setLocked(false);syncAuto();T.hist=[];T.trace=[];renderTunings();renderStrings();drawTrace();});
   renderTunings();
   $('#tuningSel').addEventListener('change',e=>{T.tuning=+e.target.value;T.target=null;T.tuned=new Set();T.locked=null;setLocked(false);renderStrings();});
   $('#autoBtn').addEventListener('click',()=>{T.auto=true;syncAuto();});
