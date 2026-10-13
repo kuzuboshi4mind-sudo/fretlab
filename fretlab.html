@@ -125,7 +125,13 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .tuner-main{display:flex;flex-direction:column;gap:12px}
 .inst-row{justify-content:space-between}
 .inst-row select{flex:1;min-width:170px}
-#instSeg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));flex:1 1 320px;border-radius:999px}
+#instSeg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));flex:1 1 380px;border-radius:999px}
+@media (max-width:520px){
+  #instSeg{grid-template-columns:repeat(6,minmax(0,1fr));border-radius:16px}
+  #instSeg button:nth-child(-n+3){grid-column:span 2}
+  #instSeg button:nth-child(n+4){grid-column:span 3;border-top:1px solid var(--line)}
+  #instSeg button:nth-child(3){border-right:0}
+}
 #instSeg button{padding:7px 4px;font-size:13px;white-space:nowrap}
 .tnote-row{display:flex;align-items:flex-end;justify-content:center;gap:18px;margin-top:6px}
 .tnote{font-family:var(--display);font-weight:300;font-size:104px;line-height:.9;font-variant-numeric:lining-nums;transition:color .2s}
@@ -143,6 +149,9 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 @media (prefers-reduced-motion:reduce){.tuner-main.locked .tnote,.tuner-main.locked .tnote-row::before,.tstate.all{animation:none}}
 
 .tnote sub{font-size:32px;color:var(--muted);font-weight:400}
+.tnote .acc,.sbtn .nn .acc{font-family:var(--body);font-size:.42em;font-weight:500;vertical-align:.95em;margin-left:.04em}
+.treadout{white-space:nowrap}
+.tmeta{min-width:0}
 .tmeta{padding-bottom:10px}
 .ttarget{font-size:13px;color:var(--muted);letter-spacing:.06em}
 .treadout{font-family:var(--mono);font-size:14px;color:var(--fg);font-variant-numeric:tabular-nums;display:flex;gap:12px}
@@ -555,7 +564,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
     <div class="tuner">
       <div class="card tuner-main">
         <div class="row inst-row">
-          <div class="seg" id="instSeg"><button data-v="guitar">ギター</button><button data-v="bass4">ベース4弦</button><button data-v="bass5">ベース5弦</button><button data-v="uke">ウクレレ</button></div>
+          <div class="seg" id="instSeg"><button data-v="guitar">ギター</button><button data-v="bass4">ベース4弦</button><button data-v="bass5">ベース5弦</button><button data-v="uke">ウクレレ</button><button data-v="chrom">クロマチック</button></div>
           <select id="tuningSel" aria-label="チューニング"></select>
         </div>
         <div class="tnote-row">
@@ -586,6 +595,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
           <span class="label">メーターの読み方</span>
           <p>線が<b>左</b>に流れていたら音が低いので、ペグを<b>締めて</b>上げます。<b>右</b>なら高いので、一度少し<b>緩めてから</b>下から合わせ直すと狂いにくくなります。中央の帯（±5セント）に線がまっすぐ収まれば完了です。</p>
           <p>ベースの低い弦は、音が出てから一瞬待つと安定して読み取れます。ウクレレのHigh-G（4弦が高いG）にも対応しています。</p>
+          <p><b>クロマチック</b>は弦を決めずに、鳴らした音にいちばん近い音（12音すべて）を表示します。変則チューニングや、ほかの楽器・歌の音程確認に。</p>
         </div>
       </div>
     </div>
@@ -1263,17 +1273,21 @@ const INSTR={
     {name:'スタンダード（BEADG）',m:[23,28,33,38,43]},{name:'半音下げ（B♭E♭A♭D♭G♭）',m:[22,27,32,37,42]},{name:'ハイC（EADGC）',m:[28,33,38,43,48]}]},
   uke:{name:'ウクレレ',dec:1,min:180,max:1200,tunings:[
     {name:'スタンダード High-G（GCEA）',m:[67,60,64,69]},{name:'Low-G（GCEA）',m:[55,60,64,69]},{name:'D調（ADF♯B）',m:[69,62,66,71]}]},
+  // クロマチック：弦を決めず、鳴った音にいちばん近い半音（12音）に合わせる
+  chrom:{name:'クロマチック',dec:2,min:30,max:1600,chromatic:true,tunings:[{name:'12音すべて（いちばん近い音）',m:[]}]},
 };
 const T={inst:store.get('tInst','guitar'),tuning:0,stream:null,analyser:null,buf:null,hist:[],loop:null,target:null,auto:true,trace:[],raf:0,ema:null,lockAt:0,locked:null,tuned:new Set(),silent:0,muteUntil:0};
 if(!INSTR[T.inst]) T.inst='guitar';
 const curTuning=()=>INSTR[T.inst].tunings[T.tuning]||INSTR[T.inst].tunings[0];
-function noteLabel(m){return `${NOTES_S[((m%12)+12)%12]}<sub>${Math.floor(m/12)-1}</sub>`}
+function noteLabel(m){const n=NOTES_S[((m%12)+12)%12];return `${n[0]}${n.length>1?'<span class="acc">♯</span>':''}<sub>${Math.floor(m/12)-1}</sub>`}
 function renderTunings(){
   const sel=$('#tuningSel'); sel.innerHTML=''; INSTR[T.inst].tunings.forEach((t,i)=>sel.add(new Option(t.name,i)));
   T.tuning=Math.min(T.tuning,INSTR[T.inst].tunings.length-1); sel.value=T.tuning;
 }
 function renderStrings(){
-  const ms=curTuning().m, el=$('#stringBtns'); el.innerHTML=''; const n=ms.length;
+  const ms=curTuning().m, el=$('#stringBtns'); el.innerHTML=''; const n=ms.length, chrom=!!INSTR[T.inst].chromatic;
+  el.hidden=chrom; $('#autoBtn').hidden=chrom; $('#tuningSel').hidden=chrom;
+  if(chrom){ $('#tTarget').textContent='クロマチック：鳴らした音にいちばん近い音を表示します'; return; }
   ms.forEach((m,i)=>{
     const b=document.createElement('button'); b.className='sbtn'; b.dataset.i=i;
     b.innerHTML=`<span class="nn">${noteLabel(m)}</span><span class="sn">${n-i}弦</span>`;
@@ -1337,20 +1351,24 @@ function tunerLoop(){
   T.hist.push(r.f); if(T.hist.length>7) T.hist.shift();
   const fm=[...T.hist].sort((a,b)=>a-b)[Math.floor(T.hist.length/2)];
   const ms=curTuning().m, mf=69+12*Math.log2(fm/a4);
-  if(T.auto){ let bi=0; ms.forEach((m,i)=>{ if(Math.abs(mf-m)<Math.abs(mf-ms[bi])) bi=i; }); if(bi!==T.target){T.trace.unshift(null);T.ema=null;T.lockAt=0;setLocked(false);} T.target=bi; markString(); }
-  const tm=ms[T.target??0], raw=(mf-tm)*100;
+  const chrom=!!INSTR[T.inst].chromatic;
+  if(chrom){
+    // 半音の境目で表示がちらつかないよう、0.6半音以上離れたら次の音に切り替える
+    if(T.target==null||Math.abs(mf-T.target)>0.6){ const nt=Math.round(mf); if(nt!==T.target){T.trace.unshift(null);T.ema=null;T.lockAt=0;T.locked=null;setLocked(false);} T.target=nt; }
+  } else if(T.auto){ let bi=0; ms.forEach((m,i)=>{ if(Math.abs(mf-m)<Math.abs(mf-ms[bi])) bi=i; }); if(bi!==T.target){T.trace.unshift(null);T.ema=null;T.lockAt=0;setLocked(false);} T.target=bi; markString(); }
+  const tm=chrom?T.target:ms[T.target??0], raw=(mf-tm)*100;
   T.ema=T.ema==null?raw:T.ema+(raw-T.ema)*.35;
   const cents=Math.round(T.ema), n=ms.length;
   $('#tNote').innerHTML=noteLabel(tm);
-  $('#tTarget').textContent=`${n-(T.target??0)}弦をチューニング中${T.auto?'（自動）':''}`;
+  $('#tTarget').textContent=chrom?`クロマチック：${NOTES_S[((tm%12)+12)%12]} に合わせています`:`${n-(T.target??0)}弦をチューニング中${T.auto?'（自動）':''}`;
   $('#tCents').textContent=(cents>0?'+ ':cents<0?'− ':'± ')+Math.min(999,Math.abs(cents))+' cent';
   $('#tHz').textContent=fm.toFixed(1)+' Hz';
   // ±3セント以内が0.6秒続いたら「合った」
   const now=performance.now(), near=Math.abs(T.ema)<=3;
   if(near){ if(!T.lockAt) T.lockAt=now; } else if(Math.abs(T.ema)>8){ T.lockAt=0; if(T.locked===T.target){ T.locked=null; setLocked(false); } }
   if(near&&T.lockAt&&now-T.lockAt>600&&T.locked!==T.target){
-    T.locked=T.target; T.tuned.add(T.target); setLocked(true); tunerChime(tm); markString();
-    if(T.tuned.size===ms.length){ $('#tState').className='tstate good all'; $('#tState').textContent='全弦チューニング完了！ いい音で弾けます'; T.trace.unshift(cents); trimTrace(); drawTrace(); return; }
+    T.locked=T.target; if(!chrom) T.tuned.add(T.target); setLocked(true); tunerChime(tm); markString();
+    if(!chrom&&T.tuned.size===ms.length){ $('#tState').className='tstate good all'; $('#tState').textContent='全弦チューニング完了！ いい音で弾けます'; T.trace.unshift(cents); trimTrace(); drawTrace(); return; }
   }
   const ok=Math.abs(cents)<=5, st=$('#tState');
   if(!(st.classList.contains('all')&&ok)){
