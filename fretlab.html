@@ -475,8 +475,52 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
   .chord-name{font-size:52px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* opening: line-drawn guitar, strings, a pluck, then the wordmark (~1.6s) */
+.intro{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--bg);cursor:pointer;animation:intro-out .45s cubic-bezier(.4,0,.2,1) 1.3s forwards}
+.intro::before{content:"";position:absolute;inset:0;background:url(img/paper.jpg) center/cover no-repeat;z-index:-1}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .intro::before{filter:invert(1);opacity:.32}}
+:root[data-theme="dark"] .intro::before{filter:invert(1);opacity:.32}
+.intro svg{height:min(44vh,330px);width:auto;overflow:visible;animation:intro-rise 1.7s cubic-bezier(.2,.7,.2,1) both}
+.intro .ln{fill:none;stroke:url(#introGold);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:intro-draw .75s cubic-bezier(.65,0,.35,1) forwards}
+.intro .st{fill:none;stroke:var(--cobalt-b);stroke-width:.7;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;opacity:.85;animation:intro-draw .4s cubic-bezier(.4,0,.2,1) forwards}
+.intro .pk{animation:intro-draw .4s cubic-bezier(.4,0,.2,1) forwards,intro-pluck .5s ease-out .95s}
+.intro .rp{fill:none;stroke:var(--gold-b);stroke-width:.8;opacity:0;transform-box:fill-box;transform-origin:center;animation:intro-ripple .8s cubic-bezier(.2,.7,.3,1) forwards}
+.intro .wm{font-family:var(--serif);font-weight:700;font-size:26px;letter-spacing:.42em;padding-left:.42em;line-height:1;opacity:0;animation:intro-word .6s cubic-bezier(.2,.7,.2,1) .78s forwards}
+.intro .wm b{background:linear-gradient(180deg,var(--cobalt-a),var(--cobalt-b));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:inherit}
+.intro .wm span{background:linear-gradient(180deg,var(--gold-a),var(--gold-b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.intro .sb{font-family:var(--serif);font-size:12px;letter-spacing:.5em;padding-left:.5em;color:var(--muted);opacity:0;animation:intro-word .6s ease .95s forwards}
+@keyframes intro-draw{to{stroke-dashoffset:0}}
+@keyframes intro-rise{from{transform:translateY(8px) scale(.985)}to{transform:none}}
+@keyframes intro-word{from{opacity:0;letter-spacing:.7em;filter:blur(3px)}to{opacity:1;filter:none}}
+@keyframes intro-pluck{0%,100%{transform:none}20%{transform:translateX(1.4px)}40%{transform:translateX(-1.1px)}60%{transform:translateX(.7px)}80%{transform:translateX(-.3px)}}
+@keyframes intro-ripple{0%{opacity:.7;transform:scale(.6)}100%{opacity:0;transform:scale(2.6)}}
+@keyframes intro-out{to{opacity:0;visibility:hidden;transform:scale(1.015)}}
+@media (prefers-reduced-motion:reduce){.intro *{animation-duration:.01s!important;animation-delay:0s!important}.intro{animation:intro-out .3s ease .6s forwards!important}}
 </style>
 
+<div class="intro" id="intro" aria-hidden="true">
+  <svg viewBox="0 -4 200 342">
+    <defs><linearGradient id="introGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--gold-a)"/><stop offset="1" stop-color="var(--gold-b)"/></linearGradient></defs>
+    <path class="ln" pathLength="1" style="animation-duration:.85s" d="M100 122 C128 120 156 132 156 162 C156 186 144 196 146 210 C148 226 172 238 172 272 C172 312 140 332 100 332"/><path class="ln" pathLength="1" style="animation-duration:.85s" d="M100 122 C72 120 44 132 44 162 C44 186 56 196 54 210 C52 226 28 238 28 272 C28 312 60 332 100 332"/>
+    <circle class="ln" pathLength="1" style="animation-delay:.18s;animation-duration:.6s" cx="100" cy="196" r="18"/>
+    <circle class="ln" pathLength="1" style="animation-delay:.24s;animation-duration:.6s;stroke-width:.6" cx="100" cy="196" r="22"/>
+    <path class="ln" pathLength="1" style="animation-delay:.1s;animation-duration:.55s" d="M93 124 L93 40 L90 6 Q100 1 110 6 L107 40 L107 124"/>
+    <path class="ln" pathLength="1" style="animation-delay:.3s;animation-duration:.3s" d="M92 40 L108 40"/>
+    <path class="ln" pathLength="1" style="animation-delay:0.30s;animation-duration:.25s;stroke-width:.8" d="M93 52 L107 52"/><path class="ln" pathLength="1" style="animation-delay:0.33s;animation-duration:.25s;stroke-width:.8" d="M93 66 L107 66"/><path class="ln" pathLength="1" style="animation-delay:0.36s;animation-duration:.25s;stroke-width:.8" d="M93 79 L107 79"/><path class="ln" pathLength="1" style="animation-delay:0.39s;animation-duration:.25s;stroke-width:.8" d="M93 91 L107 91"/><path class="ln" pathLength="1" style="animation-delay:0.42s;animation-duration:.25s;stroke-width:.8" d="M93 102 L107 102"/><path class="ln" pathLength="1" style="animation-delay:0.45s;animation-duration:.25s;stroke-width:.8" d="M93 112 L107 112"/><circle class="ln" pathLength="1" style="animation-delay:0.22s;animation-duration:.3s" cx="85" cy="12" r="2.6"/><circle class="ln" pathLength="1" style="animation-delay:0.25s;animation-duration:.3s" cx="85" cy="22" r="2.6"/><circle class="ln" pathLength="1" style="animation-delay:0.28s;animation-duration:.3s" cx="85" cy="32" r="2.6"/><circle class="ln" pathLength="1" style="animation-delay:0.31s;animation-duration:.3s" cx="115" cy="12" r="2.6"/><circle class="ln" pathLength="1" style="animation-delay:0.34s;animation-duration:.3s" cx="115" cy="22" r="2.6"/><circle class="ln" pathLength="1" style="animation-delay:0.37s;animation-duration:.3s" cx="115" cy="32" r="2.6"/>
+    <path class="ln" pathLength="1" style="animation-delay:.35s;animation-duration:.45s" d="M82 284 L118 284 L118 290 L82 290 Z"/>
+    <path class="st" pathLength="1" style="animation-delay:0.420s" d="M94.60 40 L89.00 287"/><path class="st" pathLength="1" style="animation-delay:0.465s" d="M96.76 40 L93.40 287"/><path class="st pk" pathLength="1" style="animation-delay:0.510s" d="M98.92 40 L97.80 287"/><path class="st" pathLength="1" style="animation-delay:0.555s" d="M101.08 40 L102.20 287"/><path class="st" pathLength="1" style="animation-delay:0.600s" d="M103.24 40 L106.60 287"/><path class="st" pathLength="1" style="animation-delay:0.645s" d="M105.40 40 L111.00 287"/>
+    <circle class="rp" cx="100" cy="196" r="16" style="animation-delay:.95s"/>
+    <circle class="rp" cx="100" cy="196" r="16" style="animation-delay:1.1s"/>
+  </svg>
+  <div class="wm"><b>FRET</b><span>LAB</span></div>
+  <div class="sb">ギター練習帳</div>
+</div>
+<script>(function(){const el=document.getElementById('intro');let seen=false;try{seen=sessionStorage.getItem('fretlab.intro')==='1';sessionStorage.setItem('fretlab.intro','1');}catch(e){}
+if(seen){el.remove();return;}
+const done=()=>{if(el.isConnected)el.remove();};
+el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intro-out')done();});
+el.addEventListener('click',()=>{el.style.animation='intro-out .25s ease forwards';});
+setTimeout(done,2600);})();</script>
 <div class="botanic" aria-hidden="true"></div>
 <div class="wrap">
   <header class="top">
