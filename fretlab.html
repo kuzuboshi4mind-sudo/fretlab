@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: quiet white page with hairlines; ebony fretboard is the one dark object; faint line-drawn botanicals sit behind everything */
+/* Layout: quiet white page with hairlines; ebony fretboard is the one dark object; a soft paper texture sits behind everything */
 :root{
   --bg:#f7f7f3; --surface:#fdfdfb; --panel:#efefe9; --line:#e2e2da;
   --fg:#161816; --muted:#878a84;
@@ -49,8 +49,9 @@
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.7;margin:0;position:relative}
 .botanic{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.botanic::before{content:"";position:absolute;inset:-20%;background:radial-gradient(40% 35% at 92% 6%,var(--wash),transparent 70%),radial-gradient(45% 40% at 0% 100%,var(--wash),transparent 70%)}
-.botanic svg{position:absolute;stroke:var(--leaf);fill:none;opacity:.32}
+.botanic::before{content:"";position:absolute;inset:0;background:url(img/paper.jpg) center/cover no-repeat}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .botanic::before{filter:invert(1);opacity:.32}}
+:root[data-theme="dark"] .botanic::before{filter:invert(1);opacity:.32}
 .wrap{position:relative;z-index:1}
 .wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
 h1,h2,h3{text-wrap:balance;margin:0}
@@ -62,7 +63,7 @@ button,select,input{font:inherit;color:inherit}
 .mark{font-family:var(--serif);font-weight:700;font-size:24px;letter-spacing:.3em;line-height:1.1;background:linear-gradient(180deg,var(--cobalt-a),var(--cobalt-b));-webkit-background-clip:text;background-clip:text;color:transparent}
 .mark span{background:linear-gradient(180deg,var(--gold-a) 10%,var(--gold-b) 60%,var(--gold-a) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .sub{color:var(--muted);font-size:13px}
-.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;column-gap:2px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 62%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:flex;flex-wrap:wrap;column-gap:2px;border-bottom:1px solid var(--line);margin-bottom:20px}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex:0 0 auto;background:none;border:0;border-bottom:1.5px solid transparent;padding:12px 10px 8px;letter-spacing:.06em;cursor:pointer;color:var(--muted);font-weight:500;white-space:nowrap}
 .tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--fg);font-weight:500}
@@ -476,32 +477,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
-<div class="botanic" aria-hidden="true">
-  <svg style="right:-40px;top:-10px" width="300" height="360" viewBox="0 0 300 360" stroke-width="1.1" stroke-linecap="round">
-    <path d="M250 0 C220 80 200 160 120 360"/>
-    <g>
-      <path d="M244 30 c-30 -10 -50 4 -56 20 c22 8 44 2 56 -20z"/><path d="M240 40 l-46 8"/>
-      <path d="M236 62 c26 -16 48 -8 56 6 c-20 14 -44 12 -56 -6z"/><path d="M236 62 l52 4"/>
-      <path d="M226 98 c-32 -6 -52 10 -56 26 c24 6 46 -2 56 -26z"/><path d="M224 104 l-50 18"/>
-      <path d="M218 128 c24 -20 48 -14 58 0 c-18 16 -44 18 -58 0z"/><path d="M218 128 l54 -2"/>
-      <path d="M204 166 c-30 -2 -48 16 -50 32 c24 2 44 -8 50 -32z"/><path d="M202 172 l-46 24"/>
-      <path d="M196 196 c22 -22 46 -18 58 -6 c-16 18 -42 22 -58 6z"/><path d="M196 196 l54 -8"/>
-      <path d="M178 236 c-28 2 -44 20 -44 36 c22 0 40 -12 44 -36z"/>
-      <path d="M170 262 c20 -20 42 -18 52 -6 c-14 16 -38 20 -52 6z"/>
-    </g>
-  </svg>
-  <svg style="left:-30px;bottom:-20px" width="260" height="300" viewBox="0 0 260 300" stroke-width="1" stroke-linecap="round">
-    <path d="M20 300 C60 220 110 140 230 40"/>
-    <g>
-      <path d="M52 238 q-34 -14 -40 -46"/><path d="M52 238 q8 -36 40 -48"/>
-      <path d="M78 200 q-32 -16 -36 -48"/><path d="M78 200 q10 -34 42 -44"/>
-      <path d="M106 166 q-30 -18 -32 -48"/><path d="M106 166 q12 -32 44 -40"/>
-      <path d="M136 134 q-28 -18 -28 -46"/><path d="M136 134 q14 -30 44 -34"/>
-      <path d="M168 104 q-24 -18 -22 -42"/><path d="M168 104 q16 -26 42 -28"/>
-      <path d="M200 72 q-20 -16 -16 -36"/><path d="M200 72 q16 -20 36 -20"/>
-    </g>
-  </svg>
-</div>
+<div class="botanic" aria-hidden="true"></div>
 <div class="wrap">
   <header class="top">
     <div class="mark">FRET<span>LAB</span></div>
@@ -1417,7 +1393,7 @@ function tunerLoop(){
   const r=detectPitch();
   if(!r){ if(++T.silent>6){ T.hist=[]; T.ema=null; T.lockAt=0; } T.trace.unshift(null); trimTrace(); drawTrace(); return; }
   T.silent=0;
-  T.hist.push(r.f); if(T.hist.length>7) T.hist.shift();
+  T.hist.push(r.f); if(T.hist.length>9) T.hist.shift();
   const fm=[...T.hist].sort((a,b)=>a-b)[Math.floor(T.hist.length/2)];
   const ms=curTuning().m, mf=69+12*Math.log2(fm/a4);
   const chrom=!!INSTR[T.inst].chromatic;
@@ -1426,26 +1402,34 @@ function tunerLoop(){
     if(T.target==null||Math.abs(mf-T.target)>0.6){ const nt=Math.round(mf); if(nt!==T.target){T.trace.unshift(null);T.ema=null;T.lockAt=0;T.locked=null;setLocked(false);} T.target=nt; }
   } else if(T.auto){ let bi=0; ms.forEach((m,i)=>{ if(Math.abs(mf-m)<Math.abs(mf-ms[bi])) bi=i; }); if(bi!==T.target){T.trace.unshift(null);T.ema=null;T.lockAt=0;setLocked(false);} T.target=bi; markString(); }
   const tm=chrom?T.target:ms[T.target??0], raw=(mf-tm)*100;
-  T.ema=T.ema==null?raw:T.ema+(raw-T.ema)*.35;
-  const cents=Math.round(T.ema), n=ms.length;
+  // メーターはゆっくり追従させる（大きくずれたときだけ素早く寄せる）
+  const dev=T.ema==null?0:Math.abs(raw-T.ema);
+  T.ema=T.ema==null?raw:T.ema+(raw-T.ema)*(dev>35?.4:.07);
+  const cents=Math.round(T.ema), n=ms.length, now=performance.now();
+  // ±3セント以内が0.6秒続いたら「合った」
+  const near=Math.abs(T.ema)<=3;
+  if(near){ if(!T.lockAt) T.lockAt=now; } else if(Math.abs(T.ema)>8){ T.lockAt=0; if(T.locked===T.target){ T.locked=null; setLocked(false); } }
+  let all=false;
+  if(near&&T.lockAt&&now-T.lockAt>600&&T.locked!==T.target){
+    T.locked=T.target; if(!chrom) T.tuned.add(T.target); setLocked(true); tunerChime(tm); markString(); T.drawAt=0;
+    all=!chrom&&T.tuned.size===ms.length;
+  }
+  // 波形は2フレームに1点（流れる速さを半分に）
+  if(++frame%2===0){ T.trace.unshift(cents); trimTrace(); drawTrace(); }
+  // 数字と文字は少し間引いて更新（読みやすく）
+  if(T.drawAt&&now-T.drawAt<180&&T.shownNote===tm) return;
+  T.drawAt=now; T.shownNote=tm;
   $('#tNote').innerHTML=noteLabel(tm);
   $('#tTarget').textContent=chrom?`クロマチック：${NOTES_S[((tm%12)+12)%12]} に合わせています`:`${n-(T.target??0)}弦をチューニング中${T.auto?'（自動）':''}`;
   $('#tCents').textContent=(cents>0?'+ ':cents<0?'− ':'± ')+Math.min(999,Math.abs(cents))+' cent';
   $('#tHz').textContent=fm.toFixed(1)+' Hz';
-  // ±3セント以内が0.6秒続いたら「合った」
-  const now=performance.now(), near=Math.abs(T.ema)<=3;
-  if(near){ if(!T.lockAt) T.lockAt=now; } else if(Math.abs(T.ema)>8){ T.lockAt=0; if(T.locked===T.target){ T.locked=null; setLocked(false); } }
-  if(near&&T.lockAt&&now-T.lockAt>600&&T.locked!==T.target){
-    T.locked=T.target; if(!chrom) T.tuned.add(T.target); setLocked(true); tunerChime(tm); markString();
-    if(!chrom&&T.tuned.size===ms.length){ $('#tState').className='tstate good all'; $('#tState').textContent='全弦チューニング完了！ いい音で弾けます'; T.trace.unshift(cents); trimTrace(); drawTrace(); return; }
-  }
   const ok=Math.abs(cents)<=5, st=$('#tState');
-  if(!(st.classList.contains('all')&&ok)){
+  if(all){ st.className='tstate good all'; st.textContent='全弦チューニング完了！ いい音で弾けます'; }
+  else if(!(st.classList.contains('all')&&ok)){
     st.className='tstate '+(ok?'good':'warn');
     st.textContent= ok?(T.locked===T.target?'✓ ぴったり！':'もう少し…そのまま'):Math.abs(cents)>150?(cents<0?'かなり低い ― 弦を確認してください':'かなり高い ― 弦を確認してください'):(cents<0?'← 低い：ペグを締めて上げる':'高い → 一度緩めてから合わせ直す');
   }
   $('#tNote').classList.toggle('ok',ok);
-  T.trace.unshift(cents); trimTrace(); drawTrace();
 }
 function trimTrace(){ if(T.trace.length>160) T.trace.length=160; }
 // 心電図のように、最新の値を上に描き、古い値ほど下へ流す
