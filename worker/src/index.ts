@@ -1,10 +1,8 @@
-// Fretlab「レッスンコーチ」API（Cloudflare Workers）
-//   POST /character  希望からコーチのキャラクターを作る（JSON を返す）
-//   POST /chat       コーチとして返事をする（テキストを少しずつ流す）
+// Fretlab「レッスンコーチ（AI先生）」API（Cloudflare Workers）
+//   POST /ask   ギターの質問に AI先生 が答える（テキストを少しずつ流す）
 // Anthropic の API キーはこのサーバーの secret（ANTHROPIC_API_KEY）にだけ置き、アプリには渡さない。
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
-import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 
 interface Env {
   ANTHROPIC_API_KEY: string;
@@ -14,21 +12,9 @@ interface Env {
 
 const MODEL = "claude-opus-5-5";
 
-const CharacterSchema = z.object({
-  name: z.string().describe("コーチの名前（日本語、2〜8文字程度）"),
-  symbol: z.string().describe("アイコンに表示する1文字（漢字・ひらがな・英字のいずれか）"),
-  catchphrase: z.string().describe("口癖やひとことキャッチコピー（30文字以内）"),
-  personality: z.string().describe("性格と教え方の特徴（80文字以内）"),
-  speaking_style: z.string().describe("口調の具体的な説明。語尾や一人称を含める（60文字以内）"),
-  specialty: z.string().describe("得意なジャンルや分野（40文字以内）"),
-  greeting: z.string().describe("その口調で書いた、生徒への最初のあいさつ（120文字以内）"),
-});
-type Character = z.infer<typeof CharacterSchema>;
-
-const ChatBody = z.object({
-  character: CharacterSchema,
+const AskBody = z.object({
   messages: z
-    .array(z.object({ role: z.enum(["user", "assistant"]), content: z.string().min(1).max(2000) }))
+    .array(z.object({ role: z.enum(["user", "assistant"]), content: z.string().min(1).max(4000) }))
     .min(1)
     .max(30),
   context: z
@@ -41,46 +27,40 @@ const ChatBody = z.object({
     .optional(),
 });
 
-const CharacterBody = z.object({
-  preset: z.string().max(40).optional(),
-  wish: z.string().max(400).optional(),
-});
+// 毎回同じ文面（キャッシュが効くように、日時や生徒ごとの情報は入れない）
+const SYSTEM = `あなたはギター練習アプリ「Fretlab」の「AI先生」です。ギター講師として、生徒の質問に的確に答えます。
 
-const APP_GUIDE = `あなたはギター練習アプリ「Fretlab」のレッスンコーチです。
-アプリには次の機能があります。必要なときだけ、具体的にどの画面で何をすればよいかを案内してください。
+## 答え方
+- 質問にまず結論から答え、そのあと理由と具体的なやり方を書きます。
+- 正確さを最優先します。コードの構成音、度数、フレット位置、指番号、スケールの音、機材の仕組みなどの事実は、確かなことだけを書きます。自信がないことは推測で断定せず、「〜の場合が多い」「確認するなら〜」と伝えます。
+- コードの押さえ方は「6弦→1弦」の順にフレット番号で書きます（例：C = x32010、x はミュート、0 は開放弦）。指番号は 1=人差し指、2=中指、3=薬指、4=小指。
+- フレーズを示すときは短い TAB 譜を使ってかまいません（コードブロック内、e|B|G|D|A|E の6行）。
+- 練習方法は、BPM・時間・回数など具体的な数字を入れて、今日からできる形にします。
+- 長さはスマホで読みやすい程度にします。簡単な質問は短く、手順が必要な質問だけ見出しや箇条書きを使います。Markdown は **太字**、箇条書き、番号付きリスト、### 見出し、コードブロックだけを使います（表は使いません）。
+- 生徒の悩みに寄り添い、丁寧で親しみやすい「です・ます」調で話します。
+- 痛みやしびれが続く相談には、無理をせず休むこと、続くときは医師に相談することを勧めます。
+- ギターや音楽と関係のない質問には、ギターの先生として答えられる範囲ではないことを短く伝え、練習の話に戻します。
+- 著作権のある曲の歌詞や楽譜をそのまま書き写すことはしません。コード進行の一般的な説明や練習のコツは答えてかまいません。
+
+## アプリの機能（役立つときだけ、どの画面で何をするか案内します）
 - メトロノーム：BPM 30〜260、クリック音色10種、ドラムパターン15種（8ビート、シャッフル、ボサノヴァなど）
-- チューナー：ギター・ベース4弦/5弦・ウクレレ。マイクで音程を測る
-- コード一覧：12ルート×17タイプ、押さえ方を横向きのダイアグラムで表示
-- コード進行：定番100パターン（カノン進行、王道進行、丸サ進行、12小節ブルースなど）をドラムと伴奏つきで再生
-- 指板音程表（音名・度数表示、指板クイズ）、スケール表（13スケール）
-- 練習記録（タイマー、14日間のグラフ、連続練習日数）、練習Tips`;
+- チューナー：クロマチック・ギター・ベース4弦/5弦・ウクレレ。針のメーターで表示
+- コード：12ルート×17タイプ。押さえ方を横向きのダイアグラムで、0〜12フレットのポジション別に表示
+- 進行：定番100パターン（カノン進行、王道進行、丸サ進行、12小節ブルースなど）をドラムと伴奏つきで再生
+- 指板（音名・度数表示、指板クイズ）、スケール（13スケール）
+- 練習曲：著作権の切れた曲のコード譜をメロディつきで再生、キー変更・カポ表示
+- TAB：有名なメロディやリフを TAB 譜で再生
+- マイ記録：ポモドーロ式タイマーで練習時間を記録、録音
+- ヒント：練習のコツとギター豆知識`;
 
-function systemPrompt(c: Character, ctx?: z.infer<typeof ChatBody>["context"]): string {
-  const lines = [
-    APP_GUIDE,
-    "",
-    "## あなたのキャラクター",
-    `名前：${c.name}`,
-    `口癖：${c.catchphrase}`,
-    `性格と教え方：${c.personality}`,
-    `口調：${c.speaking_style}`,
-    `得意分野：${c.specialty}`,
-    "",
-    "## 話し方のルール",
-    "- いつもこのキャラクターの口調で、日本語で話してください。",
-    "- 返事はスマホで読みやすい長さにします。ふだんは3〜6文。練習メニューなど手順を伝えるときだけ、短い箇条書きを使います。",
-    "- 練習のアドバイスは、BPM・時間・回数など具体的な数字を入れて、今日からできる形にします。",
-    "- 痛みやしびれが続く相談には、無理をせず休むこと、続くときは医師に相談することを勧めます。",
-    "- 音楽やギター練習と関係のない話題は、キャラクターらしく軽く受け止めてから練習の話に戻します。",
-  ];
-  if (ctx && (ctx.streak !== undefined || ctx.week_minutes !== undefined || ctx.recent?.length || ctx.instrument)) {
-    lines.push("", "## 生徒の練習状況（アプリの記録より。話題に合うときだけ触れる）");
-    if (ctx.streak !== undefined) lines.push(`連続練習：${ctx.streak}日`);
-    if (ctx.week_minutes !== undefined) lines.push(`直近7日の練習時間：${ctx.week_minutes}分`);
-    if (ctx.recent?.length) lines.push(`最近の練習内容：${ctx.recent.join("、")}`);
-    if (ctx.instrument) lines.push(`チューナーで選んでいる楽器：${ctx.instrument}`);
-  }
-  return lines.join("\n");
+function contextNote(ctx?: z.infer<typeof AskBody>["context"]): string | null {
+  if (!ctx) return null;
+  const lines: string[] = [];
+  if (ctx.streak !== undefined) lines.push(`連続練習：${ctx.streak}日`);
+  if (ctx.week_minutes !== undefined) lines.push(`直近7日の練習時間：${ctx.week_minutes}分`);
+  if (ctx.recent?.length) lines.push(`最近の練習内容：${ctx.recent.join("、")}`);
+  if (ctx.instrument) lines.push(`チューナーで選んでいる楽器：${ctx.instrument}`);
+  return lines.length ? `## 生徒の練習状況（アプリの記録より。話題に合うときだけ触れる）\n${lines.join("\n")}` : null;
 }
 
 function cors(origin: string | null, env: Env): Record<string, string> {
@@ -99,34 +79,25 @@ function json(data: unknown, status: number, headers: Record<string, string>): R
   return new Response(JSON.stringify(data), { status, headers: { ...headers, "Content-Type": "application/json; charset=utf-8" } });
 }
 
-async function makeCharacter(client: Anthropic, body: z.infer<typeof CharacterBody>): Promise<Character | null> {
-  const wish = [body.preset ? `タイプ：${body.preset}` : "", body.wish ? `希望：${body.wish}` : ""].filter(Boolean).join("\n") || "おまかせ";
-  const response = await client.messages.parse({
-    model: MODEL,
-    max_tokens: 4000,
-    output_config: { effort: "low", format: zodOutputFormat(CharacterSchema) },
-    system:
-      "ギター練習アプリのレッスンコーチのキャラクターを1人作ってください。生徒の希望に合わせ、親しみやすく個性のある人物にします。実在の人物や既存作品のキャラクターは使わず、オリジナルにしてください。",
-    messages: [{ role: "user", content: wish }],
-  });
-  if (response.stop_reason === "refusal") return null;
-  return response.parsed_output ?? null;
-}
-
-async function chat(client: Anthropic, body: z.infer<typeof ChatBody>, headers: Record<string, string>): Promise<Response> {
+async function ask(client: Anthropic, body: z.infer<typeof AskBody>, headers: Record<string, string>): Promise<Response> {
   const { readable, writable } = new TransformStream<Uint8Array, Uint8Array>();
   const writer = writable.getWriter();
   const enc = new TextEncoder();
+  const note = contextNote(body.context);
   (async () => {
     let wrote = false;
     try {
       const stream = client.beta.messages.stream({
         model: MODEL,
-        max_tokens: 4000,
+        max_tokens: 16000,
         betas: ["server-side-fallback-2026-07-01"],
         fallbacks: "default",
-        output_config: { effort: "low" },
-        system: systemPrompt(body.character, body.context),
+        // 的確さを優先して medium（質問によって考える量は自動で調整される）
+        output_config: { effort: "medium" },
+        system: [
+          { type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } },
+          ...(note ? [{ type: "text" as const, text: note }] : []),
+        ],
         messages: body.messages,
       } as Parameters<typeof client.beta.messages.stream>[0]);
       stream.on("text", (delta) => {
@@ -135,7 +106,9 @@ async function chat(client: Anthropic, body: z.infer<typeof ChatBody>, headers: 
       });
       const final = await stream.finalMessage();
       if (final.stop_reason === "refusal" && !wrote) {
-        await writer.write(enc.encode("ごめんね、その話題にはうまく答えられないんだ。練習のことなら何でも聞いてね。"));
+        await writer.write(enc.encode("ごめんなさい、その質問にはお答えできません。ギターや練習のことなら何でも聞いてください。"));
+      } else if (final.stop_reason === "max_tokens") {
+        await writer.write(enc.encode("\n\n（長くなったのでここで区切ります。「続きを」と送ってください）"));
       }
     } catch (e) {
       console.error(e);
@@ -166,24 +139,12 @@ export default {
     } catch {
       return json({ error: "invalid json" }, 400, headers);
     }
-    const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
     const path = new URL(req.url).pathname;
-    if (path === "/character") {
-      const body = CharacterBody.safeParse(raw);
-      if (!body.success) return json({ error: "invalid body" }, 400, headers);
-      try {
-        const c = await makeCharacter(client, body.data);
-        return c ? json({ character: c }, 200, headers) : json({ error: "could not create" }, 422, headers);
-      } catch (e) {
-        console.error(e);
-        return json({ error: "upstream error" }, 502, headers);
-      }
-    }
-    if (path === "/chat") {
-      const body = ChatBody.safeParse(raw);
+    if (path === "/ask") {
+      const body = AskBody.safeParse(raw);
       if (!body.success) return json({ error: "invalid body" }, 400, headers);
       if (body.data.messages[0].role !== "user" || body.data.messages.at(-1)?.role !== "user") return json({ error: "invalid messages" }, 400, headers);
-      return chat(client, body.data, headers);
+      return ask(new Anthropic({ apiKey: env.ANTHROPIC_API_KEY }), body.data, headers);
     }
     return json({ error: "not found" }, 404, headers);
   },

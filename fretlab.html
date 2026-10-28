@@ -145,6 +145,24 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .tuner-main.locked .tnote-row::before{animation:lockring 1s ease-out}
 .tuner-main.locked .tnote{color:var(--good);text-shadow:0 0 24px color-mix(in srgb,var(--good) 60%,transparent);animation:lockpop .5s ease-out}
 .tuner-main.locked .gauge .zone{opacity:.7}
+/* チューニングが合った瞬間：カードに緑の光が広がり、針が光り、中心にチェックが描かれる */
+.tuner-main{position:relative;overflow:hidden}
+.tuner-main::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:radial-gradient(70% 50% at 50% 62%,color-mix(in srgb,var(--good) 30%,transparent),transparent 72%);opacity:0}
+.tuner-main.locked::after{animation:lockwash 1.8s cubic-bezier(.2,.7,.3,1)}
+@keyframes lockwash{0%{opacity:0}12%{opacity:1}100%{opacity:0}}
+.gauge .tk.z{transition:stroke .3s}
+.gauge.in .tk.z{stroke:var(--good)}
+.gauge .hub{transition:r .35s cubic-bezier(.3,1.6,.5,1),fill .3s}
+.tuner-main.locked .gauge .hub{r:13px;fill:var(--good)}
+.gauge .ck{fill:none;stroke:var(--bg);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;opacity:0}
+.tuner-main.locked .gauge .ck{opacity:1;animation:ckdraw .45s cubic-bezier(.65,0,.35,1) .12s forwards}
+@keyframes ckdraw{to{stroke-dashoffset:0}}
+.gauge .lk{fill:none;stroke:var(--good);stroke-width:1.5;opacity:0;transform-origin:150px 160px}
+.tuner-main.locked .gauge .lk{animation:lkring 1.3s cubic-bezier(.2,.7,.3,1)}
+.tuner-main.locked .gauge .lk.l2{animation-delay:.22s}
+@keyframes lkring{0%{opacity:.9;transform:scale(.5)}100%{opacity:0;transform:scale(5.5)}}
+.tuner-main.locked #needle line{filter:drop-shadow(0 0 5px var(--good))}
+@media (prefers-reduced-motion:reduce){.tuner-main.locked::after,.tuner-main.locked .gauge .lk{animation:none}.tuner-main.locked .gauge .ck{animation:none;stroke-dashoffset:0}}
 @keyframes lockring{0%{opacity:.9;transform:scale(.6)}100%{opacity:0;transform:scale(1.6)}}
 @keyframes lockpop{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
 .sbtn{position:relative}
@@ -274,24 +292,48 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .tip .btn{margin-top:8px;min-height:34px;padding:4px 12px;font-size:13px}
 
 
-/* AI teacher */
-.ai-chat{display:flex;flex-direction:column;gap:12px;max-width:760px}
-.ai-char{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center}
-.ai-avatar{width:64px;height:64px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-family:var(--serif);font-size:30px;background:var(--accent-soft);color:var(--third)}
-.ai-name{font-family:var(--serif);font-size:22px;font-weight:700;letter-spacing:.06em}
-.ai-catch{font-family:var(--display);font-style:italic;font-size:18px;color:var(--root)}
-.ai-tools{display:flex;flex-direction:column;gap:6px}
-.ai-tools .btn{min-height:34px;padding:4px 14px;font-size:13px}
-.ai-log{display:flex;flex-direction:column;gap:10px;min-height:120px}
-.bubble{max-width:85%;padding:12px 16px;border-radius:18px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75}
-.bubble.t{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-top-left-radius:6px}
-.bubble.u{align-self:flex-end;background:var(--fg);color:var(--bg);border-top-right-radius:6px}
-.bubble.t.wait::after{content:"…";animation:blink 1s infinite}
+/* AI teacher (Q&A) */
+.ai-chat{display:flex;flex-direction:column;gap:14px;max-width:760px}
+.ai-hero{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center}
+.ai-avatar{width:60px;height:60px}
+.ai-avatar svg{width:100%;height:100%}
+.ai-avatar path{fill:var(--root)}
+.ai-avatar text{fill:var(--root-ink);font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.04em}
+.ai-name{font-family:var(--serif);font-size:22px;font-weight:700;letter-spacing:.1em}
+.ai-new{min-height:36px;padding:4px 16px;font-size:13px}
+.ai-off{font-size:13px;line-height:1.7;color:var(--fg);background:color-mix(in srgb,var(--warn) 14%,transparent);border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);border-radius:12px;padding:10px 14px}
+.ai-off b{margin-right:4px}
+.ai-start{display:flex;flex-direction:column;gap:10px}
+.ai-examples{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.ai-ex{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 14px;font:inherit;font-size:14px;color:var(--fg);cursor:pointer;line-height:1.55;transition:border-color .2s,transform .1s}
+.ai-ex:hover{border-color:var(--root)}
+.ai-ex:active{transform:scale(.99)}
+.ai-ex::before{content:"Q.";font-family:var(--display);font-weight:600;color:var(--root);margin-right:6px}
+.ai-log{display:flex;flex-direction:column;gap:12px}
+.ai-log:empty{display:none}
+.qa-q{align-self:flex-end;max-width:85%;background:var(--fg);color:var(--bg);border-radius:18px 18px 6px 18px;padding:10px 16px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7}
+.qa-a{align-self:stretch;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 18px 12px;line-height:1.85;overflow-wrap:anywhere;position:relative}
+.qa-a .who{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.12em;color:var(--root);font-weight:700;margin-bottom:6px}
+.qa-a .who i{width:8px;height:8px;border-radius:50%;background:var(--root)}
+.qa-a.wait .who i{animation:blink 1s infinite}
+.qa-a.wait .body:empty::after{content:"考えています…";color:var(--muted);font-size:14px;animation:blink 1.4s infinite}
+.md p{margin:0 0 .7em}
+.md h4{font-family:var(--serif);font-size:16px;margin:1em 0 .35em;padding-left:9px;border-left:3px solid var(--root)}
+.md ul,.md ol{margin:0 0 .8em;padding-left:1.4em}
+.md li{margin:.15em 0}
+.md li::marker{color:var(--root)}
+.md strong{font-weight:700;background:linear-gradient(transparent 62%,color-mix(in srgb,var(--root) 28%,transparent) 62%)}
+.md code{font-family:var(--mono);font-size:.9em;background:var(--panel);border-radius:5px;padding:1px 5px}
+.md pre{font-family:var(--mono);font-size:13px;line-height:1.45;background:var(--panel);border-radius:10px;padding:10px 12px;overflow-x:auto;margin:0 0 .8em;white-space:pre}
+.md pre code{background:none;padding:0}
+.md>*:last-child{margin-bottom:0}
+.qa-tools{display:flex;gap:6px;margin-top:8px}
+.qa-tools button{background:none;border:1px solid var(--line);border-radius:999px;font:inherit;font-size:12px;color:var(--muted);padding:3px 11px;cursor:pointer}
 @keyframes blink{50%{opacity:.2}}
-.ai-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px));background:var(--bg);padding-top:6px}
+.ai-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--bg) 86%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding-top:6px}
 .ai-form textarea{resize:none}
 .ai-note{font-size:12px}
-@media (max-width:760px){.ai-char{grid-template-columns:auto minmax(0,1fr)}.ai-tools{grid-column:1/-1;flex-direction:row}}
+@media (max-width:560px){.ai-hero{grid-template-columns:auto minmax(0,1fr)}.ai-new{grid-column:1/-1;justify-self:start}}
 
 /* songs */
 .songs{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:16px;align-items:start}
@@ -620,10 +662,11 @@ setTimeout(done,3200);})();</script>
           <svg class="gauge" id="gauge" viewBox="0 0 300 178" aria-hidden="true">
             <path class="arc" d="M42.6 98.0 A124 124 0 0 1 257.4 98.0"/>
             <path class="zone" d="M150 160 L136.8 34.7 A126 126 0 0 1 163.2 34.7 Z"/>
-            <line class="tk lg" x1="42.6" y1="98.0" x2="56.5" y2="106.0"/><text x="28.8" y="94.0">−50</text><line class="tk" x1="49.7" y1="87.1" x2="56.2" y2="91.8"/><line class="tk" x1="57.9" y1="77.0" x2="63.8" y2="82.4"/><line class="tk" x1="67.0" y1="67.9" x2="72.4" y2="73.8"/><line class="tk" x1="77.1" y1="59.7" x2="81.8" y2="66.2"/><line class="tk lg" x1="88.0" y1="52.6" x2="96.0" y2="66.5"/><text x="80.0" y="42.8">−25</text><line class="tk" x1="99.6" y1="46.7" x2="102.8" y2="54.0"/><line class="tk" x1="111.7" y1="42.1" x2="114.2" y2="49.7"/><line class="tk" x1="124.2" y1="38.7" x2="125.9" y2="46.5"/><line class="tk" x1="137.0" y1="36.7" x2="137.9" y2="44.6"/><line class="tk lg" x1="150.0" y1="36.0" x2="150.0" y2="52.0"/><text x="150.0" y="24.0">0</text><line class="tk" x1="163.0" y1="36.7" x2="162.1" y2="44.6"/><line class="tk" x1="175.8" y1="38.7" x2="174.1" y2="46.5"/><line class="tk" x1="188.3" y1="42.1" x2="185.8" y2="49.7"/><line class="tk" x1="200.4" y1="46.7" x2="197.2" y2="54.0"/><line class="tk lg" x1="212.0" y1="52.6" x2="204.0" y2="66.5"/><text x="220.0" y="42.8">+25</text><line class="tk" x1="222.9" y1="59.7" x2="218.2" y2="66.2"/><line class="tk" x1="233.0" y1="67.9" x2="227.6" y2="73.8"/><line class="tk" x1="242.1" y1="77.0" x2="236.2" y2="82.4"/><line class="tk" x1="250.3" y1="87.1" x2="243.8" y2="91.8"/><line class="tk lg" x1="257.4" y1="98.0" x2="243.5" y2="106.0"/><text x="271.2" y="94.0">+50</text>
+            <line class="tk lg" x1="42.6" y1="98.0" x2="56.5" y2="106.0"/><text x="28.8" y="94.0">−50</text><line class="tk" x1="49.7" y1="87.1" x2="56.2" y2="91.8"/><line class="tk" x1="57.9" y1="77.0" x2="63.8" y2="82.4"/><line class="tk" x1="67.0" y1="67.9" x2="72.4" y2="73.8"/><line class="tk" x1="77.1" y1="59.7" x2="81.8" y2="66.2"/><line class="tk lg" x1="88.0" y1="52.6" x2="96.0" y2="66.5"/><text x="80.0" y="42.8">−25</text><line class="tk" x1="99.6" y1="46.7" x2="102.8" y2="54.0"/><line class="tk" x1="111.7" y1="42.1" x2="114.2" y2="49.7"/><line class="tk" x1="124.2" y1="38.7" x2="125.9" y2="46.5"/><line class="tk z" x1="137.0" y1="36.7" x2="137.9" y2="44.6"/><line class="tk lg z" x1="150.0" y1="36.0" x2="150.0" y2="52.0"/><text x="150.0" y="24.0">0</text><line class="tk z" x1="163.0" y1="36.7" x2="162.1" y2="44.6"/><line class="tk" x1="175.8" y1="38.7" x2="174.1" y2="46.5"/><line class="tk" x1="188.3" y1="42.1" x2="185.8" y2="49.7"/><line class="tk" x1="200.4" y1="46.7" x2="197.2" y2="54.0"/><line class="tk lg" x1="212.0" y1="52.6" x2="204.0" y2="66.5"/><text x="220.0" y="42.8">+25</text><line class="tk" x1="222.9" y1="59.7" x2="218.2" y2="66.2"/><line class="tk" x1="233.0" y1="67.9" x2="227.6" y2="73.8"/><line class="tk" x1="242.1" y1="77.0" x2="236.2" y2="82.4"/><line class="tk" x1="250.3" y1="87.1" x2="243.8" y2="91.8"/><line class="tk lg" x1="257.4" y1="98.0" x2="243.5" y2="106.0"/><text x="271.2" y="94.0">+50</text>
             <text class="side" x="40" y="172">♭ 低い</text><text class="side" x="260" y="172">高い ♯</text>
             <g id="needle"><line x1="150" y1="160" x2="150" y2="44"/></g>
-            <circle class="hub" cx="150" cy="160" r="7"/>
+            <circle class="lk" cx="150" cy="160" r="16"/><circle class="lk l2" cx="150" cy="160" r="16"/>
+            <circle class="hub" cx="150" cy="160" r="7"/><path class="ck" pathLength="1" d="M144 160.5 L148.5 165 L157 155.5"/>
           </svg>
         </div>
         <div class="tstate" id="tState"></div>
@@ -866,34 +909,27 @@ setTimeout(done,3200);})();</script>
 
   <!-- AI TEACHER -->
   <section data-panel="ai" hidden>
-    <div class="panel-head"><div><h2>レッスンコーチ</h2><p>自分好みのコーチを作って、練習の悩みを相談できます。マイ記録の内容も見ながら、具体的なメニューを提案してくれます。</p></div></div>
-    <div class="card ai-off" id="aiOff" hidden>
-      <b>レッスンコーチは準備中です</b>
-      <p class="msg">管理者がAIの接続を設定すると使えるようになります。</p>
-    </div>
-    <div class="card stack" id="aiSetup" hidden>
-      <div><span class="label">コーチのタイプ</span><div class="chips" id="aiPresets"></div></div>
-      <div><label class="label" for="aiWish">こんなコーチがいい（自由に書いてください）</label>
-        <textarea id="aiWish" class="search" rows="3" maxlength="400" placeholder="例：褒めて伸ばしてくれる。ブルースが好き。初心者にもやさしく教えてほしい。"></textarea></div>
-      <div class="row"><button class="btn primary big" id="aiMake">コーチを作る</button><span class="msg" id="aiMakeMsg"></span></div>
-    </div>
-    <div class="ai-chat" id="aiChat" hidden>
-      <div class="card ai-char">
-        <div class="ai-avatar" id="aiAvatar"></div>
+    <div class="panel-head"><div><h2>レッスンコーチ</h2><p>AI先生に、ギターのことを何でも質問できます。コードの押さえ方、音楽理論、テクニック、機材、練習方法まで、具体的に答えてくれます。</p></div></div>
+    <div class="ai-chat">
+      <div class="card ai-hero">
+        <div class="ai-avatar" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 5c9 0 16 4 16 11 0 9-9 21-16 27C17 37 8 25 8 16 8 9 15 5 24 5z"/><text x="24" y="26" text-anchor="middle">AI</text></svg></div>
         <div class="ai-prof">
-          <div class="ai-name" id="aiName"></div>
-          <div class="ai-catch" id="aiCatch"></div>
-          <div class="msg" id="aiSpec"></div>
+          <div class="ai-name">AI先生</div>
+          <div class="msg" id="aiStatus">質問すると、結論 → 理由 → 具体的なやり方の順で答えます。</div>
         </div>
-        <div class="ai-tools"><button class="btn" id="aiReset">会話を消す</button><button class="btn" id="aiRemake">コーチを作り直す</button></div>
+        <button class="btn ai-new" id="aiReset" type="button">新しい質問</button>
+      </div>
+      <div class="ai-off" id="aiOff" hidden><b>AI先生は準備中です。</b>回答の機能は公開設定が済むと使えるようになります。画面の見た目と質問例はお試しいただけます。</div>
+      <div class="ai-start" id="aiStart">
+        <div class="chips" id="aiCats"></div>
+        <div class="ai-examples" id="aiExamples"></div>
       </div>
       <div class="ai-log" id="aiLog" aria-live="polite"></div>
-      <div class="chips" id="aiQuick"></div>
       <form class="ai-form" id="aiForm">
-        <textarea id="aiInput" class="search" rows="2" maxlength="2000" placeholder="コーチに相談する（例：Fコードがきれいに鳴りません）" aria-label="メッセージ"></textarea>
-        <button class="btn primary" id="aiSend" type="submit">送信</button>
+        <textarea id="aiInput" class="search" rows="2" maxlength="4000" placeholder="AI先生に質問する（例：Fコードの1弦がビビります）" aria-label="質問"></textarea>
+        <button class="btn primary" id="aiSend" type="submit">質問する</button>
       </form>
-      <p class="msg ai-note">AIの回答はまちがうこともあります。体の痛みが続くときは練習を休んでください。</p>
+      <p class="msg ai-note">AIの回答はまちがうこともあります。大事なことは楽譜や先生にも確認してください。体の痛みが続くときは練習を休みましょう。</p>
     </div>
   </section>
 
@@ -1418,12 +1454,25 @@ function detectPitch(){
   const r=yin(x,ctx.sampleRate/d,I.min,I.max);
   return r&&r.f>=I.min&&r.f<=I.max?r:null;
 }
+// 合った音と同じ音名で、柔らかいベルの和音（根音・5度・オクターブ）を鳴らす。小さなエコーで余韻を残す
 function tunerChime(m){
-  const c=ac(), t=c.currentTime+.02;
-  [[1318.5,0],[1975.5,.09]].forEach(([f,dl])=>{const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.value=f;
-    g.gain.setValueAtTime(0.0001,t+dl);g.gain.exponentialRampToValueAtTime(.18,t+dl+.01);g.gain.exponentialRampToValueAtTime(0.0001,t+dl+.7);o.connect(g);g.connect(master);o.start(t+dl);o.stop(t+dl+.8);});
-  T.muteUntil=performance.now()+700;   // 自分のチャイムを拾わないように少し待つ
-  try{navigator.vibrate&&navigator.vibrate([30,40,30]);}catch(e){}
+  const c=ac(), t=c.currentTime+.03, pc=((m%12)+12)%12;
+  let base=72+pc; if(base>78) base-=12;              // C5〜F#5 あたりの聴きやすい高さ
+  const out=c.createGain(); out.gain.value=.9; out.connect(master);
+  const dl=c.createDelay(1), fb=c.createGain(), lp=c.createBiquadFilter(), wet=c.createGain();
+  dl.delayTime.value=.19; fb.gain.value=.3; lp.type='lowpass'; lp.frequency.value=2600; wet.gain.value=.32;
+  out.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(wet); wet.connect(master);
+  const bell=(f,at,peak)=>{
+    [[1,peak,1.25],[2,peak*.22,.5],[3.99,peak*.06,.18]].forEach(([mul,pk,dec])=>{
+      const o=c.createOscillator(), g=c.createGain(); o.type='sine'; o.frequency.value=f*mul;
+      g.gain.setValueAtTime(0.0001,at); g.gain.exponentialRampToValueAtTime(pk,at+.008); g.gain.exponentialRampToValueAtTime(0.0001,at+dec);
+      o.connect(g); g.connect(out); o.start(at); o.stop(at+dec+.05);
+    });
+  };
+  [[0,0,.15],[7,.075,.11],[12,.15,.09]].forEach(([iv,d,pk])=>bell(mfreq(base+iv),t+d,pk));
+  setTimeout(()=>{try{out.disconnect();wet.disconnect();}catch(e){}},3000);
+  T.muteUntil=performance.now()+1100;   // 自分のチャイムを拾わないように少し待つ
+  try{navigator.vibrate&&navigator.vibrate([18,60,28]);}catch(e){}
 }
 function setLocked(on){
   const main=document.querySelector('.tuner-main'); if(!main) return;
@@ -2505,66 +2554,87 @@ function renderTips(){
 segInit($('#tipMode'),'tips',v=>{tipMode=v;tipCat='すべて';renderTips();});
 renderTips();
 
-/* ---------- AI先生 ---------- */
+/* ---------- レッスンコーチ（AI先生に質問） ---------- */
 // AI の API（worker/）の公開URL。空のあいだは「準備中」と表示する
 const AI_ENDPOINT='';
-const AI={char:store.get('aiChar',null),hist:store.get('aiHist',[]),busy:false,preset:'おまかせ'};
-const AI_PRESETS=['おまかせ','優しい先輩','熱血コーチ','落ち着いたジャズ講師','関西弁のロック兄さん','物知りな音楽博士','褒め上手なお姉さん'];
-const AI_QUICK=['今日の30分メニューを考えて','Fコードがきれいに鳴らない','王道進行をスムーズに弾くコツ','リズム感を良くしたい','速弾きの練習法を教えて'];
+const AI={hist:store.get('aiQA',[]),busy:false,cat:'コード'};
+const AI_EXAMPLES={
+  'コード':['Fコードの1弦がビビってきれいに鳴りません','C→G→Am→F をスムーズに持ち替えるコツは？','sus4 と add9 の違いと使いどころ','バレーコードで手首が痛くなります'],
+  '理論':['ダイアトニックコードとは？Cメジャーで教えて','王道進行はなぜ切なく聞こえるの？','ペンタトニックスケールの覚え方','カポを付けたときのキーの考え方'],
+  'テクニック':['ハンマリングとプリングをきれいに出すには','カッティングで音が汚くなる原因','速弾きの練習はどう始めればいい？','チョーキングの音程を安定させたい'],
+  'リズム':['裏拍を感じられるようになる練習','8ビートのストロークパターンを教えて','メトロノームに合わせるとずれてしまう','3連符のシャッフルのノリを出すには'],
+  '機材':['弦の太さ（ゲージ）の選び方','アコギとエレキ、初心者はどちらがいい？','弦はどれくらいで交換すべき？','エフェクターは何から買えばいい？'],
+  '練習法':['1日30分でできる練習メニューを作って','初心者が最初に覚えるべきコード','耳コピができるようになりたい','練習が続かないときのコツ'],
+};
 function aiContext(){
   const tot=dayTotals(), d=new Date(); let week=0; for(let i=0;i<7;i++){const x=new Date(d);x.setDate(x.getDate()-i);week+=tot[ymd(x)]||0;}
   let streak=0; const x=new Date(d); if(!tot[ymd(x)]) x.setDate(x.getDate()-1); while(tot[ymd(x)]){streak++;x.setDate(x.getDate()-1);}
   const recent=[...new Set(LOG.entries.slice(-12).reverse().map(e=>e.cat))].slice(0,5);
   return {streak,week_minutes:week,recent,instrument:INSTR[T.inst].name};
 }
+// 回答の Markdown を安全に表示する（使うのは見出し・太字・箇条書き・番号・コード・コードブロックだけ）
+function mdToHtml(src){
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const inline=s=>esc(s).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  const out=[]; let list=null, para=[], code=null;
+  const flushP=()=>{ if(para.length){ out.push('<p>'+para.map(inline).join('<br>')+'</p>'); para=[]; } };
+  const flushL=()=>{ if(list){ out.push(`<${list.t}>`+list.items.map(i=>'<li>'+inline(i)+'</li>').join('')+`</${list.t}>`); list=null; } };
+  for(const line of src.replace(/\r/g,'').split('\n')){
+    if(code!==null){ if(/^\s*```/.test(line)){ out.push('<pre><code>'+esc(code.join('\n'))+'</code></pre>'); code=null; } else code.push(line); continue; }
+    if(/^\s*```/.test(line)){ flushP(); flushL(); code=[]; continue; }
+    const h=line.match(/^\s*#{1,6}\s+(.*)$/), ul=line.match(/^\s*[-*・]\s+(.*)$/), ol=line.match(/^\s*\d+[.)]\s+(.*)$/);
+    if(h){ flushP(); flushL(); out.push('<h4>'+inline(h[1])+'</h4>'); }
+    else if(ul||ol){ flushP(); const t=ul?'ul':'ol'; if(!list||list.t!==t){ flushL(); list={t,items:[]}; } list.items.push((ul||ol)[1]); }
+    else if(!line.trim()){ flushP(); flushL(); }
+    else { flushL(); para.push(line); }
+  }
+  if(code!==null) out.push('<pre><code>'+esc(code.join('\n'))+'</code></pre>');
+  flushP(); flushL(); return out.join('');
+}
+function aiAnswerEl(text,wait){
+  const a=document.createElement('div'); a.className='qa-a'+(wait?' wait':'');
+  a.innerHTML='<div class="who"><i></i>AI先生</div><div class="body md"></div>';
+  a.querySelector('.body').innerHTML=mdToHtml(text||'');
+  if(!wait&&text){ const t=document.createElement('div'); t.className='qa-tools'; const c=document.createElement('button'); c.type='button'; c.textContent='コピー';
+    c.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(text);c.textContent='コピーしました';setTimeout(()=>c.textContent='コピー',1500);}catch(e){}}); t.appendChild(c); a.appendChild(t); }
+  return a;
+}
+function aiRenderExamples(){
+  const cats=$('#aiCats'); cats.innerHTML='';
+  Object.keys(AI_EXAMPLES).forEach(k=>{const b=document.createElement('button');b.className='chip';b.type='button';b.textContent=k;b.setAttribute('aria-pressed',String(k===AI.cat));b.addEventListener('click',()=>{AI.cat=k;aiRenderExamples();});cats.appendChild(b);});
+  const ex=$('#aiExamples'); ex.innerHTML='';
+  AI_EXAMPLES[AI.cat].forEach(q=>{const b=document.createElement('button');b.className='ai-ex';b.type='button';b.textContent=q;b.addEventListener('click',()=>{ if(AI_ENDPOINT) aiSend(q); else { $('#aiInput').value=q; $('#aiInput').focus(); } });ex.appendChild(b);});
+}
 function aiRender(){
   const ready=!!AI_ENDPOINT;
-  $('#aiOff').hidden=ready; $('#aiSetup').hidden=!ready||!!AI.char; $('#aiChat').hidden=!ready||!AI.char;
-  if(!AI.char) return;
-  $('#aiAvatar').textContent=AI.char.symbol||AI.char.name[0];
-  $('#aiName').textContent=AI.char.name; $('#aiCatch').textContent='“'+AI.char.catchphrase+'”';
-  $('#aiSpec').textContent=`得意：${AI.char.specialty}　／　${AI.char.personality}`;
+  $('#aiOff').hidden=ready; $('#aiSend').disabled=!ready||AI.busy;
+  $('#aiStart').hidden=AI.hist.length>0; $('#aiReset').hidden=!AI.hist.length;
   const log=$('#aiLog'); log.innerHTML='';
-  const first=document.createElement('div'); first.className='bubble t'; first.textContent=AI.char.greeting; log.appendChild(first);
-  AI.hist.forEach(m=>{const b=document.createElement('div');b.className='bubble '+(m.role==='user'?'u':'t');b.textContent=m.content;log.appendChild(b);});
-}
-async function aiMake(){
-  if(AI.busy) return; AI.busy=true; const btn=$('#aiMake'), msg=$('#aiMakeMsg'); btn.disabled=true; msg.textContent='コーチを呼んでいます…';
-  try{
-    const r=await fetch(AI_ENDPOINT+'/character',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({preset:AI.preset==='おまかせ'?undefined:AI.preset,wish:$('#aiWish').value.trim()||undefined})});
-    if(r.status===429) throw new Error('混み合っています。1分ほど待ってからもう一度押してください。');
-    const j=await r.json(); if(!r.ok||!j.character) throw new Error('コーチを作れませんでした。書き方を変えてもう一度お試しください。');
-    AI.char=j.character; AI.hist=[]; store.set('aiChar',AI.char); store.set('aiHist',AI.hist); msg.textContent=''; aiRender();
-  }catch(e){ msg.textContent=e.message.startsWith('混み')||e.message.startsWith('コーチ')?e.message:'通信できませんでした。電波の良い場所でもう一度お試しください。'; }
-  finally{ AI.busy=false; btn.disabled=false; }
+  AI.hist.forEach(m=>{ if(m.role==='user'){const q=document.createElement('div');q.className='qa-q';q.textContent=m.content;log.appendChild(q);} else log.appendChild(aiAnswerEl(m.content,false)); });
 }
 async function aiSend(text){
-  text=(text||'').trim(); if(!text||AI.busy) return;
-  AI.busy=true; $('#aiSend').disabled=true; $('#aiInput').value='';
+  text=(text||'').trim(); if(!text||AI.busy||!AI_ENDPOINT) return;
+  AI.busy=true; $('#aiInput').value='';
   AI.hist.push({role:'user',content:text}); aiRender();
-  const log=$('#aiLog'), b=document.createElement('div'); b.className='bubble t wait'; log.appendChild(b); b.scrollIntoView({block:'end',behavior:'smooth'});
-  let reply='';
+  const log=$('#aiLog'), a=aiAnswerEl('',true); log.appendChild(a); a.scrollIntoView({block:'start',behavior:'smooth'});
+  const body=a.querySelector('.body'); let reply='';
   try{
-    const r=await fetch(AI_ENDPOINT+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({character:AI.char,messages:AI.hist.slice(-20),context:aiContext()})});
+    const r=await fetch(AI_ENDPOINT+'/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:AI.hist.slice(-20),context:aiContext()})});
     if(r.status===429) throw new Error('rate');
     if(!r.ok||!r.body) throw new Error('http');
     const rd=r.body.getReader(), dec=new TextDecoder();
-    for(;;){ const {done,value}=await rd.read(); if(done) break; reply+=dec.decode(value,{stream:true}); b.classList.remove('wait'); b.textContent=reply; }
-  }catch(e){ reply=reply||(e.message==='rate'?'少し質問が多すぎたみたい。1分ほど待ってからもう一度送ってね。':'通信できませんでした。電波の良い場所でもう一度送ってください。'); b.textContent=reply; }
-  b.classList.remove('wait');
+    for(;;){ const {done,value}=await rd.read(); if(done) break; reply+=dec.decode(value,{stream:true}); body.innerHTML=mdToHtml(reply); }
+  }catch(e){ reply=reply||(e.message==='rate'?'質問が続いたので、少し休憩させてください。1分ほど待ってからもう一度送ってください。':'通信できませんでした。電波の良い場所でもう一度送ってください。'); }
   AI.hist.push({role:'assistant',content:reply}); if(AI.hist.length>40) AI.hist=AI.hist.slice(-40);
-  if(AI.hist[0]&&AI.hist[0].role!=='user') AI.hist.shift();
-  store.set('aiHist',AI.hist); AI.busy=false; $('#aiSend').disabled=false;
+  while(AI.hist[0]&&AI.hist[0].role!=='user') AI.hist.shift();
+  store.set('aiQA',AI.hist); AI.busy=false;
+  const done=aiAnswerEl(reply,false); a.replaceWith(done); $('#aiSend').disabled=false; $('#aiReset').hidden=false;
 }
 (function initAI(){
-  const pc=$('#aiPresets'); AI_PRESETS.forEach(p=>{const b=document.createElement('button');b.className='chip';b.textContent=p;b.setAttribute('aria-pressed',String(p===AI.preset));b.addEventListener('click',()=>{AI.preset=p;pc.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',String(c===b)));});pc.appendChild(b);});
-  const q=$('#aiQuick'); AI_QUICK.forEach(t=>{const b=document.createElement('button');b.className='chip';b.textContent=t;b.addEventListener('click',()=>aiSend(t));q.appendChild(b);});
-  $('#aiMake').addEventListener('click',aiMake);
   $('#aiForm').addEventListener('submit',e=>{e.preventDefault();aiSend($('#aiInput').value);});
   $('#aiInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();aiSend($('#aiInput').value);}});
-  $('#aiReset').addEventListener('click',()=>{AI.hist=[];store.set('aiHist',AI.hist);aiRender();});
-  $('#aiRemake').addEventListener('click',()=>{AI.char=null;AI.hist=[];store.set('aiChar',null);store.set('aiHist',[]);aiRender();});
-  aiRender();
+  $('#aiReset').addEventListener('click',()=>{AI.hist=[];store.set('aiQA',AI.hist);aiRender();});
+  aiRenderExamples(); aiRender();
 })();
 
 /* ---------- PWA ---------- */
