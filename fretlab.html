@@ -82,6 +82,9 @@ button,select,input{font:inherit;color:inherit}
 .btn:hover{border-color:var(--muted)}
 .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:500}
 .btn.big{padding:12px 26px;font-size:17px;min-width:140px}
+.repeat-btn{display:inline-flex;align-items:center;gap:7px;color:var(--muted)}
+.repeat-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.repeat-btn[aria-pressed="true"]{color:var(--accent-ink);background:var(--root);border-color:var(--root)}
 select{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-height:40px}
 input[type=range]{accent-color:var(--accent);width:100%}
 input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
@@ -753,8 +756,9 @@ setTimeout(done,3200);})();</script>
           </div>
           <div class="row">
             <button class="btn primary big" id="songPlay">▶ 再生</button>
+            <button class="btn repeat-btn" id="songLoop" type="button" aria-pressed="false" title="くり返し再生"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11V9a3 3 0 0 1 3-3h11"/><path d="M15 3l3 3-3 3"/><path d="M20 13v2a3 3 0 0 1-3 3H6"/><path d="M9 21l-3-3 3-3"/></svg>リピート</button>
             <div style="flex:1;min-width:180px"><span class="label">速さ <b id="songSpeedOut">100</b>%（♩=<span id="songBpm"></span>）</span><input type="range" id="songSpeed" min="50" max="120" step="5" value="100" aria-label="速さ"></div>
-            <label class="check"><input type="checkbox" id="songLoop"> ループ</label>
+
           </div>
           <div class="msg" id="songCapo"></div>
         </div>
@@ -1040,6 +1044,12 @@ const store={get(k,d){try{const v=localStorage.getItem('fretlab.'+k);return v===
 
 /* ---------- audio ---------- */
 let ctx=null, master=null, a4=440;
+// 再生中のプレーヤーの出力先。停止時にこのバスごと消音して、先に予約済みの音（クリックなど）も確実に止める
+let BUS=null;
+const outNode=()=>BUS||master;
+function openBus(){const g=ac().createGain();g.connect(master);return g;}
+function closeBus(g){ if(!g) return; const t=ctx.currentTime; try{g.gain.cancelScheduledValues(t);g.gain.setValueAtTime(g.gain.value,t);g.gain.linearRampToValueAtTime(0,t+0.04);}catch(e){} setTimeout(()=>{try{g.disconnect();}catch(e){}},200); }
+function onBus(g,fn){const prev=BUS;BUS=g;try{return fn();}finally{BUS=prev;}}
 function ac(){
   if(!ctx){
     ctx=new (window.AudioContext||window.webkitAudioContext)();
@@ -1065,7 +1075,7 @@ function loadSamples(){
 function playBuf(name,t,gain,rate=1){
   const b=SMP.buf[name]; if(!b) return null;
   const c=ac(), s=c.createBufferSource(), g=c.createGain(); s.buffer=b; s.playbackRate.value=rate; g.gain.value=gain;
-  s.connect(g); g.connect(master); s.start(Math.max(t,c.currentTime)); return {s,g};
+  s.connect(g); g.connect(outNode()); s.start(Math.max(t,c.currentTime)); return {s,g};
 }
 // 同じ弦の前の音は止める（本物のギターと同じ）
 function choke(key,t){const v=SMP.voices[key]; if(v){try{v.g.gain.setTargetAtTime(0,Math.max(t,ctx.currentTime),0.03);v.s.stop(Math.max(t,ctx.currentTime)+0.3);}catch(e){}} }
@@ -1096,7 +1106,7 @@ function pluck(midi,when=0,gain=0.55,opt={}){
   const c=ac(), kind=opt.kind||'guitar';
   const sv=sampleNote(kind,midi,c.currentTime+when,gain*1.1,opt.str!=null?kind+opt.str:null); if(sv) return sv.s;
   const src=c.createBufferSource(); src.buffer=pluckBuffer(mfreq(midi));
-  const g=c.createGain(); g.gain.value=gain; src.connect(g); g.connect(master); src.start(c.currentTime+when); return src;
+  const g=c.createGain(); g.gain.value=gain; src.connect(g); g.connect(outNode()); src.start(c.currentTime+when); return src;
 }
 
 /* ---------- tabs ---------- */
@@ -1127,7 +1137,7 @@ function segInit(el,val,onChange){
 let noiseBuf=null;
 function noise(){if(!noiseBuf){const c=ac();noiseBuf=c.createBuffer(1,c.sampleRate,c.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}return noiseBuf;}
 function env(g,t,peak,dec,att=0.001){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(0.0002,peak),t+att);g.gain.exponentialRampToValueAtTime(0.0001,t+att+dec);}
-function tone(t,type,f,peak,dec,f2,dest=master){
+function tone(t,type,f,peak,dec,f2,dest=outNode()){
   const c=ac(),o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
   if(f2) o.frequency.exponentialRampToValueAtTime(f2,t+dec*0.8);
   env(g,t,peak,dec);o.connect(g);g.connect(dest);o.start(t);o.stop(t+dec+0.05);
@@ -1135,7 +1145,7 @@ function tone(t,type,f,peak,dec,f2,dest=master){
 function nz(t,ftype,freq,q,peak,dec){
   const c=ac(),s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();
   s.buffer=noise();f.type=ftype;f.frequency.value=freq;f.Q.value=q;env(g,t,peak,dec);
-  s.connect(f);f.connect(g);g.connect(master);s.start(t,Math.random()*0.5);s.stop(t+dec+0.05);
+  s.connect(f);f.connect(g);g.connect(outNode());s.start(t,Math.random()*0.5);s.stop(t+dec+0.05);
 }
 // level: 0=アクセント 1=拍 2=細分
 const SOUNDS=[
@@ -1946,8 +1956,9 @@ function renderSong(){
 }
 function songStrum(pc,q,capo){ stopAllPlayback(); const type=QUAL_MAP[q]??'maj', v=bestVoicing(pc,type); if(!v) return; v.frets.forEach((f,i)=>{ if(f!==null) pluck(STD[i]+f+capo,i*0.03,0.4,{str:i}); }); }
 /* 再生：伴奏（コード）＋メロディ。キーを変えると両方移調される */
-const SP={playing:false,srcs:[],timer:null,raf:0,t0:0,bd:0,passes:0,tl:null,cur:-2};
-function songSchedulePass(){
+const SP={bus:null,loop:store.get('songRepeat',false),playing:false,srcs:[],timer:null,raf:0,t0:0,bd:0,passes:0,tl:null,cur:-2};
+function songSchedulePass(){ onBus(SP.bus,songSchedulePassRaw); }
+function songSchedulePassRaw(){
   const song=SONGS[SG.idx], c=ac(), bd=SP.bd, {ev,len}=SP.tl, start=SP.t0+SP.passes*len*bd, beat=song.time===2?1:1;
   const at=t=>Math.max(0,start+t*bd-c.currentTime), keep=s=>{if(s) SP.srcs.push(s);};
   ev.forEach(e=>{
@@ -1973,10 +1984,9 @@ function songPlay(){
   stopAllPlayback();
   const song=SONGS[SG.idx], c=ac(); SP.bd=60/(song.bpm*SG.speed/100); SP.tl=songTimeline(song);
   SP.playing=true; SP.passes=0; SP.srcs=[]; SP.cur=-2;
-  const capo=songCapo(); SP.t0=c.currentTime+0.15+song.time*SP.bd;
-  for(let k=0;k<song.time;k++) metroHit(M.sound,c.currentTime+0.15+k*SP.bd,k===0?0:1,M.vol*.7);
+  SP.bus=openBus(); SP.t0=c.currentTime+0.12;   // カウントなしですぐに演奏を始める
   songSchedulePass(); $('#songPlay').textContent='■ 停止';
-  SP.timer=setInterval(()=>{ const len=SP.tl.len; if(c.currentTime>SP.t0+(SP.passes-1)*len*SP.bd-1){ if($('#songLoop').checked) songSchedulePass(); else if(c.currentTime>SP.t0+SP.passes*len*SP.bd+.3) songStop(); } },200);
+  SP.timer=setInterval(()=>{ const len=SP.tl.len; if(c.currentTime>SP.t0+(SP.passes-1)*len*SP.bd-1){ if(SP.loop) songSchedulePass(); else if(c.currentTime>SP.t0+SP.passes*len*SP.bd+.3) songStop(); } },200);
   const loop=()=>{ if(!SP.playing) return; SP.raf=requestAnimationFrame(loop);
     const el=(c.currentTime-SP.t0)/SP.bd; let k=-2;
     if(el>=0){ const pos=el%SP.tl.len; SP.tl.ev.forEach(e=>{ if(e.t<=pos+1e-6) k=e.k; }); }
@@ -1986,7 +1996,7 @@ function songPlay(){
 }
 function songStop(){
   if(!SP.playing) return; SP.playing=false; clearInterval(SP.timer); cancelAnimationFrame(SP.raf);
-  const t=ctx?ctx.currentTime:0; SP.srcs.forEach(s=>{try{s.stop(t+0.05);}catch(e){}}); SP.srcs=[];
+  const t=ctx?ctx.currentTime:0; SP.srcs.forEach(s=>{try{s.stop(t+0.05);}catch(e){}}); SP.srcs=[]; closeBus(SP.bus); SP.bus=null;
   document.querySelectorAll('#songSheet .now').forEach(x=>x.classList.remove('now')); $('#songPlay').textContent='▶ 再生';
 }
 (function initSongs(){
@@ -1995,6 +2005,8 @@ function songStop(){
   $('#songKeyDown').addEventListener('click',()=>{songStop();SG.shift=SG.shift-1<-6?SG.shift+11:SG.shift-1;renderSong();});
   $('#songKeyUp').addEventListener('click',()=>{songStop();SG.shift=SG.shift+1>6?SG.shift-11:SG.shift+1;renderSong();});
   $('#songPlay').addEventListener('click',songPlay);
+  const rp=$('#songLoop'), paintRp=()=>rp.setAttribute('aria-pressed',String(SP.loop));
+  rp.addEventListener('click',()=>{SP.loop=!SP.loop;store.set('songRepeat',SP.loop);paintRp();}); paintRp();
   $('#songSpeed').addEventListener('input',e=>{SG.speed=+e.target.value;$('#songSpeedOut').textContent=SG.speed;$('#songBpm').textContent=Math.round(SONGS[SG.idx].bpm*SG.speed/100);songStop();});
   if(SG.idx>=SONGS.length) SG.idx=0;
   renderSongList(); renderSong();
@@ -2103,7 +2115,8 @@ function drawTab(){
   });
   el.innerHTML=s+'</svg>';
 }
-function tabSchedule(){
+function tabSchedule(){ onBus(TB.bus,tabScheduleRaw); }
+function tabScheduleRaw(){
   const p=TABS_DATA[TB.idx], c=ac(), bd=60/(p.bpm*TB.speed/100), {ev,len}=TB.data, start=TB.t0+TB.passes*len*bd;
   const sw=t=>{ if(!p.swing) return t; const b=Math.floor(t), fr=t-b; return b+(Math.abs(fr-.5)<1e-6?2/3:fr); };
   ev.forEach(e=>e.notes.forEach(n=>{const src=pluck(STD[n.s]+n.f,Math.max(0,start+sw(e.t)*bd-c.currentTime),e.notes.length>1?.4:.55,{str:n.s}); if(src) TB.srcs.push(src);}));
@@ -2115,7 +2128,7 @@ function tabPlay(){
   stopAllPlayback();
   const p=TABS_DATA[TB.idx], c=ac(), bd=60/(p.bpm*TB.speed/100);
   TB.playing=true; TB.passes=0; TB.srcs=[]; TB.bd=bd; TB.t0=c.currentTime+0.15+p.beats*bd;
-  for(let k=0;k<p.beats;k++) metroHit(M.sound,c.currentTime+0.15+k*bd,k===0?0:1,M.vol*.8);
+  TB.bus=openBus(); onBus(TB.bus,()=>{ for(let k=0;k<p.beats;k++) metroHit(M.sound,c.currentTime+0.15+k*bd,k===0?0:1,M.vol*.8); });
   tabSchedule(); $('#tabPlay').textContent='■ 停止';
   TB.timer=setInterval(()=>{ const len=TB.data.len; if(c.currentTime>TB.t0+(TB.passes-1)*len*bd-1){ if($('#tabLoop').checked) tabSchedule(); else if(c.currentTime>TB.t0+TB.passes*len*bd) tabStop(); } },200);
   const loop=()=>{ if(!TB.playing) return; TB.raf=requestAnimationFrame(loop);
@@ -2126,7 +2139,7 @@ function tabPlay(){
 }
 function tabStop(){
   if(!TB.playing) return; TB.playing=false; clearInterval(TB.timer); cancelAnimationFrame(TB.raf);
-  const t=ctx?ctx.currentTime:0; TB.srcs.forEach(s=>{try{s.stop(t+0.05);}catch(e){}}); TB.srcs=[]; TB.cur=null;
+  const t=ctx?ctx.currentTime:0; TB.srcs.forEach(s=>{try{s.stop(t+0.05);}catch(e){}}); TB.srcs=[]; TB.cur=null; closeBus(TB.bus); TB.bus=null;
   document.querySelectorAll('#tabSheet .tev.on').forEach(g=>g.classList.remove('on')); $('#tabPlay').textContent='▶ 再生';
 }
 (function initTab(){
