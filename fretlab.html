@@ -144,7 +144,7 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .tnote-row::before{content:"";position:absolute;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;border:2px solid var(--good);opacity:0;pointer-events:none}
 .tuner-main.locked .tnote-row::before{animation:lockring 1s ease-out}
 .tuner-main.locked .tnote{color:var(--good);text-shadow:0 0 24px color-mix(in srgb,var(--good) 60%,transparent);animation:lockpop .5s ease-out}
-.tuner-main.locked #trace{box-shadow:inset 0 0 0 1px var(--good)}
+.tuner-main.locked .gauge .zone{opacity:.7}
 @keyframes lockring{0%{opacity:.9;transform:scale(.6)}100%{opacity:0;transform:scale(1.6)}}
 @keyframes lockpop{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
 .sbtn{position:relative}
@@ -160,10 +160,20 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .ttarget{font-size:13px;color:var(--muted);letter-spacing:.06em}
 .treadout{font-family:var(--mono);font-size:14px;color:var(--fg);font-variant-numeric:tabular-nums;display:flex;gap:12px}
 .treadout span+span{color:var(--muted)}
-.trace-wrap{position:relative}
-.trace-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--muted);padding-inline:6px}
-#trace{display:block;width:100%;height:260px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.trace-side{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);letter-spacing:.2em;margin-top:4px}
+.gauge-wrap{display:flex;justify-content:center}
+.gauge{width:100%;max-width:440px;overflow:visible}
+.gauge .arc{fill:none;stroke:var(--line);stroke-width:1.5}
+.gauge .tk{stroke:var(--muted);stroke-width:1.2}
+.gauge .tk.lg{stroke:var(--fg);stroke-width:2.2}
+.gauge .zone{fill:var(--good);opacity:.2;transition:opacity .3s}
+.gauge text{fill:var(--muted);font-family:var(--mono);font-size:10px;text-anchor:middle}
+.gauge text.side{font-family:var(--body);font-size:10.5px;letter-spacing:.15em}
+#needle{transform-origin:150px 160px;transition:transform .14s ease-out}
+#needle line{stroke:var(--warn);stroke-width:3;stroke-linecap:round;transition:stroke .2s}
+.gauge.idle #needle line{stroke:var(--muted);opacity:.5}
+.gauge.in #needle line{stroke:var(--good)}
+.gauge.in .zone{opacity:.45}
+.gauge .hub{fill:var(--fg)}
 .tstate{font-weight:500;min-height:1.6em;text-align:center;letter-spacing:.04em}
 .tstate.good{color:var(--good)} .tstate.warn{color:var(--warn)}
 .msg{font-size:13px;color:var(--muted);max-width:46ch}
@@ -592,7 +602,7 @@ setTimeout(done,3200);})();</script>
 
   <!-- TUNER -->
   <section data-panel="tuner" hidden>
-    <div class="panel-head"><div><h2>チューナー</h2><p>弦を1本ずつ鳴らすと、いちばん近い弦を自動で選んで、音程の動きを線で表示します。線が中央の帯に入ればOK。弦のボタンを押すと、その弦に固定して基準音も鳴ります。</p></div></div>
+    <div class="panel-head"><div><h2>チューナー</h2><p>弦を1本ずつ鳴らすと、いちばん近い弦を自動で選んで針で表示します。針が中央の緑の範囲に入ればOK。弦のボタンを押すと、その弦に固定して基準音も鳴ります。</p></div></div>
     <div class="tuner">
       <div class="card tuner-main">
         <div class="row inst-row">
@@ -606,10 +616,15 @@ setTimeout(done,3200);})();</script>
             <div class="treadout"><span id="tCents">± 0 cent</span><span id="tHz">— Hz</span></div>
           </div>
         </div>
-        <div class="trace-wrap">
-          <div class="trace-scale"><span>−50</span><span>−25</span><span>0</span><span>+25</span><span>+50</span></div>
-          <canvas id="trace" aria-label="音程の推移"></canvas>
-          <div class="trace-side"><span>低い</span><span>高い</span></div>
+        <div class="gauge-wrap">
+          <svg class="gauge" id="gauge" viewBox="0 0 300 178" aria-hidden="true">
+            <path class="arc" d="M42.6 98.0 A124 124 0 0 1 257.4 98.0"/>
+            <path class="zone" d="M150 160 L136.8 34.7 A126 126 0 0 1 163.2 34.7 Z"/>
+            <line class="tk lg" x1="42.6" y1="98.0" x2="56.5" y2="106.0"/><text x="28.8" y="94.0">−50</text><line class="tk" x1="49.7" y1="87.1" x2="56.2" y2="91.8"/><line class="tk" x1="57.9" y1="77.0" x2="63.8" y2="82.4"/><line class="tk" x1="67.0" y1="67.9" x2="72.4" y2="73.8"/><line class="tk" x1="77.1" y1="59.7" x2="81.8" y2="66.2"/><line class="tk lg" x1="88.0" y1="52.6" x2="96.0" y2="66.5"/><text x="80.0" y="42.8">−25</text><line class="tk" x1="99.6" y1="46.7" x2="102.8" y2="54.0"/><line class="tk" x1="111.7" y1="42.1" x2="114.2" y2="49.7"/><line class="tk" x1="124.2" y1="38.7" x2="125.9" y2="46.5"/><line class="tk" x1="137.0" y1="36.7" x2="137.9" y2="44.6"/><line class="tk lg" x1="150.0" y1="36.0" x2="150.0" y2="52.0"/><text x="150.0" y="24.0">0</text><line class="tk" x1="163.0" y1="36.7" x2="162.1" y2="44.6"/><line class="tk" x1="175.8" y1="38.7" x2="174.1" y2="46.5"/><line class="tk" x1="188.3" y1="42.1" x2="185.8" y2="49.7"/><line class="tk" x1="200.4" y1="46.7" x2="197.2" y2="54.0"/><line class="tk lg" x1="212.0" y1="52.6" x2="204.0" y2="66.5"/><text x="220.0" y="42.8">+25</text><line class="tk" x1="222.9" y1="59.7" x2="218.2" y2="66.2"/><line class="tk" x1="233.0" y1="67.9" x2="227.6" y2="73.8"/><line class="tk" x1="242.1" y1="77.0" x2="236.2" y2="82.4"/><line class="tk" x1="250.3" y1="87.1" x2="243.8" y2="91.8"/><line class="tk lg" x1="257.4" y1="98.0" x2="243.5" y2="106.0"/><text x="271.2" y="94.0">+50</text>
+            <text class="side" x="40" y="172">♭ 低い</text><text class="side" x="260" y="172">高い ♯</text>
+            <g id="needle"><line x1="150" y1="160" x2="150" y2="44"/></g>
+            <circle class="hub" cx="150" cy="160" r="7"/>
+          </svg>
         </div>
         <div class="tstate" id="tState"></div>
         <div class="strings-row" id="stringBtns"></div>
@@ -1123,6 +1138,7 @@ function showTab(id){
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',String(t.dataset.tab===id)));
   document.querySelectorAll('[data-panel]').forEach(p=>p.hidden=p.dataset.panel!==id);
   store.set('tab',id);
+  if(id==='tips') try{renderTips();}catch(e){}  // 起動直後（データ定義前）は後で描画される
   try{history.replaceState(null,'','#'+id)}catch(e){}
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>showTab(t.dataset.tab)));
@@ -1461,26 +1477,12 @@ function tunerLoop(){
   $('#tNote').classList.toggle('ok',ok);
 }
 function trimTrace(){ if(T.trace.length>160) T.trace.length=160; }
-// 心電図のように、最新の値を上に描き、古い値ほど下へ流す
+// 針のメーター：最新の値で針を振る（音が止まると中央に戻る）
 function drawTrace(){
-  const cv=$('#trace'); if(!cv) return; const dpr=window.devicePixelRatio||1, W=cv.clientWidth, H=cv.clientHeight; if(!W) return;
-  if(cv.width!==Math.round(W*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);}
-  const g=cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,W,H);
-  const cs=getComputedStyle(cv), col=k=>cs.getPropertyValue(k).trim();
-  const X=c=>W/2+Math.max(-55,Math.min(55,c))/50*(W/2-14);
-  g.fillStyle=col('--good'); g.globalAlpha=.14; g.fillRect(X(-5),0,X(5)-X(-5),H); g.globalAlpha=1;
-  [-50,-25,25,50].forEach(c=>{g.strokeStyle=col('--line');g.lineWidth=1;g.beginPath();g.moveTo(X(c)+.5,0);g.lineTo(X(c)+.5,H);g.stroke();});
-  g.strokeStyle=col('--fg'); g.globalAlpha=.5; g.lineWidth=1; g.beginPath(); g.moveTo(W/2,0); g.lineTo(W/2,H); g.stroke(); g.globalAlpha=1;
-  const step=H/150; g.lineWidth=2.2; g.lineCap='round'; g.lineJoin='round';
-  for(let i=1;i<T.trace.length;i++){
-    const a=T.trace[i-1], b=T.trace[i]; if(a==null||b==null||Math.abs(a-b)>30) continue;
-    g.globalAlpha=Math.max(.08,1-i/150);
-    g.strokeStyle=(Math.abs(a)<=5&&Math.abs(b)<=5)?col('--good'):col('--warn');
-    g.beginPath(); g.moveTo(X(a),12+(i-1)*step); g.lineTo(X(b),12+i*step); g.stroke();
-  }
-  g.globalAlpha=1;
-  const c0=T.trace[0];
-  if(c0!=null){ g.fillStyle=Math.abs(c0)<=5?col('--good'):col('--warn'); g.beginPath(); g.arc(X(c0),12,7,0,Math.PI*2); g.fill(); }
+  const g=$('#gauge'); if(!g) return; const c0=T.trace[0];
+  const v=c0==null?0:Math.max(-50,Math.min(50,c0));
+  $('#needle').style.transform=`rotate(${v*1.2}deg)`;
+  g.classList.toggle('idle',c0==null); g.classList.toggle('in',c0!=null&&Math.abs(c0)<=5);
 }
 async function micToggle(){
   const btn=$('#micBtn'), msg=$('#micMsg');
@@ -1509,7 +1511,7 @@ async function micToggle(){
   $('#loopChk').addEventListener('change',e=>{if(!e.target.checked) clearInterval(T.loop);});
   $('#micBtn').addEventListener('click',micToggle);
   setA4(store.get('a4',440));
-  new ResizeObserver(()=>drawTrace()).observe($('#trace'));
+  drawTrace();
 })();
 
 /* ---------- fretboard renderer ---------- */
@@ -2127,8 +2129,8 @@ function tabPlay(){
   if(TB.playing){tabStop();return;}
   stopAllPlayback();
   const p=TABS_DATA[TB.idx], c=ac(), bd=60/(p.bpm*TB.speed/100);
-  TB.playing=true; TB.passes=0; TB.srcs=[]; TB.bd=bd; TB.t0=c.currentTime+0.15+p.beats*bd;
-  TB.bus=openBus(); onBus(TB.bus,()=>{ for(let k=0;k<p.beats;k++) metroHit(M.sound,c.currentTime+0.15+k*bd,k===0?0:1,M.vol*.8); });
+  TB.playing=true; TB.passes=0; TB.srcs=[]; TB.bd=bd; TB.t0=c.currentTime+0.12;   // カウントなしですぐに演奏を始める
+  TB.bus=openBus();
   tabSchedule(); $('#tabPlay').textContent='■ 停止';
   TB.timer=setInterval(()=>{ const len=TB.data.len; if(c.currentTime>TB.t0+(TB.passes-1)*len*bd-1){ if($('#tabLoop').checked) tabSchedule(); else if(c.currentTime>TB.t0+TB.passes*len*bd) tabStop(); } },200);
   const loop=()=>{ if(!TB.playing) return; TB.raf=requestAnimationFrame(loop);
@@ -2490,7 +2492,10 @@ function renderTips(){
   const cats=['すべて',...new Set(src.map(t=>t.c))];
   $('#tipCats').innerHTML=''; cats.forEach(c=>{const b=document.createElement('button');b.className='chip';b.textContent=c;b.setAttribute('aria-pressed',String(c===tipCat));b.addEventListener('click',()=>{tipCat=c;renderTips();});$('#tipCats').appendChild(b);});
   const list=$('#tipList'); list.innerHTML='';
-  src.filter(t=>tipCat==='すべて'||t.c===tipCat).forEach(t=>{
+  // 開くたびに順番をシャッフルして、いろいろなヒントに出会えるように
+  const items=src.filter(t=>tipCat==='すべて'||t.c===tipCat);
+  for(let i=items.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]];}
+  items.forEach(t=>{
     const d=document.createElement('div');d.className='tip';
     d.innerHTML=`<div class="cat">${t.c}</div><h3>${t.t}</h3><p>${t.b}</p>`;
     if(t.a){const b=document.createElement('button');b.className='btn';b.textContent=t.a.label+' →';b.addEventListener('click',t.a.fn);d.appendChild(b);}
