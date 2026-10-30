@@ -1118,7 +1118,7 @@ function loadSamples(){
   if(SMP.loading) return SMP.loading;
   SMP.loading=fetch('audio/manifest.json').then(r=>r.ok?r.json():Promise.reject(new Error('no audio'))).then(man=>{
     SMP.man=man;
-    const files=[...man.guitar.map(n=>'guitar-'+n),...Object.keys(man.drums).map(k=>'drum-'+k),...man.marimba.map(n=>'marimba-'+n),...man.bass.map(n=>'bass-'+n),...man.nylon.map(n=>'nylon-'+n)];
+    const files=[...man.guitar.map(n=>'guitar-'+n),...Object.keys(man.drums).map(k=>'drum-'+k),...man.marimba.map(n=>'marimba-'+n),...man.bass.map(n=>'bass-'+n),...man.nylon.map(n=>'nylon-'+n),...(man.chime||[]).map(n=>'chime-'+n)];
     return Promise.all(files.map(f=>fetch('audio/'+f+'.mp3').then(r=>r.arrayBuffer()).then(b=>new Promise((ok,ng)=>ctx.decodeAudioData(b,ok,ng))).then(buf=>{SMP.buf[f]=buf;}).catch(()=>{})));
   }).catch(()=>{});
   return SMP.loading;
@@ -1454,24 +1454,28 @@ function detectPitch(){
   const r=yin(x,ctx.sampleRate/d,I.min,I.max);
   return r&&r.f>=I.min&&r.f<=I.max?r:null;
 }
-// 合った音と同じ音名で、柔らかいベルの和音（根音・5度・オクターブ）を鳴らす。小さなエコーで余韻を残す
+// 合った音と同じ音名で、マリンバの和音をやさしく転がすように鳴らす（根音・3度・5度・オクターブ）。小さなエコーで余韻を残す
 function tunerChime(m){
   const c=ac(), t=c.currentTime+.03, pc=((m%12)+12)%12;
-  let base=72+pc; if(base>78) base-=12;              // C5〜F#5 あたりの聴きやすい高さ
-  const out=c.createGain(); out.gain.value=.9; out.connect(master);
+  let base=60+pc; if(base<64) base+=12;              // E4〜D#5：マリンバがいちばん豊かに響く高さ
+  const out=c.createGain(); out.gain.value=.42; out.connect(master);
   const dl=c.createDelay(1), fb=c.createGain(), lp=c.createBiquadFilter(), wet=c.createGain();
-  dl.delayTime.value=.19; fb.gain.value=.3; lp.type='lowpass'; lp.frequency.value=2600; wet.gain.value=.32;
+  dl.delayTime.value=.17; fb.gain.value=.26; lp.type='lowpass'; lp.frequency.value=2200; wet.gain.value=.24;
   out.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(wet); wet.connect(master);
-  const bell=(f,at,peak)=>{
-    [[1,peak,1.25],[2,peak*.22,.5],[3.99,peak*.06,.18]].forEach(([mul,pk,dec])=>{
-      const o=c.createOscillator(), g=c.createGain(); o.type='sine'; o.frequency.value=f*mul;
-      g.gain.setValueAtTime(0.0001,at); g.gain.exponentialRampToValueAtTime(pk,at+.008); g.gain.exponentialRampToValueAtTime(0.0001,at+dec);
-      o.connect(g); g.connect(out); o.start(at); o.stop(at+dec+.05);
+  // 録音のマリンバ（なければ合成：マリンバの音板は基音と4倍音が響く）
+  const mallet=(midi,at,g)=>onBus(out,()=>{
+    if(sampleNote('chime',midi,at,g)) return;
+    const f=mfreq(midi);
+    [[1,g*.5,.9],[4,g*.1,.22],[9.9,g*.03,.06]].forEach(([mul,pk,dec])=>{
+      const o=c.createOscillator(), e=c.createGain(); o.type='sine'; o.frequency.value=f*mul;
+      e.gain.setValueAtTime(0.0001,at); e.gain.exponentialRampToValueAtTime(pk,at+.004); e.gain.exponentialRampToValueAtTime(0.0001,at+dec);
+      o.connect(e); e.connect(out); o.start(at); o.stop(at+dec+.05);
     });
-  };
-  [[0,0,.15],[7,.075,.11],[12,.15,.09]].forEach(([iv,d,pk])=>bell(mfreq(base+iv),t+d,pk));
-  setTimeout(()=>{try{out.disconnect();wet.disconnect();}catch(e){}},3000);
-  T.muteUntil=performance.now()+1100;   // 自分のチャイムを拾わないように少し待つ
+  });
+  [[0,0,.5],[4,.075,.36],[7,.15,.36],[12,.235,.42]].forEach(([iv,d,g])=>mallet(base+iv,t+d,g));
+  mallet(base,t+.235,.22);                           // 最後に根音を重ねて和音を落ち着かせる
+  setTimeout(()=>{try{out.disconnect();wet.disconnect();}catch(e){}},3500);
+  T.muteUntil=performance.now()+1200;   // 自分のチャイムを拾わないように少し待つ
   try{navigator.vibrate&&navigator.vibrate([18,60,28]);}catch(e){}
 }
 function setLocked(on){

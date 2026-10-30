@@ -10,7 +10,7 @@ SF2 = os.environ.get("SF2", "/usr/share/sounds/sf2/FluidR3_GM.sf2")
 OUT = os.path.join(os.path.dirname(__file__), "..", "site", "audio")
 os.makedirs(OUT, exist_ok=True)
 
-def render(name, program, note, vel=100, dur=2.4, tail=0.6, channel=0):
+def render(name, program, note, vel=100, dur=2.4, tail=0.6, channel=0, reverb=False):
     mid = mido.MidiFile(ticks_per_beat=480)
     tr = mido.MidiTrack(); mid.tracks.append(tr)
     tr.append(mido.MetaMessage("set_tempo", tempo=500000))   # 120 BPM → 960 ticks/秒
@@ -22,7 +22,7 @@ def render(name, program, note, vel=100, dur=2.4, tail=0.6, channel=0):
     with tempfile.TemporaryDirectory() as d:
         m, w = os.path.join(d, "a.mid"), os.path.join(d, "a.wav")
         mid.save(m)
-        subprocess.run(["fluidsynth", "-ni", "-q", "-R", "0", "-C", "0", "-g", "0.8", "-r", "44100", "-F", w, SF2, m], check=True)
+        subprocess.run(["fluidsynth", "-ni", "-q", "-R", "1" if reverb else "0", "-C", "0", "-g", "0.8", "-r", "44100", "-F", w, SF2, m], check=True)
         peak = subprocess.run(["ffmpeg", "-hide_banner", "-i", w, "-af", "volumedetect", "-f", "null", "-"], capture_output=True, text=True).stderr
         mx = float(re.search(r"max_volume: (-?[\d.]+) dB", peak).group(1))
         gain = -1.0 - mx
@@ -30,7 +30,20 @@ def render(name, program, note, vel=100, dur=2.4, tail=0.6, channel=0):
         subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", w, "-ac", "1", "-af", af,
                         "-c:a", "libmp3lame", "-b:a", "96k", os.path.join(OUT, name + ".mp3")], check=True)
 
-manifest = {"guitar": [], "bass": [], "nylon": [], "marimba": [], "drums": {}}
+# チューニングが合ったときのチャイム用マリンバ（長めの余韻＋ホールの響き）
+def render_chime(manifest):
+    manifest["chime"] = []
+    for n in range(60, 91, 3):   # C4〜F#6
+        render(f"chime-{n}", 12, n, vel=104, dur=1.6, tail=0.9, reverb=True); manifest["chime"].append(n)
+
+if os.environ.get("ONLY") == "chime":   # チャイムだけ作り直す：ONLY=chime python3 tools/render_samples.py
+    path = os.path.join(OUT, "manifest.json")
+    manifest = json.load(open(path))
+    render_chime(manifest)
+    json.dump(manifest, open(path, "w"), ensure_ascii=False)
+    print("done chime", manifest["chime"]); raise SystemExit(0)
+
+manifest = {"guitar": [], "bass": [], "nylon": [], "marimba": [], "chime": [], "drums": {}}
 # アコースティックギター（スチール弦）：E2〜A5 を3半音ごと（間は再生速度で補間）
 for n in range(40, 84, 3):
     render(f"guitar-{n}", 25, n, vel=96, dur=2.6); manifest["guitar"].append(n)
@@ -43,6 +56,7 @@ for n in range(55, 80, 3):
 # マリンバ（メトロノーム音色）
 for n in (76, 79, 84):
     render(f"marimba-{n}", 12, n, vel=110, dur=0.8, tail=0.3); manifest["marimba"].append(n)
+render_chime(manifest)
 # ドラム（GM スタンダードキット）
 DR = {"kick": 36, "snare": 38, "sidestick": 37, "clap": 39, "hat": 42, "openhat": 46, "ride": 51, "tom": 45,
       "shaker": 82, "cowbell": 56, "woodhi": 76, "woodlo": 77, "claves": 75, "triopen": 81, "trimute": 80,
