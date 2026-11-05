@@ -33,7 +33,7 @@ def render(name, program, note, vel=100, dur=2.4, tail=0.6, channel=0, reverb=Fa
 # チューニングが合ったときのチャイム用マリンバ（長めの余韻＋ホールの響き）
 def render_chime(manifest):
     manifest["chime"] = []
-    for n in range(60, 91, 3):   # C4〜F#6
+    for n in range(45, 79, 3):   # A2〜F#5
         render(f"chime-{n}", 12, n, vel=104, dur=1.6, tail=0.9, reverb=True); manifest["chime"].append(n)
 
 if os.environ.get("ONLY") == "chime":   # チャイムだけ作り直す：ONLY=chime python3 tools/render_samples.py
