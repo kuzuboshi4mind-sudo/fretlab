@@ -102,19 +102,33 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .check{display:flex;align-items:center;gap:8px;cursor:pointer}
 
 /* metronome */
-.metro{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px}
-.metro-main{display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px 16px}
-.term{font-family:var(--display);font-style:italic;font-size:24px;color:var(--root);font-weight:400}
-.bpm{display:flex;align-items:center;gap:14px}
-.bpm output{font-family:var(--display);font-weight:300;font-size:128px;line-height:1;font-variant-numeric:lining-nums tabular-nums;font-variant-numeric:tabular-nums;min-width:3ch;text-align:center}
-.round{width:48px;height:48px;border-radius:50%;font-size:22px;font-weight:300;padding:0;display:grid;place-items:center}
-.unit{font-family:var(--body);font-size:10px;color:var(--muted);letter-spacing:.5em;margin-top:-2px}
-.beats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;min-height:34px;padding-block:6px}
-.beat{width:12px;height:12px;border-radius:50%;border:0;background:var(--line);transition:transform .06s;margin:8px}
-.beat.acc{background:color-mix(in srgb,var(--root) 45%,var(--line))}
-.beat.on{background:var(--fg);transform:scale(1.5)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.metro{display:flex;flex-direction:column;gap:14px;max-width:560px;margin-inline:auto}
+.metro-main{display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 16px 22px}
+.pend{width:100%;max-width:min(300px,calc(28vh * 240 / 290));touch-action:none;cursor:ns-resize;user-select:none;-webkit-user-select:none}
+.pend svg{display:block;width:100%;height:auto;overflow:visible}
+.pend-arc{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:2 6;stroke-linecap:round}
+.pend-rod{stroke:var(--root);stroke-width:7;stroke-linecap:round}
+.pend-w{fill:#fff;stroke:color-mix(in srgb,var(--fg) 14%,transparent);stroke-width:1;filter:drop-shadow(0 3px 4px rgba(0,0,0,.28))}
+.pend-pivot{fill:var(--fg)}
+.term{font-family:var(--display);font-style:italic;font-size:15px;color:var(--muted);font-weight:400;text-align:center}
+.bpm{display:flex;align-items:center;justify-content:center;gap:clamp(16px,6vw,48px);width:100%}
+.bpm-c{display:flex;flex-direction:column;align-items:center}
+.bpm output{font-family:var(--display);font-weight:400;font-size:96px;line-height:1;font-variant-numeric:tabular-nums;min-width:3ch;text-align:center}
+.bpm .btn.round{width:64px;height:64px;font-size:30px;border-radius:50%;padding:0;background:transparent;border:1.5px solid var(--fg)}
+.beats{display:flex;gap:10px;justify-content:space-around;flex-wrap:wrap;min-height:34px;padding-block:4px;width:100%;max-width:420px}
+.beat{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--fg);background:transparent;transition:transform .06s;margin:8px}
+.beat.acc{border-color:var(--root)}
+.beat.on{background:var(--fg);transform:scale(1.25)}
 .beat.acc.on{background:var(--root)}
-.metro-main input[type=range]{max-width:420px}
+.metro-bar{display:flex;justify-content:space-around;align-items:center;width:100%;max-width:440px;margin-top:6px}
+.mbtn{background:none;border:0;color:var(--fg);width:56px;height:56px;display:grid;place-items:center;border-radius:12px;font:600 15px var(--body);letter-spacing:.08em;cursor:pointer}
+.mbtn:active{background:var(--line)}
+.mbtn svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mbtn[aria-expanded="true"] svg{transform:rotate(180deg)}
+.sig{display:flex;flex-direction:column;align-items:center;line-height:.9;font-family:var(--display);font-size:22px}
+.metro-start{width:100%;max-width:440px;background:transparent!important;color:var(--fg)!important;border:1.5px solid var(--fg)!important;border-radius:16px;font-size:20px;letter-spacing:.06em;padding:16px}
+.metro-start.on{background:var(--fg)!important;color:var(--bg)!important}
 .mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .mini label{font-size:12px;color:var(--muted)}
 .mini input{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-family:var(--mono)}
@@ -528,7 +542,10 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
   .tabs{justify-content:space-between;column-gap:0}
   .tab{padding:10px 5px 7px;font-size:12.5px;letter-spacing:.02em}
   .metro,.tuner,.scale-info{grid-template-columns:minmax(0,1fr)}
-  .bpm output{font-size:88px}
+  .bpm output{font-size:76px}
+  .bpm .btn.round{width:54px;height:54px;font-size:26px}
+  .metro-main{gap:6px;padding:12px 14px 16px}
+  .metro-start{padding:13px}
   .chord-name{font-size:52px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -604,41 +621,48 @@ setTimeout(done,3200);})();</script>
 
   <!-- METRONOME -->
   <section data-panel="metronome" hidden>
-    <div class="panel-head"><div><h2>メトロノーム</h2><p>スペースキーでスタート／ストップ。タップボタンを4回以上叩くと曲のテンポを拾えます。</p></div></div>
+    <h2 class="sr-only">メトロノーム</h2>
     <div class="metro">
       <div class="card metro-main">
-        <div class="term" id="tempoTerm">Andante</div>
+        <div class="pend" id="pend">
+          <svg viewBox="0 0 240 290" aria-label="振り子（おもりを上下にドラッグでテンポ変更）">
+            <path class="pend-arc" d="M44 112 A170 170 0 0 1 196 112"/>
+            <g id="pendArm"><line class="pend-rod" x1="120" y1="270" x2="120" y2="22"/><circle class="pend-w" id="pendW" cx="120" cy="120" r="17"/></g>
+            <circle class="pend-pivot" cx="120" cy="270" r="5"/>
+          </svg>
+        </div>
         <div class="bpm">
           <button class="btn round" id="bpmDown" aria-label="BPMを下げる">−</button>
-          <output id="bpmOut">96</output>
+          <div class="bpm-c"><output id="bpmOut">96</output><div class="term" id="tempoTerm">Andante</div></div>
           <button class="btn round" id="bpmUp" aria-label="BPMを上げる">+</button>
         </div>
-        <div class="unit">BPM</div>
-        <input type="range" id="bpmRange" min="30" max="260" value="96" aria-label="テンポ">
         <div class="beats" id="beatDots"></div>
-        <div class="row" style="justify-content:center">
-          <button class="btn primary big" id="metroPlay">スタート</button>
-          <button class="btn big" id="tapBtn">タップ</button>
+        <div class="metro-bar">
+          <button class="mbtn" id="sigBtn" aria-label="拍子"><span class="sig"><b id="sigTop">4</b><b>4</b></span></button>
+          <button class="mbtn" id="sndBtn" aria-label="音色"><svg viewBox="0 0 32 32"><path d="M5 12h5l7-6v20l-7-6H5z"/><path d="M21 11.5a6 6 0 0 1 0 9M24.5 8a11 11 0 0 1 0 16"/></svg></button>
+          <button class="mbtn" id="tapBtn" aria-label="タップでテンポ入力">TAP</button>
+          <button class="mbtn" id="moreBtn" aria-label="詳細設定" aria-expanded="false"><svg viewBox="0 0 32 32"><path d="M8 12l8 8 8-8"/></svg></button>
         </div>
+        <button class="btn primary big metro-start" id="metroPlay">START</button>
       </div>
-      <div class="card stack">
+      <div class="card stack" id="metroMore" hidden>
         <div class="row">
-          <div style="flex:1;min-width:150px"><label class="label" for="soundSel">クリック音色</label><select id="soundSel" style="width:100%"></select></div>
+          <div style="flex:1;min-width:150px"><label class="label" for="soundSel">音色</label><select id="soundSel" style="width:100%"></select></div>
           <div style="flex:1;min-width:150px"><label class="label" for="rhythmSel">リズム</label><select id="rhythmSel" style="width:100%"></select></div>
         </div>
         <div id="drumBox" hidden>
           <div class="drumgrid-scroll"><div class="drumgrid" id="drumGrid"></div></div>
           <div class="msg" id="drumNote"></div>
-          <label class="check" style="margin-top:6px"><input type="checkbox" id="layerChk"> ドラムにクリックを重ねる</label>
+          <label class="check" style="margin-top:6px"><input type="checkbox" id="layerChk"> クリックも重ねる</label>
         </div>
         <div id="clickOpts" class="stack">
         <div><span class="label">拍子</span>
           <div class="seg" id="beatsSeg"></div></div>
-        <div><span class="label">細分（1拍の刻み）</span>
+        <div><span class="label">細分</span>
           <div class="seg" id="subSeg">
             <button data-v="1">♩ 4分</button><button data-v="2">♪♪ 8分</button><button data-v="3">3連</button><button data-v="4">16分</button>
           </div></div>
-        <label class="check"><input type="checkbox" id="accentChk" checked> 1拍目にアクセント</label>
+        <label class="check"><input type="checkbox" id="accentChk"> 1拍目にアクセント</label>
         </div>
         <div><span class="label">音量</span><input type="range" id="volRange" min="0" max="100" value="70" aria-label="音量"></div>
       </div>
@@ -647,7 +671,7 @@ setTimeout(done,3200);})();</script>
 
   <!-- TUNER -->
   <section data-panel="tuner" hidden>
-    <div class="panel-head"><div><h2>チューナー</h2><p>弦を1本ずつ鳴らすと、いちばん近い弦を自動で選んで針で表示します。針が中央の緑の範囲に入ればOK。弦のボタンを押すと、その弦に固定して基準音も鳴ります。</p></div></div>
+    <div class="panel-head"><div><h2>チューナー</h2><p>1本ずつ鳴らして、針を中央へ。</p></div></div>
     <div class="tuner">
       <div class="card tuner-main">
         <div class="row inst-row">
@@ -678,7 +702,7 @@ setTimeout(done,3200);})();</script>
           <button class="btn primary big" id="micBtn">マイクで測る</button>
           <button class="btn" id="autoBtn" aria-pressed="true">自動で弦を判定</button>
         </div>
-        <div class="msg" id="micMsg" style="text-align:center;margin-inline:auto">楽器をスマホのマイクに近づけて、1本ずつ鳴らしてください。</div>
+        <div class="msg" id="micMsg" style="text-align:center;margin-inline:auto">1本ずつ鳴らしてください。</div>
       </div>
       <div class="card stack">
         <div><span class="label">基準ピッチ A4</span>
@@ -696,7 +720,7 @@ setTimeout(done,3200);})();</script>
 
   <!-- CHORDS -->
   <section data-panel="chords" hidden>
-    <div class="panel-head"><div><h2>コード一覧</h2><p>ルートとコードタイプを選ぶと、いちばん定番の押さえ方と、0〜12フレットのポジション別の押さえ方をすべて表示します。丸の中は度数（R=ルート、3=3度、5=5度、♭7=短7度）。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
+    <div class="panel-head"><div><h2>コード一覧</h2><p>定番フォームとポジション別の押さえ方。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
     <div class="stack">
       <div><span class="label">ルート</span><div class="chips" id="chordRoots"></div></div>
       <div><span class="label">タイプ</span><div class="chips" id="chordTypes"></div></div>
@@ -712,7 +736,7 @@ setTimeout(done,3200);})();</script>
 
   <!-- FRETBOARD -->
   <section data-panel="fretboard" hidden>
-    <div class="panel-head"><div><h2>指板音程表</h2><p>15フレットまでの全音名。キーを選んで「度数」表示にすると、ルートから見た音程で指板を覚えられます。音をタップすると鳴ります。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
+    <div class="panel-head"><div><h2>指板音程表</h2><p>指板の全音名。タップで鳴ります。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
     <div class="board-tools">
       <div><span class="label">表示</span><div class="seg" id="fbMode"><button data-v="name">音名</button><button data-v="degree">度数</button></div></div>
       <div><label class="label" for="fbKey">キー（ルート）</label><select id="fbKey"></select></div>
@@ -723,7 +747,7 @@ setTimeout(done,3200);})();</script>
     <div class="legend" id="fbLegend" style="margin-top:10px"></div>
     <div class="card quiz">
       <div>
-        <b>指板クイズ</b>　<span class="msg">ボードの<b>?</b>の位置の音名を答えてください（0〜12フレット）。</span>
+        <b>指板クイズ</b>　<span class="msg"><b>?</b>の音名は？</span>
         <div class="chips" id="quizAns" style="margin-top:10px"></div>
         <div class="quiz-msg" id="quizMsg"></div>
       </div>
@@ -736,7 +760,7 @@ setTimeout(done,3200);})();</script>
 
   <!-- SCALES -->
   <section data-panel="scales" hidden>
-    <div class="panel-head"><div><h2>スケール表</h2><p>指板全体にスケール音を表示します。オレンジがルート。まずはルートの位置を目印に、1つのポジションから覚えましょう。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
+    <div class="panel-head"><div><h2>スケール表</h2><p>指板上のスケール。色付きがルート。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
     <div class="board-tools">
       <div><label class="label" for="scRoot">ルート</label><select id="scRoot"></select></div>
       <div><label class="label" for="scType">スケール</label><select id="scType"></select></div>
@@ -759,7 +783,7 @@ setTimeout(done,3200);})();</script>
 
   <!-- PROGRESSIONS -->
   <section data-panel="progressions" hidden>
-    <div class="panel-head"><div><h2>コード進行</h2><p>定番のコード進行100パターン。キーを選んで再生すると、ドラムやクリックに合わせて今のコードと次のコードが表示されます。ローマ数字はキーの何番目の音がルートかを表します（I=1度、♭VII=短7度）。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
+    <div class="panel-head"><div><h2>コード進行</h2><p>定番100パターンを伴奏つきで。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
     <div class="prog">
       <div class="card prog-list-card">
         <input type="search" id="progSearch" class="search" placeholder="名前・進行で検索（例：カノン、IIm7）" aria-label="コード進行を検索">
@@ -798,7 +822,7 @@ setTimeout(done,3200);})();</script>
 
   <!-- SONGS -->
   <section data-panel="songs" hidden>
-    <div class="panel-head"><div><h2>練習曲</h2><p>著作権の保護期間が終わった名曲と伝承曲だけを集めた、歌詞つきのコード譜です。再生するとメロディと伴奏が流れ、今のコードが光ります。キーを変えると演奏も移調されます。コードは弾きやすさを優先した一例です。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
+    <div class="panel-head"><div><h2>練習曲</h2><p>名曲のコード譜。メロディと伴奏つき。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
     <div class="songs">
       <div class="card song-list-card">
         <div class="seg" id="songLang"><button data-v="all">すべて</button><button data-v="ja">日本の歌</button><button data-v="en">海外の歌</button></div>
@@ -832,7 +856,7 @@ setTimeout(done,3200);})();</script>
 
   <!-- TAB -->
   <section data-panel="tab" hidden>
-    <div class="panel-head"><div><h2>TAB練習</h2><p>著作権の切れた名曲のメロディと、練習用のオリジナルのリフ・フレーズをTAB譜で練習します。再生すると今弾く音が光ります。数字は押さえるフレット、上の線が1弦です。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
+    <div class="panel-head"><div><h2>TAB練習</h2><p>名曲のメロディとリフ。上の線が1弦。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
     <div class="songs">
       <div class="card song-list-card">
         <div class="seg" id="tabCat"><button data-v="all">すべて</button><button data-v="melody">メロディ</button><button data-v="riff">リフ・練習</button></div>
@@ -856,7 +880,7 @@ setTimeout(done,3200);})();</script>
 
   <!-- PRACTICE LOG -->
   <section data-panel="log" hidden>
-    <div class="panel-head"><div><h2>マイ記録</h2><p>時間を選んでスタートするだけ。練習した時間はそのまま記録されます。途中でやめても、やった分はちゃんと残ります。</p></div></div>
+    <div class="panel-head"><div><h2>マイ記録</h2><p>時間を選んでスタート。自動で記録。</p></div></div>
     <div class="pomo">
       <div class="card pomo-main">
         <div class="seg" id="pomoLen"><button data-v="5">5分</button><button data-v="15">15分</button><button data-v="25">25分</button><button data-v="45">45分</button></div>
@@ -890,7 +914,7 @@ setTimeout(done,3200);})();</script>
     </div>
     <div class="card rec-card">
       <div class="rec-head">
-        <div><b>録音</b><p class="msg" style="margin:2px 0 0">自分の演奏を録って聴き返しましょう。メトロノームや練習曲を鳴らしながらでも録れます。</p></div>
+        <div><b>録音</b><p class="msg" style="margin:2px 0 0">演奏を録って聴き返す。</p></div>
       </div>
       <div class="rec-ctrl">
         <button class="rec-btn" id="recBtn" aria-label="録音を開始"><i></i></button>
@@ -902,7 +926,7 @@ setTimeout(done,3200);})();</script>
       <summary>これまでの記録とバックアップ</summary>
       <div class="row" style="margin-top:12px"><label class="msg" for="goalSel">1日の目標</label><select id="goalSel"><option>15</option><option>30</option><option>45</option><option>60</option><option>90</option></select><span class="msg">分</span></div>
       <div id="logList" class="log-list"></div>
-      <p class="msg">バックアップ：下のテキストをコピーして保管。貼り付けて「復元」を押すと戻せます。</p>
+      <p class="msg">バックアップ：コピーして保管、貼り付けて「復元」。</p>
       <textarea id="backupTxt" rows="3" class="search" style="width:100%;font-family:var(--mono);font-size:12px" aria-label="バックアップデータ"></textarea>
       <div class="row"><button class="btn" id="backupCopy">コピー</button><button class="btn" id="backupLoad">復元</button><span class="msg" id="backupMsg"></span></div>
     </details>
@@ -912,17 +936,17 @@ setTimeout(done,3200);})();</script>
 
   <!-- AI TEACHER -->
   <section data-panel="ai" hidden>
-    <div class="panel-head"><div><h2>レッスンコーチ</h2><p>AI先生に、ギターのことを何でも質問できます。コードの押さえ方、音楽理論、テクニック、機材、練習方法まで、具体的に答えてくれます。</p></div></div>
+    <div class="panel-head"><div><h2>レッスンコーチ</h2><p>AI先生にギターの質問を。</p></div></div>
     <div class="ai-chat">
       <div class="card ai-hero">
         <div class="ai-avatar" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 5c9 0 16 4 16 11 0 9-9 21-16 27C17 37 8 25 8 16 8 9 15 5 24 5z"/><text x="24" y="26" text-anchor="middle">AI</text></svg></div>
         <div class="ai-prof">
           <div class="ai-name">AI先生</div>
-          <div class="msg" id="aiStatus">質問すると、結論 → 理由 → 具体的なやり方の順で答えます。</div>
+          <div class="msg" id="aiStatus">結論から答えます。</div>
         </div>
         <button class="btn ai-new" id="aiReset" type="button">新しい質問</button>
       </div>
-      <div class="ai-off" id="aiOff" hidden><b>AI先生は準備中です。</b>回答の機能は公開設定が済むと使えるようになります。画面の見た目と質問例はお試しいただけます。</div>
+      <div class="ai-off" id="aiOff" hidden><b>AI先生は準備中です。</b></div>
       <div class="ai-start" id="aiStart">
         <div class="chips" id="aiCats"></div>
         <div class="ai-examples" id="aiExamples"></div>
@@ -932,13 +956,13 @@ setTimeout(done,3200);})();</script>
         <textarea id="aiInput" class="search" rows="2" maxlength="4000" placeholder="AI先生に質問する（例：Fコードの1弦がビビります）" aria-label="質問"></textarea>
         <button class="btn primary" id="aiSend" type="submit">質問する</button>
       </form>
-      <p class="msg ai-note">AIの回答はまちがうこともあります。大事なことは楽譜や先生にも確認してください。体の痛みが続くときは練習を休みましょう。</p>
+      <p class="msg ai-note">AIの回答はまちがうこともあります。</p>
     </div>
   </section>
 
   <!-- TIPS -->
   <section data-panel="tips" hidden>
-    <div class="panel-head"><div><h2>ヒント</h2><p>上達が早い人がやっている練習のコツと、知っておくとギターがもっと面白くなる豆知識。<a href="https://kuzuboshi4mind-sudo.github.io/fretlab/about/" target="_blank" rel="noopener">Fretlab について →</a></p></div></div>
+    <div class="panel-head"><div><h2>ヒント</h2><p>練習のコツと豆知識。<a href="https://kuzuboshi4mind-sudo.github.io/fretlab/about/" target="_blank" rel="noopener">Fretlab について →</a></p></div></div>
     <div class="stack" style="margin-bottom:14px">
       <div class="seg" id="tipMode"><button data-v="tips">練習のヒント</button><button data-v="lore">ギター豆知識</button></div>
       <div class="chips" id="tipCats"></div>
@@ -1296,7 +1320,31 @@ const SOUNDS=[
   {name:'振り子（機械式）',fn:(t,l,v)=>{nz(t,'bandpass',[3800,3000,2600][l],4,[.9,.65,.3][l]*v,.012);tone(t,'sine',[420,300,260][l],[.35,.25,.1][l]*v,.05);}},
   {name:'マリンバ',fn:(t,l,v)=>{const f=[1046.5,784,659.3][l];tone(t,'sine',f,[.6,.45,.2][l]*v,.35);tone(t,'sine',f*4,[.08,.06,.02][l]*v,.06);}},
   {name:'トライアングル',fn:(t,l,v)=>{const f=[1900,1500,1300][l];[[1,.3],[2.76,.12],[5.4,.06]].forEach(([m,a])=>tone(t,'sine',f*m,a*[1,.7,.3][l]*v,.6));}},
+  {name:'メトロノーム',fn:(t,l,v)=>woodTick(t,l,v)},
 ];
+// 機械式メトロノームの「コツ・コツ」：木の箱が鳴る短い響き（いくつかの共鳴を重ねる）。左右に振れるたびに少しだけ音程が違う（チク・タク）
+const TICK={};
+function tickBuf(kind){
+  if(TICK[kind]) return TICK[kind];
+  const c=ac(), sr=c.sampleRate, bell=kind==='a', len=Math.floor(sr*(bell?.7:.09)), b=c.createBuffer(1,len,sr), d=b.getChannelData(0);
+  const p=kind==='k'?.94:1;
+  const wood=[[880*p,1,.020],[1690*p,.75,.011],[2870*p,.5,.0065],[4250*p,.3,.0035]];
+  const bellM=[[2093,.55,.32],[5230,.16,.09],[3348,.12,.14],[7110,.05,.05]];
+  let seed=7; const rnd=()=>((seed=seed*16807%2147483647)/2147483647)*2-1;
+  let pk=0;
+  for(let i=0;i<len;i++){ const t=i/sr; let v=0;
+    for(const [f,a,tau] of wood) v+=a*Math.sin(6.2832*f*t)*Math.exp(-t/tau);
+    if(bell) for(const [f,a,tau] of bellM) v+=a*Math.sin(6.2832*f*t)*Math.exp(-t/tau);
+    v+=rnd()*.7*Math.exp(-t/.0010);
+    v*=Math.min(1,t/.0002); d[i]=v; pk=Math.max(pk,Math.abs(v)); }
+  for(let i=0;i<len;i++) d[i]/=pk;
+  return TICK[kind]=b;
+}
+function woodTick(t,l,v){
+  const c=ac(), s=c.createBufferSource(), g=c.createGain();
+  s.buffer=tickBuf(l===0?'a':l===2?'s':(M.beat%2?'k':'t')); g.gain.value=[.95,.85,.38][l]*v;
+  s.connect(g); g.connect(outNode()); s.start(t);
+}
 const DRUM_VOICES={
   k:{n:'キック',fn:(t,a)=>tone(t,'sine',150,1.0*a,.32,42)},
   s:{n:'スネア',fn:(t,a)=>{nz(t,'highpass',1200,.7,.55*a,.17);tone(t,'triangle',190,.35*a,.09,150);}},
@@ -1330,7 +1378,7 @@ const DRUMS=[
 // 録音音源の割り当て（[アクセント, 拍, 細分]）。null の音色は合成音のまま
 const SOUND_SMP=[['drum-metrobell','drum-metroclick','drum-metroclick',1],null,['drum-woodhi','drum-woodlo','drum-woodlo',1],['drum-cowbell','drum-cowbell','drum-cowbell',.9],
   ['drum-claves','drum-claves','drum-claves',1],['drum-sidestick','drum-sidestick','drum-sidestick',1],['drum-openhat','drum-hat','drum-hat',.9],null,
-  ['marimba-84','marimba-79','marimba-76',.9],['drum-triopen','drum-trimute','drum-trimute',.8]];
+  ['marimba-84','marimba-79','marimba-76',.9],['drum-triopen','drum-trimute','drum-trimute',.8],null];
 function metroHit(idx,t,l,v){
   const m=SOUND_SMP[idx];
   if(m&&SMP.buf[m[l]]){ const g=[1,.7,.38][l]*v*m[3]; if(m[0]==='drum-openhat') choke('hh',t); const r=playBuf(m[l],t,g); if(m[0]==='drum-openhat'&&r) SMP.voices.hh=r; return; }
@@ -1355,7 +1403,7 @@ function stopAllPlayback(){
   if(typeof T!=='undefined'&&T.loop){clearInterval(T.loop);T.loop=null;}
 }
 /* ---------- transport (metronome / drums / progression) ---------- */
-const M={bpm:store.get('bpm',96),beats:store.get('beats',4),sub:1,accent:true,vol:0.7,sound:store.get('sound',0),rhythm:store.get('rhythm','click'),layer:false,
+const M={bpm:store.get('bpm',96),beats:store.get('beats',4),sub:1,accent:store.get('accent',false),vol:0.7,sound:store.get('sound2',10),rhythm:store.get('rhythm','click'),layer:false,
   playing:false,next:0,beat:0,subI:0,bar:0,timer:null,queue:[],owner:null,startedAt:0};
 const tickHooks=[];  // (t, {beat,subI,bar,tpb,beats}) をオーディオ時刻で呼ぶ
 const drawHooks=[];  // 画面更新（実際に鳴った瞬間）
@@ -1364,7 +1412,7 @@ const drum=()=>M.rhythm==='click'?null:DRUMS.find(d=>d.id===M.rhythm);
 function grid(){const d=drum();return d?{beats:d.beats,tpb:d.steps/d.beats}:{beats:M.beats,tpb:M.sub};}
 function setBpm(v){
   M.bpm=Math.max(30,Math.min(260,Math.round(v)));
-  $('#bpmOut').textContent=M.bpm; $('#bpmRange').value=M.bpm;
+  $('#bpmOut').textContent=M.bpm; pendWeight();
   const pb=$('#progBpm'); if(pb) pb.textContent=M.bpm;
   $('#tempoTerm').textContent=TERMS.find(t=>M.bpm<t[0])[1];
   store.set('bpm',M.bpm);
@@ -1435,28 +1483,61 @@ function transportStop(){
   if(mins>=2&&LOG.pomo.state!=='run') offerLog(mins,owner==='prog'?'コード進行':owner==='song'?'曲の練習':'リズム・メトロノーム');
 }
 function syncPlayButtons(){
-  $('#metroPlay').textContent=M.playing&&M.owner==='metro'?'ストップ':'スタート';
+  const on=M.playing&&M.owner==='metro'; $('#metroPlay').textContent=on?'STOP':'START'; $('#metroPlay').classList.toggle('on',on);
   const pp=$('#progPlay'); if(pp) pp.textContent=M.playing&&M.owner==='prog'?'■ 停止':'▶ 再生';
 }
-function metroToggle(){ if(M.playing&&M.owner==='metro') transportStop(); else transportStart('metro'); }
+function metroToggle(){ if(M.playing&&M.owner==='metro') transportStop(); else { transportStart('metro'); pendKick(); } }
+let termT=0; function flashTerm(txt){ const el=$('#tempoTerm'); el.textContent=txt; clearTimeout(termT); termT=setTimeout(()=>setBpm(M.bpm),1400); }
 function setRhythm(v){
   M.rhythm=v;store.set('rhythm',v);M.subI=0;M.beat=0;
   $('#rhythmSel').value=v; const pr=$('#progRhythm'); if(pr) pr.value=v;
   drawDrumGrid();drawBeats();
 }
+/* 振り子：拍の瞬間に端まで振れ、本物と同じく端でゆっくり・中央で速く動く。おもりの高さ＝テンポ（上ほど遅い） */
+const PD={last:null,dur:.6,dir:1,ang:0,raf:0,AMP:30};
+const PY0=48,PY1=226,lnLo=Math.log(30),lnHi=Math.log(260);
+function pendWeight(){ const w=$('#pendW'); if(!w) return; const f=(Math.log(M.bpm)-lnLo)/(lnHi-lnLo); w.setAttribute('cy',(PY0+f*(PY1-PY0)).toFixed(1)); }
+function pendFrame(){
+  const arm=$('#pendArm');
+  if(M.playing&&M.owner==='metro'){
+    if(PD.last==null) PD.ang+=(PD.AMP-PD.ang)*.35;
+    else { const ph=Math.min(1.25,(ctx.currentTime-PD.last)/PD.dur); PD.ang=PD.dir*PD.AMP*Math.cos(Math.PI*ph); }
+  } else { PD.ang*=.86; if(Math.abs(PD.ang)<.05) PD.ang=0; }
+  arm.setAttribute('transform',`rotate(${PD.ang.toFixed(2)} 120 270)`);
+  PD.raf=(M.playing&&M.owner==='metro')||PD.ang!==0?requestAnimationFrame(pendFrame):0;
+}
+const pendKick=()=>{ if(!PD.raf) PD.raf=requestAnimationFrame(pendFrame); };
+drawHooks.push(cur=>{
+  if(!cur){ PD.last=null; pendKick(); return; }
+  if(M.owner!=='metro'||cur.subI!==0) return;
+  PD.dir=PD.last==null?1:-PD.dir; PD.last=cur.t; PD.dur=60/M.bpm; pendKick();
+});
+function initPend(){
+  const el=$('#pend'), svg=el.querySelector('svg'); let drag=false;
+  const at=e=>{ const r=svg.getBoundingClientRect(), y=(e.clientY-r.top)/r.height*290; const f=Math.max(0,Math.min(1,(y-PY0)/(PY1-PY0))); setBpm(Math.exp(lnLo+f*(lnHi-lnLo))); };
+  el.addEventListener('pointerdown',e=>{drag=true;el.setPointerCapture(e.pointerId);at(e);});
+  el.addEventListener('pointermove',e=>{if(drag) at(e);});
+  const end=()=>drag=false; el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
+  pendWeight();
+}
 (function initMetro(){
   const bs=$('#beatsSeg');
   [1,2,3,4,5,6,7].forEach(n=>{const b=document.createElement('button');b.dataset.v=n;b.textContent=n===1?'1拍':`${n}/4`;bs.appendChild(b);});
-  segInit(bs,M.beats,v=>{M.beats=+v;M.beat=0;store.set('beats',M.beats);drawBeats();});
+  segInit(bs,M.beats,v=>{M.beats=+v;M.beat=0;store.set('beats',M.beats);drawBeats();$('#sigTop').textContent=M.beats;});
+  $('#sigTop').textContent=M.beats;
+  $('#accentChk').checked=M.accent;
   segInit($('#subSeg'),1,v=>{M.sub=+v;M.subI=0;});
   const ss=$('#soundSel'); SOUNDS.forEach((s,i)=>ss.add(new Option(s.name,i))); ss.value=M.sound;
-  ss.addEventListener('change',()=>{M.sound=+ss.value;store.set('sound',M.sound);metroHit(M.sound,ac().currentTime+0.02,0,M.vol);});
+  ss.addEventListener('change',()=>{M.sound=+ss.value;store.set('sound2',M.sound);metroHit(M.sound,ac().currentTime+0.02,1,M.vol);});
+  $('#sndBtn').addEventListener('click',()=>{M.sound=(M.sound+1)%SOUNDS.length;ss.value=M.sound;store.set('sound2',M.sound);metroHit(M.sound,ac().currentTime+0.02,1,M.vol);flashTerm(SOUNDS[M.sound].name);});
+  $('#sigBtn').addEventListener('click',()=>{const n=M.beats>=7?1:M.beats+1;bs.querySelector(`[data-v="${n}"]`).click();});
+  $('#moreBtn').addEventListener('click',e=>{const m=$('#metroMore');m.hidden=!m.hidden;e.currentTarget.setAttribute('aria-expanded',String(!m.hidden));});
   rhythmOptions($('#rhythmSel'));
   $('#rhythmSel').addEventListener('change',e=>setRhythm(e.target.value));
   $('#layerChk').addEventListener('change',e=>M.layer=e.target.checked);
-  $('#accentChk').addEventListener('change',e=>{M.accent=e.target.checked;drawBeats();});
+  $('#accentChk').addEventListener('change',e=>{M.accent=e.target.checked;store.set('accent',M.accent);drawBeats();});
   $('#volRange').addEventListener('input',e=>M.vol=e.target.value/100);
-  $('#bpmRange').addEventListener('input',e=>setBpm(+e.target.value));
+  initPend();
   $('#bpmDown').addEventListener('click',()=>setBpm(M.bpm-1));
   $('#bpmUp').addEventListener('click',()=>setBpm(M.bpm+1));
   $('#metroPlay').addEventListener('click',metroToggle);
@@ -1498,7 +1579,7 @@ function renderTunings(){
 function renderStrings(){
   const ms=curTuning().m, el=$('#stringBtns'); el.innerHTML=''; const n=ms.length, chrom=!!INSTR[T.inst].chromatic;
   el.hidden=chrom; $('#autoBtn').hidden=chrom; $('#tuningSel').hidden=chrom;
-  if(chrom){ $('#tTarget').textContent='クロマチック：鳴らした音にいちばん近い音を表示します'; return; }
+  if(chrom){ $('#tTarget').textContent='クロマチック'; return; }
   ms.forEach((m,i)=>{
     const b=document.createElement('button'); b.className='sbtn'; b.dataset.i=i;
     b.innerHTML=`<span class="nn">${noteLabel(m)}</span><span class="sn">${n-i}弦</span>`;
@@ -1607,7 +1688,7 @@ function tunerLoop(){
   $('#tCents').textContent=(cents>0?'+ ':cents<0?'− ':'± ')+Math.min(999,Math.abs(cents))+' cent';
   $('#tHz').textContent=fm.toFixed(1)+' Hz';
   const ok=Math.abs(cents)<=5, st=$('#tState');
-  if(all){ st.className='tstate good all'; st.textContent='全弦チューニング完了！ いい音で弾けます'; }
+  if(all){ st.className='tstate good all'; st.textContent='全弦チューニング完了！'; }
   else if(!(st.classList.contains('all')&&ok)){
     st.className='tstate '+(ok?'good':'warn');
     st.textContent= ok?(T.locked===T.target?'✓ ぴったり！':'もう少し…そのまま'):Math.abs(cents)>150?(cents<0?'かなり低い ― 弦を確認してください':'かなり高い ― 弦を確認してください'):(cents<0?'← 低い：ペグを締めて上げる':'高い → 一度緩めてから合わせ直す');
@@ -1640,13 +1721,13 @@ async function micStart(){
     // マイク感度を上げる（約4倍）＋楽器の音域以外のノイズを落とす
     const pre=ctx.createGain(); pre.gain.value=4; const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=22; const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2200;
     T.buf=new Float32Array(T.analyser.fftSize); src.connect(pre); pre.connect(hp); hp.connect(lp); lp.connect(T.analyser); T.tuned=new Set(); T.locked=null; T.lockAt=0; T.hist=[]; T.trace=[];
-    btn.textContent='測定を止める'; msg.textContent='聴いています… 1本ずつ、はっきり弾いてください。'; tunerLoop();
+    btn.textContent='測定を止める'; msg.textContent='聴いています…'; tunerLoop();
     store.set('micOK',true);
     if(store.get('tab')!=='tuner'||document.hidden) micStop(null);  // 許可を待つ間に画面を離れたとき
   }catch(e){
     T.stream=null; audioMode();
     if(e&&e.name==='NotAllowedError') store.set('micOK',false);
-    msg.textContent='この環境ではマイクを使えませんでした。弦のボタンで基準音を鳴らして、耳で合わせてください（音のうなりが消えたら合っています）。';
+    msg.textContent='マイクを使えません。弦のボタンで基準音を鳴らせます。';
   }finally{ T.starting=false; }
 }
 (function initTuner(){
@@ -2109,14 +2190,14 @@ function renderSong(){
   const song=SONGS[SG.idx]; if(!song) return;
   const capo=songCapo(), dispShift=SG.shift-capo, dispKeyPc=(keyRoot(song.key)+dispShift+120)%12;
   $('#songMeta').textContent=`${song.lang==='ja'?'日本の歌':'海外の歌'} ・ ${song.part} ・ ${song.ts||song.time+'拍子'} ・ ${song.mel?'メロディ＋伴奏':'伴奏のみ'}`;
-  $('#songTitle').textContent=song.t; $('#songCredit').textContent=song.c+'（著作権の保護期間が終了／伝承曲）';
+  $('#songTitle').textContent=song.t; $('#songCredit').textContent=song.c;
   $('#songKey').textContent=songKeyName(song,SG.shift);
   $('#songBpm').textContent=Math.round(song.bpm*SG.speed/100);
   const cap=INS==='guitar'?capoFor(song,SG.shift):0;
   $('#songMode').parentElement.hidden=INS!=='guitar';
-  $('#songCapo').textContent= SG.mode==='capo' ? (capo?'':'このキーはカポなしで弾きやすいキーです。')
-    : (cap?`ヒント：「カポで簡単に」にすると、カポ ${cap} フレット＋${songKeyName(song,SG.shift-cap)} の簡単な形で弾けます。`:'');
-  if(INS!=='guitar') $('#songCapo').textContent=isBass()?'ベースは各コードのルート（根音）を中心に弾きます。下の形はルートから構成音を順に弾くアルペジオです。':'ウクレレの押さえ方で表示しています（High-G チューニング）。';
+  $('#songCapo').textContent= SG.mode==='capo' ? ''
+    : (cap?`カポ${cap}なら ${songKeyName(song,SG.shift-cap)} の形で弾けます`:'');
+  if(INS!=='guitar') $('#songCapo').textContent=isBass()?'ルート中心に弾きます':'High-G チューニング';
   $('#songStrum').textContent='ストロークの目安 ― '+song.strum;
   const used=[]; const sheet=$('#songSheet'); sheet.innerHTML=''; sheet.className='card sheet'+(song.lang==='en'?' en':'');
   if(capo){ const cb=document.createElement('div'); cb.className='capo-badge';
@@ -2306,7 +2387,7 @@ function renderTab(){
   const p=TABS_DATA[TB.idx]; TB.data=buildTab(p);
   $('#tabMeta').textContent=`${p.cat==='melody'?'メロディ':'リフ・練習'} ・ キー ${p.key} ・ ${p.ts||p.beats+'拍子'}${p.swing?'（シャッフル）':''}`;
   $('#tabTitle').textContent=p.t; $('#tabDesc').textContent=p.info+(p.cat==='melody'&&!/オリジナル/.test(p.info)?'（著作権の保護期間が終了した曲）':'');
-  $('#tabTip').textContent='コツ ― '+p.tip+(INS==='guitar'?'':`（${ins().name}用に${TB.data.shift?`${['','1','2','3'][Math.abs(TB.data.shift)/12]}オクターブ${TB.data.shift>0?'上げ':'下げ'}て`:'自動で'}弦とフレットを割り当てています）`); $('#tabBpm').textContent=Math.round(p.bpm*TB.speed/100);
+  $('#tabTip').textContent='コツ ― '+p.tip+(INS==='guitar'||!TB.data.shift?'':`（${['','1','2','3'][Math.abs(TB.data.shift)/12]}オクターブ${TB.data.shift>0?'上':'下'}）`); $('#tabBpm').textContent=Math.round(p.bpm*TB.speed/100);
   drawTab();
 }
 function drawTab(){
@@ -2437,7 +2518,7 @@ function renderLog(){
     c.innerHTML=`<i style="height:${Math.round(x.v/mx*80)}%"></i><span>${x.i===0?'今日':'日月火水木金土'[x.d.getDay()]}</span>`; c.title=`${x.d.getMonth()+1}/${x.d.getDate()} ${x.v}分`; wb.appendChild(c);});
   const list=$('#logList'); list.innerHTML='';
   const byDay=Object.entries(tot).sort((a,b)=>a[0]<b[0]?1:-1).slice(0,30);
-  if(!byDay.length) list.innerHTML='<p class="msg">まだ記録がありません。上のタイマーで最初の1セットを始めましょう。</p>';
+  if(!byDay.length) list.innerHTML='<p class="msg">まだ記録がありません。</p>';
   byDay.forEach(([date,min])=>{const [yy,mm,dd]=date.split('-'), n=LOG.entries.filter(e=>e.date===date).length, r=document.createElement('div'); r.className='log-row';
     r.innerHTML=`<span class="d">${+mm}/${+dd}（${'日月火水木金土'[new Date(+yy,+mm-1,+dd).getDay()]}）</span><span class="m">${min}分</span><span class="memo">${n}セット</span><span></span>`; list.appendChild(r);});
 }
@@ -2462,7 +2543,7 @@ function offerLog(mins,cat){
       if(!Array.isArray(arr)||!arr.every(e=>e&&/^\d{4}-\d{2}-\d{2}$/.test(e.date)&&+e.min>0)) throw 0;
       LOG.entries=arr.map(e=>({id:e.id||Date.now()+Math.random(),date:e.date,min:+e.min,cat:String(e.cat||'練習'),memo:String(e.memo||'')}));
       saveLog();renderLog();$('#backupMsg').textContent=`${arr.length}件を復元しました`;
-    }catch(e){$('#backupMsg').textContent='読み込めませんでした。コピーした文字列をそのまま貼り付けてください。';}
+    }catch(e){$('#backupMsg').textContent='読み込めませんでした';}
   });
   // アプリを閉じている間に時間が来ていたら、ここで記録する
   if(LOG.pomo.state==='run'&&pomoLeft()<=0) pomoFinish(true);
@@ -2511,7 +2592,7 @@ async function recSave(){
   const d=new Date(), name=`練習 ${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   const item={id:Date.now(),name,date:d.toISOString(),dur,type,blob:new Blob(REC.chunks,{type})};
   try{ await recPut(item); $('#recMsg').textContent=`保存しました（${recFmt(dur)}）`; }
-  catch(e){ $('#recMsg').textContent='端末に保存できませんでした。空き容量を確認してください。'; REC.items.unshift(item); }
+  catch(e){ $('#recMsg').textContent='保存できませんでした'; REC.items.unshift(item); }
   $('#recTime').textContent='00:00'; recRender();
 }
 function recExt(type){return /mp4|aac|m4a/.test(type)?'m4a':/ogg/.test(type)?'ogg':'webm';}
