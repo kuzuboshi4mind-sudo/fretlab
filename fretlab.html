@@ -1182,6 +1182,9 @@ const outNode=()=>BUS||master;
 function openBus(){const g=ac().createGain();g.connect(master);return g;}
 function closeBus(g){ if(!g) return; const t=ctx.currentTime; try{g.gain.cancelScheduledValues(t);g.gain.setValueAtTime(g.gain.value,t);g.gain.linearRampToValueAtTime(0,t+0.04);}catch(e){} setTimeout(()=>{try{g.disconnect();}catch(e){}},200); }
 function onBus(g,fn){const prev=BUS;BUS=g;try{return fn();}finally{BUS=prev;}}
+// iPhone：アプリを開いている間はサイレントモード（消音スイッチ）でも音を鳴らす（iOS 17 以降の Safari）
+function audioMode(t='playback'){ try{ const a=navigator.audioSession; if(a&&a.type!==t) a.type=t; }catch(e){} }
+audioMode();
 function ac(){
   if(!ctx){
     ctx=new (window.AudioContext||window.webkitAudioContext)();
@@ -1256,6 +1259,7 @@ function showTab(id){
   document.querySelectorAll('[data-panel]').forEach(p=>p.hidden=p.dataset.panel!==id);
   store.set('tab',id);
   if(id==='tips') try{renderTips();}catch(e){}  // 起動直後（データ定義前）は後で描画される
+  try{tunerAuto(id);}catch(e){}
   try{history.replaceState(null,'','#'+id)}catch(e){}
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>showTab(t.dataset.tab)));
@@ -1618,22 +1622,32 @@ function drawTrace(){
   $('#needle').style.transform=`rotate(${v*1.2}deg)`;
   g.classList.toggle('idle',c0==null); g.classList.toggle('in',c0!=null&&Math.abs(c0)<=5);
 }
-async function micToggle(){
+function micStop(note='測定を止めました。'){
+  if(!T.stream) return;
+  T.stream.getTracks().forEach(t=>t.stop());T.stream=null;T.analyser=null;cancelAnimationFrame(T.raf);
+  $('#micBtn').textContent='マイクで測る'; if(note) $('#micMsg').textContent=note; audioMode();
+}
+function micToggle(){ if(T.stream) micStop(); else micStart(); }
+async function micStart(){
   const btn=$('#micBtn'), msg=$('#micMsg');
-  if(T.stream){T.stream.getTracks().forEach(t=>t.stop());T.stream=null;T.analyser=null;cancelAnimationFrame(T.raf);btn.textContent='マイクで測る';msg.textContent='測定を止めました。';return;}
+  if(T.stream||T.starting) return; T.starting=true;
   ac();
   try{
     if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) throw new Error('nomedia');
+    audioMode('play-and-record');
     T.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
     const src=ctx.createMediaStreamSource(T.stream); T.analyser=ctx.createAnalyser(); T.analyser.fftSize=8192;
     // マイク感度を上げる（約4倍）＋楽器の音域以外のノイズを落とす
     const pre=ctx.createGain(); pre.gain.value=4; const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=22; const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2200;
     T.buf=new Float32Array(T.analyser.fftSize); src.connect(pre); pre.connect(hp); hp.connect(lp); lp.connect(T.analyser); T.tuned=new Set(); T.locked=null; T.lockAt=0; T.hist=[]; T.trace=[];
     btn.textContent='測定を止める'; msg.textContent='聴いています… 1本ずつ、はっきり弾いてください。'; tunerLoop();
+    store.set('micOK',true);
+    if(store.get('tab')!=='tuner'||document.hidden) micStop(null);  // 許可を待つ間に画面を離れたとき
   }catch(e){
-    T.stream=null;
+    T.stream=null; audioMode();
+    if(e&&e.name==='NotAllowedError') store.set('micOK',false);
     msg.textContent='この環境ではマイクを使えませんでした。弦のボタンで基準音を鳴らして、耳で合わせてください（音のうなりが消えたら合っています）。';
-  }
+  }finally{ T.starting=false; }
 }
 (function initTuner(){
   segInit($('#instSeg'),T.inst,v=>{T.inst=v;T.tuning=0;T.target=null;T.auto=true;T.tuned=new Set();T.locked=null;setLocked(false);syncAuto();T.hist=[];T.trace=[];renderTunings();renderStrings();drawTrace();});
@@ -1647,6 +1661,20 @@ async function micToggle(){
   setA4(store.get('a4',440));
   drawTrace();
 })();
+// チューナーを開いたらすぐ聴き始める（一度マイクを許可していれば、ボタンを押さなくてよい）。離れたらマイクを止める
+function micGranted(){ try{ return navigator.permissions.query({name:'microphone'}).then(r=>r.state==='granted',()=>false); }catch(e){ return Promise.resolve(false); } }
+function tunerAuto(id){
+  if(typeof T==='undefined') return;
+  if(id!=='tuner'){ micStop(null); return; }
+  if(T.stream||document.hidden) return;
+  if(store.get('micOK',false)) micStart();       // タップ直後なので、必要なら許可の確認が出る
+  else micGranted().then(ok=>{ if(ok&&store.get('tab')==='tuner') micStart(); });
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden) micStop(null);
+  else if(store.get('tab')==='tuner') micGranted().then(ok=>{ if(ok&&store.get('tab')==='tuner') micStart(); });
+});
+if(store.get('tab')==='tuner') micGranted().then(ok=>{ if(ok&&store.get('tab')==='tuner') micStart(); });
 
 /* ---------- fretboard renderer ---------- */
 const FRETS=15;
@@ -2456,6 +2484,7 @@ async function recToggle(){
   const msg=$('#recMsg');
   try{
     if(!window.MediaRecorder||!navigator.mediaDevices) throw new Error('unsupported');
+    audioMode('play-and-record');
     REC.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:true}});
     const mime=recMime(); REC.rec=new MediaRecorder(REC.stream,mime?{mimeType:mime}:undefined); REC.chunks=[];
     REC.rec.ondataavailable=e=>{if(e.data&&e.data.size) REC.chunks.push(e.data);};
@@ -2473,7 +2502,7 @@ async function recToggle(){
 }
 function recCleanup(){
   clearInterval(REC.tick); cancelAnimationFrame(REC.raf); REC.an=null;
-  if(REC.stream) REC.stream.getTracks().forEach(t=>t.stop()); REC.stream=null;
+  if(REC.stream) REC.stream.getTracks().forEach(t=>t.stop()); REC.stream=null; if(!T.stream) audioMode();
   $('#recBtn').classList.remove('on'); $('#recBtn').setAttribute('aria-label','録音を開始'); $('#recLevel').style.width='0';
 }
 async function recSave(){
