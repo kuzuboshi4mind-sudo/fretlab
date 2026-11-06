@@ -36,6 +36,18 @@ def render_chime(manifest):
     for n in range(45, 79, 3):   # A2〜F#5
         render(f"chime-{n}", 12, n, vel=104, dur=1.6, tail=0.9, reverb=True); manifest["chime"].append(n)
 
+def render_marimba(manifest):
+    manifest["marimba"] = []
+    for n in (64, 67, 72):   # E4・G4・C5（アクセント＝C5）
+        render(f"marimba-{n}", 12, n, vel=110, dur=0.8, tail=0.3); manifest["marimba"].append(n)
+
+if os.environ.get("ONLY") == "marimba":   # メトロノームのマリンバだけ作り直す
+    path = os.path.join(OUT, "manifest.json")
+    manifest = json.load(open(path))
+    render_marimba(manifest)
+    json.dump(manifest, open(path, "w"), ensure_ascii=False)
+    print("done marimba", manifest["marimba"]); raise SystemExit(0)
+
 if os.environ.get("ONLY") == "chime":   # チャイムだけ作り直す：ONLY=chime python3 tools/render_samples.py
     path = os.path.join(OUT, "manifest.json")
     manifest = json.load(open(path))
@@ -54,8 +66,7 @@ for n in range(23, 50, 3):
 for n in range(55, 80, 3):
     render(f"nylon-{n}", 24, n, vel=96, dur=2.2); manifest["nylon"].append(n)
 # マリンバ（メトロノーム音色）
-for n in (76, 79, 84):
-    render(f"marimba-{n}", 12, n, vel=110, dur=0.8, tail=0.3); manifest["marimba"].append(n)
+render_marimba(manifest)
 render_chime(manifest)
 # ドラム（GM スタンダードキット）
 DR = {"kick": 36, "snare": 38, "sidestick": 37, "clap": 39, "hat": 42, "openhat": 46, "ride": 51, "tom": 45,

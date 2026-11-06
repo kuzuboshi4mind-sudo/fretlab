@@ -641,11 +641,11 @@ setTimeout(done,3200);})();</script>
           <button class="mbtn" id="sigBtn" aria-label="拍子"><span class="sig"><b id="sigTop">4</b><b>4</b></span></button>
           <button class="mbtn" id="sndBtn" aria-label="音色"><svg viewBox="0 0 32 32"><path d="M5 12h5l7-6v20l-7-6H5z"/><path d="M21 11.5a6 6 0 0 1 0 9M24.5 8a11 11 0 0 1 0 16"/></svg></button>
           <button class="mbtn" id="tapBtn" aria-label="タップでテンポ入力">TAP</button>
-          <button class="mbtn" id="moreBtn" aria-label="詳細設定" aria-expanded="false"><svg viewBox="0 0 32 32"><path d="M8 12l8 8 8-8"/></svg></button>
+          <button class="mbtn" id="moreBtn" aria-label="詳細設定" aria-expanded="true"><svg viewBox="0 0 32 32"><path d="M8 12l8 8 8-8"/></svg></button>
         </div>
         <button class="btn primary big metro-start" id="metroPlay">START</button>
       </div>
-      <div class="card stack" id="metroMore" hidden>
+      <div class="card stack" id="metroMore">
         <div class="row">
           <div style="flex:1;min-width:150px"><label class="label" for="soundSel">音色</label><select id="soundSel" style="width:100%"></select></div>
           <div style="flex:1;min-width:150px"><label class="label" for="rhythmSel">リズム</label><select id="rhythmSel" style="width:100%"></select></div>
@@ -1318,7 +1318,7 @@ const SOUNDS=[
   {name:'サイドスティック',fn:(t,l,v)=>{tone(t,'triangle',[2000,1700,1500][l],[.5,.35,.15][l]*v,.03);nz(t,'bandpass',3500,2,[.45,.3,.12][l]*v,.035);}},
   {name:'ハイハット',fn:(t,l,v)=>nz(t,'highpass',[6500,7500,8500][l],1,[.6,.4,.18][l]*v,[.14,.05,.035][l])},
   {name:'振り子（機械式）',fn:(t,l,v)=>{nz(t,'bandpass',[3800,3000,2600][l],4,[.9,.65,.3][l]*v,.012);tone(t,'sine',[420,300,260][l],[.35,.25,.1][l]*v,.05);}},
-  {name:'マリンバ',fn:(t,l,v)=>{const f=[1046.5,784,659.3][l];tone(t,'sine',f,[.6,.45,.2][l]*v,.35);tone(t,'sine',f*4,[.08,.06,.02][l]*v,.06);}},
+  {name:'マリンバ',fn:(t,l,v)=>{const f=[523.25,392,329.63][l];tone(t,'sine',f,[.6,.45,.2][l]*v,.35);tone(t,'sine',f*4,[.08,.06,.02][l]*v,.06);}},
   {name:'トライアングル',fn:(t,l,v)=>{const f=[1900,1500,1300][l];[[1,.3],[2.76,.12],[5.4,.06]].forEach(([m,a])=>tone(t,'sine',f*m,a*[1,.7,.3][l]*v,.6));}},
   {name:'メトロノーム',fn:(t,l,v)=>woodTick(t,l,v)},
 ];
@@ -1328,14 +1328,14 @@ function tickBuf(kind){
   if(TICK[kind]) return TICK[kind];
   const c=ac(), sr=c.sampleRate, bell=kind==='a', len=Math.floor(sr*(bell?.7:.09)), b=c.createBuffer(1,len,sr), d=b.getChannelData(0);
   const p=kind==='k'?.94:1;
-  const wood=[[880*p,1,.020],[1690*p,.75,.011],[2870*p,.5,.0065],[4250*p,.3,.0035]];
+  const wood=[[640*p,1,.026],[1230*p,.7,.014],[2080*p,.42,.008],[3100*p,.2,.0045]];
   const bellM=[[2093,.55,.32],[5230,.16,.09],[3348,.12,.14],[7110,.05,.05]];
   let seed=7; const rnd=()=>((seed=seed*16807%2147483647)/2147483647)*2-1;
   let pk=0;
   for(let i=0;i<len;i++){ const t=i/sr; let v=0;
     for(const [f,a,tau] of wood) v+=a*Math.sin(6.2832*f*t)*Math.exp(-t/tau);
     if(bell) for(const [f,a,tau] of bellM) v+=a*Math.sin(6.2832*f*t)*Math.exp(-t/tau);
-    v+=rnd()*.7*Math.exp(-t/.0010);
+    v+=rnd()*.45*Math.exp(-t/.0008);
     v*=Math.min(1,t/.0002); d[i]=v; pk=Math.max(pk,Math.abs(v)); }
   for(let i=0;i<len;i++) d[i]/=pk;
   return TICK[kind]=b;
@@ -1378,7 +1378,7 @@ const DRUMS=[
 // 録音音源の割り当て（[アクセント, 拍, 細分]）。null の音色は合成音のまま
 const SOUND_SMP=[['drum-metrobell','drum-metroclick','drum-metroclick',1],null,['drum-woodhi','drum-woodlo','drum-woodlo',1],['drum-cowbell','drum-cowbell','drum-cowbell',.9],
   ['drum-claves','drum-claves','drum-claves',1],['drum-sidestick','drum-sidestick','drum-sidestick',1],['drum-openhat','drum-hat','drum-hat',.9],null,
-  ['marimba-84','marimba-79','marimba-76',.9],['drum-triopen','drum-trimute','drum-trimute',.8],null];
+  ['marimba-72','marimba-67','marimba-64',.9],['drum-triopen','drum-trimute','drum-trimute',.8],null];
 function metroHit(idx,t,l,v){
   const m=SOUND_SMP[idx];
   if(m&&SMP.buf[m[l]]){ const g=[1,.7,.38][l]*v*m[3]; if(m[0]==='drum-openhat') choke('hh',t); const r=playBuf(m[l],t,g); if(m[0]==='drum-openhat'&&r) SMP.voices.hh=r; return; }
@@ -1403,7 +1403,7 @@ function stopAllPlayback(){
   if(typeof T!=='undefined'&&T.loop){clearInterval(T.loop);T.loop=null;}
 }
 /* ---------- transport (metronome / drums / progression) ---------- */
-const M={bpm:store.get('bpm',96),beats:store.get('beats',4),sub:1,accent:store.get('accent',false),vol:0.7,sound:store.get('sound2',10),rhythm:store.get('rhythm','click'),layer:false,
+const M={bpm:store.get('bpm',96),beats:store.get('beats',4),sub:1,accent:store.get('accent',false),vol:0.7,sound:store.get('sound3',0),rhythm:store.get('rhythm','click'),layer:false,
   playing:false,next:0,beat:0,subI:0,bar:0,timer:null,queue:[],owner:null,startedAt:0};
 const tickHooks=[];  // (t, {beat,subI,bar,tpb,beats}) をオーディオ時刻で呼ぶ
 const drawHooks=[];  // 画面更新（実際に鳴った瞬間）
@@ -1528,10 +1528,12 @@ function initPend(){
   $('#accentChk').checked=M.accent;
   segInit($('#subSeg'),1,v=>{M.sub=+v;M.subI=0;});
   const ss=$('#soundSel'); SOUNDS.forEach((s,i)=>ss.add(new Option(s.name,i))); ss.value=M.sound;
-  ss.addEventListener('change',()=>{M.sound=+ss.value;store.set('sound2',M.sound);metroHit(M.sound,ac().currentTime+0.02,1,M.vol);});
-  $('#sndBtn').addEventListener('click',()=>{M.sound=(M.sound+1)%SOUNDS.length;ss.value=M.sound;store.set('sound2',M.sound);metroHit(M.sound,ac().currentTime+0.02,1,M.vol);flashTerm(SOUNDS[M.sound].name);});
+  ss.addEventListener('change',()=>{M.sound=+ss.value;store.set('sound3',M.sound);metroHit(M.sound,ac().currentTime+0.02,1,M.vol);});
+  $('#sndBtn').addEventListener('click',()=>{M.sound=(M.sound+1)%SOUNDS.length;ss.value=M.sound;store.set('sound3',M.sound);metroHit(M.sound,ac().currentTime+0.02,1,M.vol);flashTerm(SOUNDS[M.sound].name);});
   $('#sigBtn').addEventListener('click',()=>{const n=M.beats>=7?1:M.beats+1;bs.querySelector(`[data-v="${n}"]`).click();});
-  $('#moreBtn').addEventListener('click',e=>{const m=$('#metroMore');m.hidden=!m.hidden;e.currentTarget.setAttribute('aria-expanded',String(!m.hidden));});
+  const more=v=>{$('#metroMore').hidden=!v;$('#moreBtn').setAttribute('aria-expanded',String(v));store.set('metroMore',v);};
+  more(store.get('metroMore',true));
+  $('#moreBtn').addEventListener('click',()=>more($('#metroMore').hidden));
   rhythmOptions($('#rhythmSel'));
   $('#rhythmSel').addEventListener('change',e=>setRhythm(e.target.value));
   $('#layerChk').addEventListener('change',e=>M.layer=e.target.checked);
