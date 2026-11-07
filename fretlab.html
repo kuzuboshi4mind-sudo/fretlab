@@ -105,7 +105,7 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .metro{display:flex;flex-direction:column;gap:14px;max-width:560px;margin-inline:auto}
 .metro-main{display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 16px 22px}
-.pend{width:100%;max-width:min(300px,calc(28vh * 240 / 290));touch-action:none;cursor:ns-resize;user-select:none;-webkit-user-select:none}
+.pend{width:100%;max-width:560px;touch-action:none;cursor:ns-resize;user-select:none;-webkit-user-select:none}
 .pend svg{display:block;width:100%;height:auto;overflow:visible}
 .pend-arc{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:2 6;stroke-linecap:round}
 .pend-rod{stroke:var(--root);stroke-width:7;stroke-linecap:round}
@@ -196,7 +196,7 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .treadout{font-family:var(--mono);font-size:14px;color:var(--fg);font-variant-numeric:tabular-nums;display:flex;gap:12px}
 .treadout span+span{color:var(--muted)}
 .gauge-wrap{display:flex;justify-content:center}
-.gauge{width:100%;max-width:440px;overflow:visible}
+.gauge{width:100%;max-width:560px;overflow:visible}
 .gauge .arc{fill:none;stroke:var(--line);stroke-width:1.5}
 .gauge .tk{stroke:var(--muted);stroke-width:1.2}
 .gauge .tk.lg{stroke:var(--fg);stroke-width:2.2}
@@ -544,7 +544,11 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
   .metro,.tuner,.scale-info{grid-template-columns:minmax(0,1fr)}
   .bpm output{font-size:76px}
   .bpm .btn.round{width:54px;height:54px;font-size:26px}
-  .metro-main{gap:6px;padding:12px 14px 16px}
+  .metro-main{gap:4px;padding:10px 6px 14px}
+  .bpm output{font-size:68px}
+  .tuner-main .gauge-wrap{margin-inline:-14px}
+  .metro-main .beat{margin:4px 8px}
+  .metro-bar{margin-top:0}
   .metro-start{padding:13px}
   .chord-name{font-size:52px}
 }
@@ -625,10 +629,10 @@ setTimeout(done,3200);})();</script>
     <div class="metro">
       <div class="card metro-main">
         <div class="pend" id="pend">
-          <svg viewBox="0 0 240 290" aria-label="振り子（おもりを上下にドラッグでテンポ変更）">
-            <path class="pend-arc" d="M44 112 A170 170 0 0 1 196 112"/>
-            <g id="pendArm"><line class="pend-rod" x1="120" y1="270" x2="120" y2="22"/><circle class="pend-w" id="pendW" cx="120" cy="120" r="17"/></g>
-            <circle class="pend-pivot" cx="120" cy="270" r="5"/>
+          <svg viewBox="0 0 280 232" aria-label="振り子（おもりを上下にドラッグでテンポ変更）">
+            <path class="pend-arc" d="M28 54 A205 205 0 0 1 252 54"/>
+            <g id="pendArm"><line class="pend-rod" x1="140" y1="220" x2="140" y2="14"/><circle class="pend-w" id="pendW" cx="140" cy="110" r="16"/></g>
+            <circle class="pend-pivot" cx="140" cy="220" r="5"/>
           </svg>
         </div>
         <div class="bpm">
@@ -686,7 +690,7 @@ setTimeout(done,3200);})();</script>
           </div>
         </div>
         <div class="gauge-wrap">
-          <svg class="gauge" id="gauge" viewBox="0 0 300 178" aria-hidden="true">
+          <svg class="gauge" id="gauge" viewBox="17 0 266 178" aria-hidden="true">
             <path class="arc" d="M42.6 98.0 A124 124 0 0 1 257.4 98.0"/>
             <path class="zone" d="M150 160 L136.8 34.7 A126 126 0 0 1 163.2 34.7 Z"/>
             <line class="tk lg" x1="42.6" y1="98.0" x2="56.5" y2="106.0"/><text x="28.8" y="94.0">−50</text><line class="tk" x1="49.7" y1="87.1" x2="56.2" y2="91.8"/><line class="tk" x1="57.9" y1="77.0" x2="63.8" y2="82.4"/><line class="tk" x1="67.0" y1="67.9" x2="72.4" y2="73.8"/><line class="tk" x1="77.1" y1="59.7" x2="81.8" y2="66.2"/><line class="tk lg" x1="88.0" y1="52.6" x2="96.0" y2="66.5"/><text x="80.0" y="42.8">−25</text><line class="tk" x1="99.6" y1="46.7" x2="102.8" y2="54.0"/><line class="tk" x1="111.7" y1="42.1" x2="114.2" y2="49.7"/><line class="tk" x1="124.2" y1="38.7" x2="125.9" y2="46.5"/><line class="tk z" x1="137.0" y1="36.7" x2="137.9" y2="44.6"/><line class="tk lg z" x1="150.0" y1="36.0" x2="150.0" y2="52.0"/><text x="150.0" y="24.0">0</text><line class="tk z" x1="163.0" y1="36.7" x2="162.1" y2="44.6"/><line class="tk" x1="175.8" y1="38.7" x2="174.1" y2="46.5"/><line class="tk" x1="188.3" y1="42.1" x2="185.8" y2="49.7"/><line class="tk" x1="200.4" y1="46.7" x2="197.2" y2="54.0"/><line class="tk lg" x1="212.0" y1="52.6" x2="204.0" y2="66.5"/><text x="220.0" y="42.8">+25</text><line class="tk" x1="222.9" y1="59.7" x2="218.2" y2="66.2"/><line class="tk" x1="233.0" y1="67.9" x2="227.6" y2="73.8"/><line class="tk" x1="242.1" y1="77.0" x2="236.2" y2="82.4"/><line class="tk" x1="250.3" y1="87.1" x2="243.8" y2="91.8"/><line class="tk lg" x1="257.4" y1="98.0" x2="243.5" y2="106.0"/><text x="271.2" y="94.0">+50</text>
@@ -1263,9 +1267,12 @@ function pluckBuffer(freq){
 // kind: guitar / bass / nylon、str: 弦番号（同じ弦の音を止めるため）
 function pluck(midi,when=0,gain=0.55,opt={}){
   const c=ac(), kind=opt.kind||'guitar';
-  const sv=sampleNote(kind,midi,c.currentTime+when,gain*1.1,opt.str!=null?kind+opt.str:null); if(sv) return sv.s;
+  const t0=c.currentTime+when;
+  // dur（秒）を指定すると、その長さで指を離したように音を止める
+  const release=(g,s)=>{ if(!opt.dur) return; const te=t0+Math.max(.08,opt.dur); try{ g.gain.setTargetAtTime(0,te,.045); s.stop(te+.4); }catch(e){} };
+  const sv=sampleNote(kind,midi,t0,gain*1.1,opt.str!=null?kind+opt.str:null); if(sv){ release(sv.g,sv.s); return sv.s; }
   const src=c.createBufferSource(); src.buffer=pluckBuffer(mfreq(midi));
-  const g=c.createGain(); g.gain.value=gain; src.connect(g); g.connect(outNode()); src.start(c.currentTime+when); return src;
+  const g=c.createGain(); g.gain.value=gain; src.connect(g); g.connect(outNode()); src.start(t0); release(g,src); return src;
 }
 
 /* ---------- tabs ---------- */
@@ -1494,8 +1501,8 @@ function setRhythm(v){
   drawDrumGrid();drawBeats();
 }
 /* 振り子：拍の瞬間に端まで振れ、本物と同じく端でゆっくり・中央で速く動く。おもりの高さ＝テンポ（上ほど遅い） */
-const PD={last:null,dur:.6,dir:1,ang:0,raf:0,AMP:30};
-const PY0=48,PY1=226,lnLo=Math.log(30),lnHi=Math.log(260);
+const PD={last:null,dur:.6,dir:1,ang:0,raf:0,AMP:32};
+const PY0=36,PY1=186,lnLo=Math.log(30),lnHi=Math.log(260);
 function pendWeight(){ const w=$('#pendW'); if(!w) return; const f=(Math.log(M.bpm)-lnLo)/(lnHi-lnLo); w.setAttribute('cy',(PY0+f*(PY1-PY0)).toFixed(1)); }
 function pendFrame(){
   const arm=$('#pendArm');
@@ -1503,7 +1510,7 @@ function pendFrame(){
     if(PD.last==null) PD.ang+=(PD.AMP-PD.ang)*.35;
     else { const ph=Math.min(1.25,(ctx.currentTime-PD.last)/PD.dur); PD.ang=PD.dir*PD.AMP*Math.cos(Math.PI*ph); }
   } else { PD.ang*=.86; if(Math.abs(PD.ang)<.05) PD.ang=0; }
-  arm.setAttribute('transform',`rotate(${PD.ang.toFixed(2)} 120 270)`);
+  arm.setAttribute('transform',`rotate(${PD.ang.toFixed(2)} 140 220)`);
   PD.raf=(M.playing&&M.owner==='metro')||PD.ang!==0?requestAnimationFrame(pendFrame):0;
 }
 const pendKick=()=>{ if(!PD.raf) PD.raf=requestAnimationFrame(pendFrame); };
@@ -1514,7 +1521,7 @@ drawHooks.push(cur=>{
 });
 function initPend(){
   const el=$('#pend'), svg=el.querySelector('svg'); let drag=false;
-  const at=e=>{ const r=svg.getBoundingClientRect(), y=(e.clientY-r.top)/r.height*290; const f=Math.max(0,Math.min(1,(y-PY0)/(PY1-PY0))); setBpm(Math.exp(lnLo+f*(lnHi-lnLo))); };
+  const at=e=>{ const r=svg.getBoundingClientRect(), y=(e.clientY-r.top)/r.height*232; const f=Math.max(0,Math.min(1,(y-PY0)/(PY1-PY0))); setBpm(Math.exp(lnLo+f*(lnHi-lnLo))); };
   el.addEventListener('pointerdown',e=>{drag=true;el.setPointerCapture(e.pointerId);at(e);});
   el.addEventListener('pointermove',e=>{if(drag) at(e);});
   const end=()=>drag=false; el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
@@ -2096,23 +2103,29 @@ drawHooks.push(cur=>{
 // mel：メロディ（音名:拍）。メロディを確認できていない曲は mel なし（伴奏のみ）
 const SONGS=[
   {id:'furusato',lang:'ja',t:'ふるさと（故郷）',c:'作詞 高野辰之（1947年没）／作曲 岡野貞一（1941年没）・1914年',key:'C',time:3,bpm:84,part:'1番',strum:'3拍子：ベース → ジャン → ジャン',
-   lines:['[C]うさぎ[G7]おいし [C]かのやま','[C]こぶな[F]つりし [G7]かの[C]かわ','[C]ゆめは[F]いまも [C]めぐ[G]りて','[F]わすれ[C]がたき [G7]ふるさ[C]と'],
-   seq:[3,3,6, 3,3,3,3, 3,3,3,3, 3,3,3,3]},
+   lines:['[C]うさぎ[G]おいし [C]かのやま','[F]こぶな[C]つりし [G]かの[C]かわ','[G]ゆめは[C]いまも [F]めぐ[C]りて','[C]わすれがたき [G7]ふるさ[C]と'],
+   seq:[3,3,6, 3,3,3,3, 3,3,3,3, 6,3,3],
+    mel:'C4 C4 C4 D4:1.5 E4:.5 D4 E4 E4 F4 G4:2 r F4 G4 A4 E4:1.5 F4:.5 E4 D4 D4 B3 C4:2 r D4:.5 C4:.5 D4 G3 C4:.5 D4:.5 E4 E4 F4:.5 E4:.5 F4:1.5 A4:.5 G4:.5 F4:.5 E4 r G4 G4 G4 C4:1.5 D4:.5 E4 F4 F4 D4 C4:2 r'},
   {id:'akatombo',lang:'ja',t:'赤とんぼ',c:'作詞 三木露風（1964年没）／作曲 山田耕筰（1965年没）・1927年',key:'C',time:3,bpm:72,part:'1番',strum:'3拍子：ベース → ジャン → ジャン、またはアルペジオ',
-   lines:['[C]ゆうやけ[F]こやけの [C]あかとん[G7]ぼ','[C]おわれて[F]みたのは [C]いつの[G7]ひ[C]か'],
-   seq:[3,3,3,3, 3,3,3,1.5,1.5]},
-  {id:'kojo',lang:'ja',t:'荒城の月',c:'作詞 土井晩翠（1952年没）／作曲 滝廉太郎（1903年没）・1901年',key:'Em',time:4,bpm:66,part:'1番',strum:'4拍子：アルペジオ（親指でルート→3弦→2弦→1弦）',
-   lines:['[Em]はるこうろうの [Am]はなの[Em]えん','[C]めぐる[Am]さかずき [B7]かげさして','[Em]ちよのまつが[Am]え [Em]わけいでし','[Am]むかしの[B7]ひかり いま[Em]いずこ'],
-   seq:[4,2,2, 2,2,4, 4,2,2, 2,2,4]},
-  {id:'shabondama',lang:'ja',t:'しゃぼん玉',c:'作詞 野口雨情（1945年没）／作曲 中山晋平（1952年没）・1922年',key:'C',time:4,bpm:92,part:'1番',strum:'4拍子：↓ ↓ ↓↑ ↓',
-   lines:['[C]しゃぼんだま [G7]とんだ','[G7]やねまで [C]とんだ','[F]やねまで [C]とんで','[C]こわれて [G7]きえ[C]た'],
-   seq:[4,4, 4,4, 4,4, 4,2,2]},
+   lines:['[C]ゆうやけこやけの [F]あかとん[C]ぼ','[Am]おわれて[C]みたのは いつの[G7]ひ[C]か'],
+   seq:[6,3,3, 3,5,1,3],
+    mel:'G3:.5 C4:.5 C4:1.5 D4:.5 E4:.5 G4:.5 C5:.5 A4:.5 G4 A4:.5 C4:.5 C4 D4 E4:2 r E4:.5 A4:.5 G4:1.5 A4:.5 C5:.5 A4:.5 G4:.5 A4:.5 G4:.5 E4:.5 G4:.5 E4:.5 C4:.5 E4:.5 D4:.5 C4:.5 C4:2 r'},
+  {id:'kojo',lang:'ja',t:'荒城の月',c:'作詞 土井晩翠（1952年没）／作曲 滝廉太郎（1903年没）・1901年',key:'Em',time:4,bpm:70,part:'1番',strum:'4拍子：アルペジオ（親指でルート→3弦→2弦→1弦）',
+   lines:['[Em]はるこうろうの [Am]はな[B7]のえん','[Em]めぐるさかずき [Am]かげ[B7]さし[Em]て','[Em]ちよのまつが[C]え [Am]わけいで[B7]し','[Em]むかしのひかり [Am]いま[B7]いず[Em]こ'],
+   seq:[8,2,6, 8,2,2,4, 4,4,4,4, 8,2,2,4],
+    mel:'B3 B3 E4 F#4 G4 F#4 E4:2 C4 C4 B3 A#3 B3:3 r B3 B3 E4 F#4 G4 F#4 E4:2 C4 A3 B3:1.5 B3:.5 E3:3 r G3:1.5 G3:.5 F#3 E3 C4 C4 B3:2 A3 B3 C4 C4 B3:3 r B3 B3 E4 F#4 G4 F#4 E4:2 C4 A3 B3:1.5 B3:.5 E3:3 r'},
+  {id:'shabondama',lang:'ja',t:'しゃぼん玉',c:'作詞 野口雨情（1945年没）／作曲 中山晋平（1952年没）・1922年',key:'C',time:2,bpm:84,part:'1番',strum:'4拍子：↓ ↓ ↓↑ ↓',
+   lines:['[C]しゃぼんだま とんだ','[F]やねまで [C]とんだ','[C]やねまで [G]とんで','[F]こわ[C]れて [G7]き[C]えた'],
+   seq:[4, 2,2, 2,2, 1,1,1,1],
+    mel:'G3:.5 C4:.25 C4:.25 C4:.5 D4:.5 E4:.5 G4:.5 G4:.5 r:.5 A4:.5 F4:.5 C5:.5 A4:.5 G4:.5 A4:.5 G4:.5 r:.5 E4:.5 E4:.5 D4:.5 C4:.5 D4:.5 G4:.5 G4:.5 r:.5 A4:.5 A4:.5 G4:.5 C4:.5 E4:.5 D4:.5 C4:.5 r:.5'},
   {id:'nanatsunoko',lang:'ja',t:'七つの子',c:'作詞 野口雨情（1945年没）／作曲 本居長世（1945年没）・1921年',key:'C',time:4,bpm:80,part:'1番',strum:'4拍子：↓ ↓↑ ↓ ↓↑',
-   lines:['[C]からす なぜ[F]なくの[C]','[C]からすは [G7]やまに','[F]かわいい [C]ななつの','[C]こがある[G7]から[C]よ'],
-   seq:[4,2,2, 4,4, 4,4, 4,2,2]},
+   lines:['[C]からす なぜなくの','[Am]からすは や[G]まに','[C]かわいい ななつの','[G7]こがあるから[C]よ'],
+   seq:[8, 4,4, 8, 4,4],
+    mel:'E5 D5:.5 C5:.5 D5 r E5:.5 C5:.5 A4:.5 C5:.5 G4 r A4:.5 G4:.5 E4:.5 G4:.5 A4 C5 D5:3 r E5:1.5 F5:.5 G5 E5 G5 A5:.5 G5:.5 E5 C5 D5:.5 D5:.5 E5:.5 C5:.5 A4 G4 C5:3 r'},
   {id:'harugakita',lang:'ja',t:'春が来た',c:'作詞 高野辰之（1947年没）／作曲 岡野貞一（1941年没）・1910年',key:'C',time:4,bpm:96,part:'1番',strum:'4拍子：↓ ↓ ↓ ↓（元気よく）',
-   lines:['[C]はるがきた [G7]はるがきた [C]どこにきた','[F]やまに[C]きた [F]さとに[C]きた [G7]のにも[C]きた'],
-   seq:[4,4,4, 2,2,2,2,2,2]},
+   lines:['[C]はるがきた はるがきた [F]どこに[C]き[G7]た','[C]やまにきた [F]さとにきた [C]のにも[G7]き[C]た'],
+   seq:[8,2,2,4, 4,4,2,2,4],
+    mel:'G4 E4:.5 F4:.5 G4 A4 G4 E4:.5 F4:.5 G4 C5 A4 G4 E4:1.5 C4:.5 D4:3 r G4 A4:.5 G4:.5 E4 G4 C5 D5:.5 C5:.5 A4 C5 G4 E5 D5:1.5 G4:.5 C5:3 r'},
   {id:'sakura',lang:'ja',t:'さくらさくら',c:'日本古謡（江戸時代の箏曲が元とされる）',key:'Am',time:4,bpm:60,part:'全体',strum:'4拍子：ゆったりアルペジオ。E の部分で少し間を取る',
    lines:['[Am]さくら さくら','[Dm]やよいのそらは [Am]みわたす[E]かぎり','[Dm]かすみかくもか [Am]においぞ[E]いずる','[Am]いざや いざや [Dm]みに[E]ゆか[Am]ん'],
    seq:[8, 8,6,2, 8,6,2, 8,2,2,4],
@@ -2150,14 +2163,17 @@ const SONGS=[
    seq:[12,2,2],
    mel:'C4 C4 C4:.6667 D4:.3333 E4 E4:.6667 D4:.3333 E4:.6667 F4:.3333 G4:2 C5:.3333 C5:.3333 C5:.3334 G4:.3333 G4:.3333 G4:.3334 E4:.3333 E4:.3333 E4:.3334 C4:.3333 C4:.3333 C4:.3334 G4:.6667 F4:.3333 E4:.6667 D4:.3333 C4:2'},
   {id:'susanna',lang:'en',t:'Oh! Susanna',c:'Words & music: Stephen Foster (1848)',key:'C',time:4,bpm:108,part:'Chorus',strum:'4拍子：カントリー風（ベース↓ ↑ ベース↓ ↑）',
-   lines:['[F]Oh! Su[C]sanna, oh don\'t you cry for [G]me','For I\'ve [C]come from Alabama with my [G]banjo on my [C]knee'],
-   seq:[2,4,2, 4,2,2]},
+   lines:['[F]Oh! Susanna, [C]oh don\'t you [G7]cry for me','For I\'ve [C]come from Alabama with my [G7]banjo on my [C]knee'],
+   seq:[8,4,4, 10,2,4],
+    mel:'F4:2 F4:2 A4 A4:2 A4 G4 G4 E4 C4 D4:3 C4:.5 D4:.5 E4 G4 G4:1.5 A4:.5 G4 E4 C4:1.5 D4:.5 E4 E4 D4 D4 C4:3 r'},
   {id:'scarborough',lang:'en',t:'Scarborough Fair',c:'Traditional English ballad（イギリス伝承）',key:'Am',time:3,bpm:84,part:'Verse 1',strum:'3拍子：アルペジオ（ドリアン調の D がポイント）',
-   lines:['[Am]Are you going to [G]Scarborough [Am]Fair?','[C]Parsley, [Am]sage, rose[D]mary and [Am]thyme','[Am]Remember [C]me to one who [G]lives there','[Am]She once was a [G]true love of [Am]mine'],
-   seq:[6,3,3, 3,3,3,3, 3,6,3, 6,3,3]},
+   lines:['[Am]Are you going to [G]Scarborough [Am]Fair?','[C]Parsley, [Am]sage, rose[D]mary and [Am]thyme','[Am]Remember [C]me to the one who [G]lives there','[Am]She once was a [G]true love of [Am]mine'],
+   seq:[6,3,3, 3,3,3,6, 3,6,6, 3,6,3],
+    mel:'A3:2 A3 E4 E4 E4 B3:1.5 C4:.5 B3 A3:3 r E4 G4 A4:2 G4 E4 F#4 D4 E4:4 r A4 A4:2 A4 G4:2 E4:.5 E4:.5 E4 D4 C4 B3 G3:2 G3:2 r A3:2 E4 D4:2 C4 B3 A3 G3 A3:3'},
   {id:'swinglow',lang:'en',t:'Swing Low, Sweet Chariot',c:'Traditional African-American spiritual（19世紀）',key:'G',time:4,bpm:76,part:'Chorus',strum:'4拍子：ゆったり ↓ ↓↑ ↓ ↓↑',
-   lines:['[G]Swing low, sweet [C]chari[G]ot','Coming for to carry me [D]home','[G]Swing low, sweet [C]chari[G]ot','Coming [D]for to carry me [G]home'],
-   seq:[4,2,6,4, 4,2,6,4,4]},
+   lines:['[G]Swing low, sweet [C]chari[G]ot','Coming for to carry me [D7]home','[G]Swing low, sweet [C]chari[G]ot','Coming for to carry [D7]me [G]home'],
+   seq:[4,2,6,4, 4,2,5,1,4],
+    mel:'B4 G4:2 B4 G4:2 G4:.5 E4:.75 D4:.75 G4:.5 G4:.5 G4:.5 G4:.5 B4:.5 B4:.5 D5 D5:4 E5:.5 D5:.5 B4:2 D5 G4:2 G4:.5 E4:.75 D4:.75 G4:.5 G4:.5 G4:.5 G4:.5 B4:.5 B4:.5 A4 G4:3 r'},
 ];
 
 const QUAL_MAP={'':'maj',m:'m','7':'7',M7:'M7',maj7:'M7',m7:'m7',mM7:'mM7','6':'6',m6:'m6',sus2:'sus2',sus4:'sus4','7sus4':'7sus4',add9:'add9','9':'9',dim:'dim',dim7:'dim7',m7b5:'m7b5',aug:'aug'};
@@ -2250,7 +2266,7 @@ function songSchedulePassRaw(){
     }
   });
   if(song.mel){ let t=0; song.mel.trim().split(/\s+/).forEach(tok=>{const [n,d]=tok.split(':'); const dur=d?+d:1;
-    if(n!=='r') keep(pluck(noteMidi(n)+SG.shift-(SG.shift>6?12:0),at(t),.8,{kind:'nylon',str:'mel'})); t+=dur; }); }
+    if(n!=='r') keep(pluck(noteMidi(n)+SG.shift-(SG.shift>6?12:0),at(t),.8,{kind:'nylon',str:'mel',dur:dur*bd*.97})); t+=dur; }); }
   SP.passes++;
 }
 function songPlay(){
@@ -2416,7 +2432,7 @@ function tabSchedule(){ onBus(TB.bus,tabScheduleRaw); }
 function tabScheduleRaw(){
   const p=TABS_DATA[TB.idx], c=ac(), bd=60/(p.bpm*TB.speed/100), {ev,len}=TB.data, start=TB.t0+TB.passes*len*bd;
   const sw=t=>{ if(!p.swing) return t; const b=Math.floor(t), fr=t-b; return b+(Math.abs(fr-.5)<1e-6?2/3:fr); };
-  const tu=tun(), kd=ins().kind; ev.forEach(e=>e.notes.forEach(n=>{const src=pluck(tu[n.s]+n.f,Math.max(0,start+sw(e.t)*bd-c.currentTime),e.notes.length>1?.4:.55,{kind:kd,str:n.s}); if(src) TB.srcs.push(src);}));
+  const tu=tun(), kd=ins().kind; ev.forEach(e=>e.notes.forEach(n=>{const src=pluck(tu[n.s]+n.f,Math.max(0,start+sw(e.t)*bd-c.currentTime),e.notes.length>1?.4:.55,{kind:kd,str:n.s,dur:(sw(e.t+e.d)-sw(e.t))*bd*.92}); if(src) TB.srcs.push(src);}));
   if($('#tabClick').checked) for(let k=0;k<Math.round(len);k++) metroHit(M.sound,start+k*bd,k%p.beats===0?0:1,M.vol*.55);
   TB.passes++;
 }
