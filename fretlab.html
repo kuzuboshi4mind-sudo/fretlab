@@ -630,7 +630,7 @@ setTimeout(done,3200);})();</script>
       <div class="card metro-main">
         <div class="pend" id="pend">
           <svg viewBox="0 0 280 232" aria-label="振り子（おもりを上下にドラッグでテンポ変更）">
-            <path class="pend-arc" d="M28 54 A205 205 0 0 1 252 54"/>
+            <path class="pend-arc" id="pendArc" d="M28 54 A205 205 0 0 1 252 54"/>
             <g id="pendArm"><line class="pend-rod" x1="140" y1="220" x2="140" y2="14"/><circle class="pend-w" id="pendW" cx="140" cy="110" r="16"/></g>
             <circle class="pend-pivot" cx="140" cy="220" r="5"/>
           </svg>
@@ -1504,6 +1504,15 @@ function setRhythm(v){
 const PD={last:null,dur:.6,dir:1,ang:0,raf:0,AMP:32};
 const PY0=36,PY1=186,lnLo=Math.log(30),lnHi=Math.log(260);
 function pendWeight(){ const w=$('#pendW'); if(!w) return; const f=(Math.log(M.bpm)-lnLo)/(lnHi-lnLo); w.setAttribute('cy',(PY0+f*(PY1-PY0)).toFixed(1)); }
+/* 振り幅：棒の先が画面の左右の端（少し内側）まで届く角度。画面の大きさが変わるたびに計算し直す */
+function pendAmp(){
+  const svg=$('#pend svg'); if(!svg) return; const r=svg.getBoundingClientRect(); if(!r.width) return;
+  const k=r.width/280, px=r.left+140*k, W=document.documentElement.clientWidth||innerWidth;
+  const reach=Math.min(px,W-px)-8, len=209.5*k;
+  PD.AMP=Math.max(32,Math.min(75,Math.asin(Math.min(1,reach/len))*180/Math.PI));
+  const R=200, a=PD.AMP*Math.PI/180, dx=(R*Math.sin(a)).toFixed(1), y=(220-R*Math.cos(a)).toFixed(1);
+  $('#pendArc').setAttribute('d',`M${(140-dx).toFixed(1)} ${y} A${R} ${R} 0 0 1 ${(140+ +dx).toFixed(1)} ${y}`);
+}
 function pendFrame(){
   const arm=$('#pendArm');
   if(M.playing&&M.owner==='metro'){
@@ -1525,7 +1534,8 @@ function initPend(){
   el.addEventListener('pointerdown',e=>{drag=true;el.setPointerCapture(e.pointerId);at(e);});
   el.addEventListener('pointermove',e=>{if(drag) at(e);});
   const end=()=>drag=false; el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
-  pendWeight();
+  pendWeight(); pendAmp(); addEventListener('resize',pendAmp);
+  if(window.ResizeObserver) new ResizeObserver(pendAmp).observe(svg);
 }
 (function initMetro(){
   const bs=$('#beatsSeg');
