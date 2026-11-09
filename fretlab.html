@@ -129,16 +129,16 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .nt{font-size:1.15em;line-height:1;margin-right:2px}
 .nt.n3{position:relative;font-size:.82em;letter-spacing:-.12em;margin-right:5px}
 .nt.n3::before{content:"3";position:absolute;left:50%;top:-.95em;transform:translateX(-50%);font-size:.62em;font-weight:700;letter-spacing:0}
-/* 拍子のダイヤル：楽譜の拍子記号と同じく、上が分子・下が分母。それぞれ左右になぞって選ぶ */
-.sigdial{display:flex;flex-direction:column;align-items:stretch;gap:2px;margin:6px auto 0;max-width:300px;transition:opacity .2s}
-.sigdial.locked{opacity:.45;pointer-events:none}
-.sigdial-bar{height:2px;background:var(--fg);border-radius:2px;margin:2px 0;opacity:.75}
-.dial{position:relative;min-width:0;height:54px;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior:contain;scrollbar-width:none;border-radius:14px;background:var(--surface);border:1px solid var(--line);
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 28%,#000 72%,transparent);mask-image:linear-gradient(90deg,transparent,#000 28%,#000 72%,transparent);touch-action:pan-x}
+/* 拍子：上の帯の「4/4」と同じ小さな縦並びの数字。数字を上下になぞるか、タップで変える */
+.sigline{display:flex;align-items:center;gap:16px}
+.sigline .label{margin:0;flex:0 0 auto;white-space:nowrap}
+.sigline .msg{margin:0;font-size:12.5px}
+.sigdial{display:flex;flex-direction:column;align-items:center;transition:opacity .2s}
+.sigdial.locked{opacity:.4;pointer-events:none}
+.dial{width:44px;height:30px;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none;touch-action:pan-y;border-radius:8px}
 .dial::-webkit-scrollbar{display:none}
-.dial .pad{flex:0 0 calc(50% - 26px)}
-.dial button{flex:0 0 52px;height:52px;scroll-snap-align:center;border:0;background:none;color:var(--muted);font:500 26px var(--display);cursor:pointer;transition:color .15s,transform .15s}
-.dial button[aria-selected="true"]{color:var(--fg);font-weight:700;transform:scale(1.2)}
+.dial:focus-visible{outline:2px solid var(--cobalt-a)}
+.dial button{display:block;width:100%;height:30px;scroll-snap-align:center;border:0;background:none;color:var(--fg);font:500 26px/30px var(--display);cursor:pointer;padding:0}
 .sig{display:flex;flex-direction:column;align-items:center;line-height:.9;font-family:var(--display);font-size:22px}
 .metro-start{width:100%;max-width:440px;background:transparent!important;color:var(--fg)!important;border:1.5px solid var(--fg)!important;border-radius:16px;font-size:20px;letter-spacing:.06em;padding:16px}
 .metro-start.on{background:var(--fg)!important;color:var(--bg)!important}
@@ -681,13 +681,12 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           <div style="flex:1;min-width:150px"><label class="label" for="soundSel">音色</label><select id="soundSel" style="width:100%"></select></div>
           <div style="flex:1;min-width:150px"><label class="label" for="rhythmSel">リズム</label><select id="rhythmSel" style="width:100%"></select></div>
         </div>
-        <div id="sigBox"><span class="label">拍子</span>
+        <div id="sigBox" class="sigline"><span class="label">拍子</span>
           <div class="sigdial" id="sigDial">
-            <div class="dial" id="dialTop" role="listbox" aria-label="拍子の分子（1小節の拍の数）"></div>
-            <div class="sigdial-bar" aria-hidden="true"></div>
-            <div class="dial" id="dialBot" role="listbox" aria-label="拍子の分母（1拍の音符）"></div>
+            <div class="dial" id="dialTop" role="listbox" aria-label="拍子の上の数（1小節の拍の数）。上下になぞるかタップで変更"></div>
+            <div class="dial" id="dialBot" role="listbox" aria-label="拍子の下の数（1拍の音符）。上下になぞるかタップで変更"></div>
           </div>
-          <div class="msg" id="sigNote" hidden>ドラムパターンの拍子（「クリックのみ」で変更できます）</div></div>
+          <div class="msg" id="sigNote" hidden>ドラムパターンの拍子です</div></div>
         <div id="drumBox" hidden>
           <div class="drumgrid-scroll" hidden><div class="drumgrid" id="drumGrid"></div></div>
           <div class="msg" id="drumNote"></div>
@@ -1655,18 +1654,18 @@ function initPend(){
     if(from!=='top') dialTop.set(n); if(from!=='bot') dialBot.set(d);
   };
   function makeDial(el,vals,onPick){
-    el.innerHTML='<div class="pad"></div>'+vals.map(v=>`<button type="button" role="option" data-v="${v}">${v}</button>`).join('')+'<div class="pad"></div>';
-    const btns=[...el.querySelectorAll('button')], H=52; let cur=null, tm=0, quiet=false, touched=0;
+    el.innerHTML=vals.map(v=>`<button type="button" role="option" tabindex="-1" data-v="${v}">${v}</button>`).join('');
+    const btns=[...el.querySelectorAll('button')], H=30; let cur=null, tm=0, quiet=false, touched=0, moved=0;
     // 指・マウスのホイールで動かしたときだけ選び直す（画面に出た瞬間などの自動スクロールでは変えない）
     ['pointerdown','touchstart','wheel'].forEach(ev=>el.addEventListener(ev,()=>touched=Date.now(),{passive:true}));
     const mark=v=>btns.forEach(b=>b.setAttribute('aria-selected',String(+b.dataset.v===v)));
-    const set=(v,smooth)=>{ cur=v; mark(v); const i=vals.indexOf(v); if(i<0||!el.clientWidth) return; quiet=true; el.scrollTo({left:i*H,behavior:smooth?'smooth':'auto'}); setTimeout(()=>quiet=false,smooth?400:60); };
-    el.addEventListener('scroll',()=>{ const i=Math.max(0,Math.min(vals.length-1,Math.round(el.scrollLeft/H))); mark(vals[i]);
-      if(Date.now()-touched<4000) touched=Date.now();
-      clearTimeout(tm); tm=setTimeout(()=>{ const j=Math.max(0,Math.min(vals.length-1,Math.round(el.scrollLeft/H)));
+    const set=(v,smooth)=>{ cur=v; mark(v); const i=vals.indexOf(v); if(i<0||!el.clientHeight) return; quiet=true; el.scrollTo({top:i*H,behavior:smooth?'smooth':'auto'}); setTimeout(()=>quiet=false,smooth?400:60); };
+    el.addEventListener('scroll',()=>{ const i=Math.max(0,Math.min(vals.length-1,Math.round(el.scrollTop/H))); mark(vals[i]);
+      if(Date.now()-touched<4000){ touched=Date.now(); if(!quiet) moved=Date.now(); }
+      clearTimeout(tm); tm=setTimeout(()=>{ const j=Math.max(0,Math.min(vals.length-1,Math.round(el.scrollTop/H)));
         if(quiet||Date.now()-touched>1500){ mark(cur); return; }
         if(vals[j]!==cur){ cur=vals[j]; onPick(cur); } },140); },{passive:true});
-    btns.forEach(b=>b.addEventListener('click',()=>{ const v=+b.dataset.v; set(v,true); onPick(v); }));
+    btns.forEach(b=>b.addEventListener('click',()=>{ if(Date.now()-moved<250) return; const v=vals[(vals.indexOf(cur)+1)%vals.length]; set(v,true); onPick(v); }));   // タップで次の数
     el.tabIndex=0; el.addEventListener('keydown',e=>{ const i=vals.indexOf(cur); if((e.key==='ArrowRight'||e.key==='ArrowDown')&&i<vals.length-1){e.preventDefault();set(vals[i+1],true);onPick(vals[i+1]);} if((e.key==='ArrowLeft'||e.key==='ArrowUp')&&i>0){e.preventDefault();set(vals[i-1],true);onPick(vals[i-1]);} });
     // 隠れているあいだは位置を合わせられないので、見えたときに合わせ直す
     if(window.IntersectionObserver) new IntersectionObserver(es=>es.forEach(x=>{ if(x.isIntersecting&&cur!=null) set(cur,false); })).observe(el);
