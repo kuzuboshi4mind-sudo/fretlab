@@ -1245,7 +1245,7 @@ function loadSamples(){
   SMP.loading=fetch('audio/manifest.json').then(r=>r.ok?r.json():Promise.reject(new Error('no audio'))).then(man=>{
     SMP.man=man;
     const files=[...man.guitar.map(n=>'guitar-'+n),...Object.keys(man.drums).map(k=>'drum-'+k),...man.marimba.map(n=>'marimba-'+n),...man.bass.map(n=>'bass-'+n),...man.nylon.map(n=>'nylon-'+n),...(man.chime||[]).map(n=>'chime-'+n)];
-    const wav=['metro-tick','metro-tock','kit-side-hard','kit-side-soft','kit-hat-hard','kit-hat-soft','kit-hat-pedal'];   // メトロノームの録音・本物のサイドスティックとハイハット（wav）
+    const wav=['metro-tick','metro-tock','kit-hat-hard','kit-hat-soft','kit-hat-pedal'];   // メトロノームの録音・本物のサイドスティックとハイハット（wav）
     wav.forEach(f=>fetch('audio/'+f+'.wav').then(r=>r.arrayBuffer()).then(b=>new Promise((ok,ng)=>ctx.decodeAudioData(b,ok,ng))).then(buf=>{SMP.buf[f]=buf;}).catch(()=>{}));
     return Promise.all(files.map(f=>fetch('audio/'+f+'.mp3').then(r=>r.arrayBuffer()).then(b=>new Promise((ok,ng)=>ctx.decodeAudioData(b,ok,ng))).then(buf=>{SMP.buf[f]=buf;}).catch(()=>{})));
   }).catch(()=>{});
@@ -1333,20 +1333,19 @@ function nz(t,ftype,freq,q,peak,dec){
 }
 // level: 0=アクセント 1=拍 2=細分。smp：録音の音（アクセント・拍・細分、音量、再生速度）。rec：強さごとに録り分けた本物の音 [ファイル, 音量]
 const SOUNDS=[
-  {id:'click1',name:'クリック1',smp:['drum-metrobell','drum-metroclick','drum-metroclick',1],fn:(t,l,v)=>tone(t,'square',[1760,1175,820][l],[.5,.32,.15][l]*v,.03)},
-  {id:'clk2',name:'クリック2',smp:['drum-metrobell','drum-metroclick','drum-metroclick',1,.74],fn:(t,l,v)=>tone(t,'square',[1300,870,610][l],[.5,.32,.15][l]*v,.035)},   // クリック1を低くした音
-  {id:'click3',name:'クリック3',fn:(t,l,v)=>{nz(t,'bandpass',[5200,4200,3600][l],1.4,[.85,.6,.26][l]*v,.009);tone(t,'triangle',[3200,2600,2300][l],[.22,.15,.07][l]*v,.008);}},   // 乾いた「カチッ」
+  {id:'click1',name:'クリック1',smp:['drum-metrobell','drum-metroclick','drum-metroclick',1.6],fn:(t,l,v)=>tone(t,'square',[1760,1175,820][l],[.8,.52,.24][l]*v,.03)},
+  {id:'clk2',name:'クリック2',smp:['drum-metrobell','drum-metroclick','drum-metroclick',1.6,.74],fn:(t,l,v)=>tone(t,'square',[1300,870,610][l],[.8,.52,.24][l]*v,.035)},   // クリック1を低くした音
+  {id:'click3',name:'クリック3',fn:(t,l,v)=>{nz(t,'bandpass',[5200,4200,3600][l],1.4,[3.2,2.2,1][l]*v,.01);tone(t,'triangle',[3200,2600,2300][l],[.85,.58,.27][l]*v,.008);}},   // 乾いた「カチッ」
   {id:'metro',name:'メトロノーム',fn:(t,l,v)=>metroRec(t,l,v)},
-  {id:'eclick1',name:'電子クリック1',fn:(t,l,v)=>tone(t,'square',[1760,1175,820][l],[.42,.28,.13][l]*v,.028)},   // 電子的な「ピッ」
-  {id:'eclick2',name:'電子クリック2',fn:(t,l,v)=>tone(t,'sine',[1320,880,660][l],[.6,.45,.2][l]*v,.08)},
+  {id:'eclick1',name:'電子クリック1',fn:(t,l,v)=>tone(t,'square',[1760,1175,820][l],[.75,.5,.23][l]*v,.028)},   // 電子的な「ピッ」
+  {id:'eclick2',name:'電子クリック2',fn:(t,l,v)=>tone(t,'sine',[1320,880,660][l],[.95,.7,.32][l]*v,.08)},
   {id:'wood',name:'ウッドブロック',smp:['drum-woodhi','drum-woodlo','drum-woodlo',1],fn:(t,l,v)=>{tone(t,'sine',[1250,880,700][l],[.8,.6,.28][l]*v,.07,[1150,820,650][l]);nz(t,'bandpass',[2400,1800,1500][l],8,[.25,.18,.08][l]*v,.02);}},
   {id:'cowbell',name:'カウベル',smp:['drum-cowbell','drum-cowbell','drum-cowbell',.9],fn:(t,l,v)=>{const p=[1.25,1,.9][l];[587,845].forEach(f=>tone(t,'square',f*p,[.16,.11,.05][l]*v,.22));}},
   {id:'claves',name:'クラベス',smp:['drum-claves','drum-claves','drum-claves',1],fn:(t,l,v)=>tone(t,'sine',[2800,2450,2100][l],[.7,.5,.22][l]*v,.045)},
-  {id:'side',name:'サイドスティック',rec:[['kit-side-hard',.95],['kit-side-soft',.95],['kit-side-soft',.5]],fn:(t,l,v)=>{tone(t,'triangle',[2000,1700,1500][l],[.5,.35,.15][l]*v,.02);nz(t,'bandpass',3500,2,[.45,.3,.12][l]*v,.02);}},   // 本物のサイドスティック（MuseScore_General、MIT）
   {id:'hat',name:'ハイハット',rec:[['kit-hat-hard',.8],['kit-hat-soft',.85],['kit-hat-pedal',.5]],fn:(t,l,v)=>nz(t,'highpass',[6000,7000,8000][l],.7,[.45,.3,.14][l]*v,[.09,.04,.03][l])},
 ];
-const SOUND_OLD=['click1','eclick2','wood','cowbell','claves','side','hat','click1','click1','click1','metro'];   // 前の版の並び（保存済みの番号を引き継ぐ）
-const SOUND_ALIAS={click2:'eclick1',beep:'eclick2',tri:'click1'};   // 名前を変えた・消した音色
+const SOUND_OLD=['click1','eclick2','wood','cowbell','claves','click1','hat','click1','click1','click1','metro'];   // 前の版の並び（保存済みの番号を引き継ぐ）
+const SOUND_ALIAS={click2:'eclick1',beep:'eclick2',tri:'click1',side:'click1'};   // 名前を変えた・消した音色
 const soundIndex=id=>Math.max(0,SOUNDS.findIndex(x=>x.id===(SOUND_ALIAS[id]||id)));
 // 機械式メトロノームの録音（チク・タクの2音）。拍ごとに交互に鳴らす。アクセントは少し高く強く、細分は小さく
 function metroRec(t,l,v){

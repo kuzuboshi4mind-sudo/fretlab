@@ -2,7 +2,7 @@
 Released under the MIT license ("I hereby release Fluid under the MIT license").
 Rendered with FluidSynth by tools/render_samples.py.
 
-kit-side-*.wav / kit-hat-*.wav（メトロノームのサイドスティック・ハイハット）:
+kit-hat-*.wav（メトロノームのハイハット）:
 MuseScore_General SoundFont (MIT, parts PD or CC0) by S. Christian Collins
 （Jazz キットの音を FluidSynth で書き出し、長さを整えたもの）
 
