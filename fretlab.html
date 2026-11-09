@@ -1436,24 +1436,19 @@ const DRUMS=[
   {id:'8shuffle',name:'8ビート（バウンス）',kit:'std',fill:1,beats:4,steps:16,swing:{unit:4,amt:.64,only:'k'},rows:{h:'X-x-X-x-X-x-X-x-',s:'----X-------X---',k:'x--x---x-x----x-'},note:'ハイハットとスネアはまっすぐ、バスドラムだけが16分の裏で弾むノリ。'},
   {id:'16beat',name:'16ビート',kit:'std',fill:1,beats:4,steps:16,rows:{h:'XoxoXoxoXoxoXoxo',s:'----X--o-o--X--o',k:'x-----x---x--x--'},feel:{jit:4}},
   {id:'16shuffle',name:'16ビート（バウンス）',kit:'std',fill:1,beats:4,steps:16,swing:{unit:4,amt:.6},rows:{h:'XoxoXoxoXoxoXoxo',s:'----X--o-o--X--o',k:'x-----x---x--x--'},note:'16分の裏を少し後ろにずらして弾ませる、ハネた16ビート。'},
+  {id:'funk',name:'ファンク／ソウル',kit:'room',fill:1,beats:4,steps:16,swing:{unit:4,amt:.57},rows:{h:'XoxoXoxoXoxoXo-o',O:'--------------x-',s:'---oX--o-o-oX--o',k:'x-x----x--x-x---'},note:'16分を少し跳ねさせ、スネアをわずかに遅らせたブラックミュージックのグルーヴ。ゴーストノートが命。',feel:{jit:4,lay:{s:12,h:3}}},
   {id:'pop',name:'アコースティック・ポップ',kit:'room',beats:4,steps:16,rows:{z:'xoxoxoxoxoxoxoxo',R:'----x-------x---',k:'x-----x-x-------'},feel:{lay:{R:6}}},
   {id:'ballad',name:'バラード',kit:'room',fill:1,beats:4,steps:16,rows:{h:'x-o-x-o-x-o-x-o-',R:'----x-------x---',k:'x-------x-x-----'},feel:{lay:{R:10,h:4}}},
   {id:'four',name:'4つ打ち（ダンス）',kit:'elec',beats:4,steps:16,rows:{O:'--x---x---x---x-',h:'x-o-x-o-x-o-x-o-',c:'----x-------x---',k:'X---X---X---X---'},feel:{jit:1}},
-  {id:'funk',name:'ファンク',kit:'std',fill:1,beats:4,steps:16,rows:{h:'XxoxXxoxXxoxXxox',s:'----X--o-o--X--o',k:'x--x------x--x--'},feel:{jit:3}},
-  {id:'punk',name:'パンク（2ビート）',kit:'power',vk:{s:'std'},fill:1,beats:4,steps:16,rows:{h:'x-x-x-x-x-x-x-x-',s:'--X---X---X---X-',k:'x---x---x---x---'},feel:{lay:{s:-3}}},
   {id:'metal',name:'メタル（ツーバス）',kit:'power',fill:1,beats:4,steps:16,rows:{r:'X---x---X---x---',s:'----X-------X---',k:'xxxxxxxxxxxxxxxx'},feel:{jit:3}},
   {id:'shuffle',name:'ブルース・シャッフル',kit:'room',fill:1,beats:4,steps:12,rows:{r:'X-xx-xX-xx-x',p:'---x-----x--',s:'---X-----X--',k:'x--o--x--o--'},note:'ライドで「タッ・タ」と跳ねる、ブルースの定番。'},
   {id:'swing',name:'ジャズ・スウィング',kit:'jazz',comp:1,beats:4,steps:12,rows:{r:'x--X-xx--X-x',p:'---x-----x--',k:'o--o--o--o--'},note:'ライドの「チーン・チキ」と2・4拍のハイハット。スネアは自由にコンピング。',feel:{lay:{r:-3,p:2}}},
   {id:'reggae',name:'レゲエ',kit:'std',beats:4,steps:16,rows:{h:'x-o-x-o-x-o-x-o-',R:'--------X-------',k:'--------X-------'},note:'3拍目だけにキックとリム。ギターは裏拍でカッティング。',feel:{lay:{R:8,k:8}}},
   {id:'bossa',name:'ボサノヴァ',kit:'brush',beats:4,steps:16,rows:{z:'xoxoxoxoxoxoxoxo',R:'x--x--x---x--x--',k:'x--xo--xx--xo--x'},note:'リムがボサノヴァ・クラーベ。テンポは120〜150が目安。'},
-  {id:'country',name:'カントリー（トレインビート）',kit:'std',vk:{s:'brush'},beats:4,steps:16,rows:{s:'xoxoXoxoxoxoXoxo',p:'----x-------x---',k:'x-------x-------'},note:'ブラシのスネアで16分を刻み、2・4拍を強く。汽車が走るようなノリ。',feel:{jit:5}},
-  {id:'country2',name:'カントリー（2ビート）',kit:'std',vk:{s:'brush'},fill:1,beats:4,steps:16,rows:{h:'x-o-x-o-x-o-x-o-',s:'----X-------X---',k:'x-------x-------'},note:'「ブン・チャッ」の2ビート。スネアはブラシ。ベースは1・3拍でルートと5度を交互に。'},
-  {id:'salsa',name:'ラテン（サルサ）',kit:'perc',beats:4,steps:16,
-    rows:{w:'----x---x-------x-----x-----x---',v:'X---x---X---x---',q:'o-o-x-o-o-o-----',Q:'------------X-X-',y:'X-x-x-xoX-x-x-xo',Y:'------x-------x-',z:'xoxoxoxoxoxoxoxo'},
-    note:'コンガのトゥンバオ、ボンゴのマルティージョ、カウベル、シェーカー。クラーベは2-3（2小節でひとまわり）。テンポは160〜200が目安。',feel:{jit:5}},
-  {id:'chacha',name:'ラテン（チャチャチャ）',kit:'perc',beats:4,steps:16,
-    rows:{v:'X---x---X---x---',G:'X-------X-------',g:'----x-x-----x-x-',q:'----x-------x---',Q:'------------X-X-',L:'X-------X-------',w:'x-----x-----x-------x---x-------',m:'x-x-x-x-x-x-x-x-'},
-    note:'ギロの「ギーッ・ギ・ギ」、カウベル、コンガの「チャチャチャ」。テンポは110〜130が目安。',feel:{jit:5}},
+  {id:'country',name:'カントリー',kit:'brush',beats:4,steps:16,rows:{s:'--o-x-o---o-x-o-',p:'----x-------x---',k:'x-------x-------'},note:'ブラシのスネアでやさしく「ブン・チャッ」の2ビート。ベースは1・3拍でルートと5度を交互に。',feel:{jit:6,lay:{s:8}}},
+  {id:'latin',name:'ラテン',kit:'latin',beats:4,steps:16,
+    rows:{w:'----x---x-------x-----x-----x---',v:'X---x---X---x---',G:'X-------X-------',g:'----x-x-----x-x-',y:'X-o-x-o-X-o-x-o-',Y:'------x-------x-',q:'o-o-X-o-o-o-----',Q:'------------X---',L:'--------------X-',z:'x-o-x-o-x-o-x-o-'},
+    note:'本物のコンガ・ボンゴ・ギロ・シェイカー・カウベル・クラベスによるソン／サルサのリズム。クラーベは2-3（2小節でひとまわり）。テンポは100〜180が目安。',feel:{jit:7,lay:{G:-4,g:-4}}},
   {id:'waltz',name:'ワルツ（3/4）',kit:'brush',beats:3,steps:6,rows:{h:'x-o-o-',s:'--x-x-',k:'X-----'}},
   {id:'six8',name:'6/8 バラード',kit:'room',fill:1,ts:[6,8],beats:2,steps:6,rows:{h:'xoxxox',s:'---X--',k:'x-----'},note:'BPMは付点4分音符（1小節に2拍）で数えます。',feel:{lay:{s:8}}},
 ];
@@ -1486,7 +1481,7 @@ function kitHit(kit,k,t,a){
   return true;
 }
 function drumHit(k,t,a,kit){
-  if(kit){ if(kitHit(kit,k,t,a)) return; loadKit(kit); }
+  if(kit){ if(kitHit(kit,k,t,a)) return; loadKit(kit); if(kit==='latin') return; }   // ラテンは読み込むまで鳴らさない（電子音で代わりに鳴らさない）
   const m=DRUM_SMP[k];
   if(m&&SMP.buf[m[0]]){ if(k==='h'||k==='O') choke('hh',t); const r=playBuf(m[0],t,a*m[1]); if((k==='h'||k==='O')&&r) SMP.voices.hh=r;
     if(k==='R'&&r){ const t0=Math.max(t,ctx.currentTime); r.g.gain.setValueAtTime(a*m[1],t0+.03); r.g.gain.setTargetAtTime(0,t0+.03,.03); r.s.stop(t0+.3); }   // リム：部屋の響きを削って、木の「コッ」だけ自然に減衰させる
@@ -1738,7 +1733,7 @@ function initPend(){
     if(!$('[data-panel="metronome"]').hidden){e.preventDefault();metroToggle();}
     else if(!$('[data-panel="progressions"]').hidden){e.preventDefault();progToggle();}
   });
-  setBpm(M.bpm); if(!DRUMS.find(d=>d.id===M.rhythm)) M.rhythm=M.rhythm==='half'||M.rhythm==='halfshuffle'?'8beat':'click'; setRhythm(M.rhythm);
+  setBpm(M.bpm); if(!DRUMS.find(d=>d.id===M.rhythm)) M.rhythm={half:'8beat',halfshuffle:'8beat',punk:'8beat',country2:'country',salsa:'latin',chacha:'latin'}[M.rhythm]||'click'; setRhythm(M.rhythm);
 })();
 
 /* ---------- tuner ---------- */
