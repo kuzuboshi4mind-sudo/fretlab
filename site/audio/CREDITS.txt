@@ -1,3 +1,10 @@
 音源: Fluid (R3) General MIDI SoundFont by Frank Wen
 Released under the MIT license ("I hereby release Fluid under the MIT license").
 Rendered with FluidSynth by tools/render_samples.py.
+
+kit-side-*.wav / kit-hat-*.wav（メトロノームのサイドスティック・ハイハット）:
+MuseScore_General SoundFont (MIT, parts PD or CC0) by S. Christian Collins
+（Jazz キットの音を FluidSynth で書き出し、長さを整えたもの）
+
+metro-tick.wav / metro-tock.wav（メトロノームの音色「メトロノーム」）:
+持ち主から提供された機械式メトロノームの録音から切り出したもの
