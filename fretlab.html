@@ -133,12 +133,13 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .sigline{display:flex;align-items:center;gap:16px}
 .sigline .label{margin:0;flex:0 0 auto;white-space:nowrap}
 .sigline .msg{margin:0;font-size:12.5px}
-.sigdial{display:flex;flex-direction:column;align-items:center;transition:opacity .2s}
+.sigdial{display:flex;flex-direction:column;align-items:center;gap:5px;transition:opacity .2s}
+.sigdial-bar{width:60px;height:2px;border-radius:2px;background:var(--fg)}
 .sigdial.locked{opacity:.4;pointer-events:none}
-.dial{width:44px;height:30px;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none;touch-action:pan-y;border-radius:8px}
+.dial{width:56px;height:44px;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none;touch-action:pan-y;border:1.5px solid var(--line);border-radius:12px;background:var(--surface)}
 .dial::-webkit-scrollbar{display:none}
 .dial:focus-visible{outline:2px solid var(--cobalt-a)}
-.dial button{display:block;width:100%;height:30px;scroll-snap-align:center;border:0;background:none;color:var(--fg);font:500 26px/30px var(--display);cursor:pointer;padding:0}
+.dial button{display:block;width:100%;height:41px;scroll-snap-align:center;border:0;background:none;color:var(--fg);font:600 32px/35px var(--display);cursor:pointer;padding:0 0 6px}
 .sig{display:flex;flex-direction:column;align-items:center;line-height:.9;font-family:var(--display);font-size:22px}
 .metro-start{width:100%;max-width:440px;background:transparent!important;color:var(--fg)!important;border:1.5px solid var(--fg)!important;border-radius:16px;font-size:20px;letter-spacing:.06em;padding:16px}
 .metro-start.on{background:var(--fg)!important;color:var(--bg)!important}
@@ -684,6 +685,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
         <div id="sigBox" class="sigline"><span class="label">拍子</span>
           <div class="sigdial" id="sigDial">
             <div class="dial" id="dialTop" role="listbox" aria-label="拍子の上の数（1小節の拍の数）。上下になぞるかタップで変更"></div>
+            <div class="sigdial-bar" aria-hidden="true"></div>
             <div class="dial" id="dialBot" role="listbox" aria-label="拍子の下の数（1拍の音符）。上下になぞるかタップで変更"></div>
           </div>
           <div class="msg" id="sigNote" hidden>ドラムパターンの拍子です</div></div>
@@ -1419,11 +1421,11 @@ const ROW_ORDER='CrbOhpzcsRTtk';
 // 記号：k キック、s スネア、R リム（サイドスティック）、c クラップ、h ハイハット（閉）、p ハイハット（足）、O オープンハイハット、r ライド、b ライドのカップ、C クラッシュ、t ロータム、T ハイタム、z シェイカー
 const DRUMS=[
   {id:'8beat',name:'8ビート',kit:'std',fill:1,beats:4,steps:16,rows:{h:'X-x-X-x-X-x-X-x-',s:'----X-------X---',k:'x-------x-x-----'}},
-  {id:'8shuffle',name:'8ビート・シャッフル',kit:'std',fill:1,beats:4,steps:12,rows:{h:'X-xX-xX-xX-x',s:'---X-----X--',k:'x-----x-x---'},note:'8分音符を3連の「タッ・タ」で跳ねるノリ。'},
+  {id:'8shuffle',name:'8ビート（バウンス）',kit:'std',fill:1,beats:4,steps:16,swing:{unit:2,amt:.63},rows:{h:'X-x-X-x-X-x-X-x-',s:'----X-----o-X---',k:'x-----x-x-------'},note:'8分の裏を少し後ろにずらして弾ませる、バウンスのノリ。'},
   {id:'16beat',name:'16ビート',kit:'std',fill:1,beats:4,steps:16,rows:{h:'XoxoXoxoXoxoXoxo',s:'----X--o-o--X--o',k:'x-----x---x--x--'},feel:{jit:4}},
-  {id:'16shuffle',name:'16ビート・シャッフル',kit:'std',fill:1,beats:4,steps:24,rows:{h:'X-ox-oX-ox-oX-ox-oX-ox-o',s:'------X----o--o---X----o',k:'x--------x-----x--------'},note:'16分音符を跳ねさせるノリ（ハネた16ビート）。'},
+  {id:'16shuffle',name:'16ビート（バウンス）',kit:'std',fill:1,beats:4,steps:16,swing:{unit:4,amt:.6},rows:{h:'XoxoXoxoXoxoXoxo',s:'----X--o-o--X--o',k:'x-----x---x--x--'},note:'16分の裏を少し後ろにずらして弾ませる、ハネた16ビート。'},
   {id:'half',name:'ハーフタイム',kit:'std',fill:1,beats:4,steps:16,rows:{h:'X-x-x-x-X-x-x-x-',s:'--------X-----o-',k:'x--x------x-----'},note:'スネアは3拍目だけ。テンポの半分の速さに感じる、ゆったり重いノリ。'},
-  {id:'halfshuffle',name:'ハーフタイム・シャッフル',kit:'std',fill:1,beats:4,steps:12,rows:{h:'X-xx-xX-xx-x',s:'-o--o-X--o-o',k:'x----x---x--'},note:'3連の真ん中に小さなゴーストノート、3拍目にスネア。'},
+  {id:'halfshuffle',name:'ハーフタイム（バウンス）',kit:'std',fill:1,beats:4,steps:16,swing:{unit:4,amt:.62},rows:{h:'X-x-x-x-X-x-x-x-',s:'--o---o-X--o--o-',k:'x--x------x-----'},note:'ゆったり重いハーフタイムを、16分の裏で弾ませる。小さなゴーストノートつき。'},
   {id:'pop',name:'アコースティック・ポップ',kit:'room',beats:4,steps:16,rows:{z:'xoxoxoxoxoxoxoxo',R:'----x-------x---',k:'x-----x-x-------'},feel:{lay:{R:6}}},
   {id:'ballad',name:'バラード',kit:'room',fill:1,beats:4,steps:16,rows:{h:'x-o-x-o-x-o-x-o-',R:'----x-------x---',k:'x-------x-x-----'},feel:{lay:{R:10,h:4}}},
   {id:'four',name:'4つ打ち（ダンス）',kit:'elec',beats:4,steps:16,rows:{O:'--x---x---x---x-',h:'x-o-x-o-x-o-x-o-',c:'----x-------x---',k:'X---X---X---X---'},feel:{jit:1}},
@@ -1525,8 +1527,18 @@ function drumBar(d,g,i){
   if(d.comp&&sub===2&&rnd()<.16) out.push([rnd()<.75?'s':'k','o']);
   return out;
 }
+// バウンス（跳ね）：8分または16分の裏を、ちょうど半分より少し後ろに置く（amt＝裏の位置。0.5でまっすぐ、0.67で3連）
+function swingOffset(d,g,i){
+  const sw=d.swing; if(!sw) return 0;
+  const bd=60/M.bpm, sub=i%g.tpb, x=sub/g.tpb;                       // 拍の中の位置（0〜1）
+  let y=x;
+  if(sw.unit===2){ y=x<.5?x/.5*sw.amt:sw.amt+(x-.5)/.5*(1-sw.amt); }
+  else { const h=Math.floor(x*2)/2, r=(x-h)*2; y=h+(r<.5?r/.5*sw.amt:sw.amt+(r-.5)/.5*(1-sw.amt))/2; }
+  return (y-x)*bd;
+}
 function humanHit(d,k,ch,t,i,g){
   const f=d.feel||{}, jit=(f.jit??6)/1000, lay=((f.lay&&f.lay[k])||0)/1000;
+  t+=swingOffset(d,g,i);
   let v=ch==='X'?1:ch==='x'?.78:.3;
   if((k==='h'||k==='z'||k==='r')&&ch!=='X') v*=i%(g.tpb)===0?1:.88;          // 拍の頭を少し強く
   v*=1+(rnd()-.5)*(ch==='o'?.3:.14);                                        // 毎回少しずつ違う強さ
@@ -1655,7 +1667,7 @@ function initPend(){
   };
   function makeDial(el,vals,onPick){
     el.innerHTML=vals.map(v=>`<button type="button" role="option" tabindex="-1" data-v="${v}">${v}</button>`).join('');
-    const btns=[...el.querySelectorAll('button')], H=30; let cur=null, tm=0, quiet=false, touched=0, moved=0;
+    const btns=[...el.querySelectorAll('button')], H=41; let cur=null, tm=0, quiet=false, touched=0, moved=0;
     // 指・マウスのホイールで動かしたときだけ選び直す（画面に出た瞬間などの自動スクロールでは変えない）
     ['pointerdown','touchstart','wheel'].forEach(ev=>el.addEventListener(ev,()=>touched=Date.now(),{passive:true}));
     const mark=v=>btns.forEach(b=>b.setAttribute('aria-selected',String(+b.dataset.v===v)));
@@ -2064,7 +2076,7 @@ const PROGS=[
   {c:'ロック',n:'IV始まりアンセム',p:'IV | I | V | V',d:'スタジアムロックのサビのように、IVから大きく広がる。'},
   {c:'ロック',n:'パワーリフ（Im–♭VI–♭VII–Im）',p:'Im | bVI | bVII | Im',d:'ヘヴィなマイナーリフの土台。ブリッジミュートの練習に。'},
   // ブルース
-  {c:'ブルース',n:'12小節ブルース',p:'I7 | I7 | I7 | I7 | IV7 | IV7 | I7 | I7 | V7 | IV7 | I7 | V7',d:'すべての基本。12小節で1コーラス。ドラムは「シャッフル」がおすすめ。'},
+  {c:'ブルース',n:'12小節ブルース',p:'I7 | I7 | I7 | I7 | IV7 | IV7 | I7 | I7 | V7 | IV7 | I7 | V7',d:'すべての基本。12小節で1コーラス。ドラムは「ブルース・シャッフル」がおすすめ。'},
   {c:'ブルース',n:'12小節ブルース（クイックチェンジ）',p:'I7 | IV7 | I7 | I7 | IV7 | IV7 | I7 | I7 | V7 | IV7 | I7 | V7',d:'2小節目で早めにIV7へ行く形。変化がついて弾きやすい。'},
   {c:'ブルース',n:'マイナーブルース',p:'Im7 | Im7 | Im7 | Im7 | IVm7 | IVm7 | Im7 | Im7 | bVI7 | V7 | Im7 | V7',d:'マイナーキーの12小節。♭VI7→V7の流れが渋い。'},
   {c:'ブルース',n:'8小節ブルース',p:'I7 | V7 | IV7 | IV7 | I7 | V7 | I7 IV7 | I7 V7',d:'短めの8小節フォーム。古いブルースやゴスペルに多い。'},
