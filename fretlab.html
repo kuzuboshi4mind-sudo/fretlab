@@ -1412,30 +1412,48 @@ const DRUM_VOICES={
   p:{n:'ハット（足）',fn:(t,a)=>nz(t,'highpass',6500,1,.22*a,.035)},
   b:{n:'カップ',fn:(t,a)=>tone(t,'sine',2600,.12*a,.5)},
   C:{n:'クラッシュ',fn:(t,a)=>nz(t,'highpass',4000,.7,.4*a,1.2)},
+  y:{n:'ボンゴ（高）',fn:(t,a)=>tone(t,'sine',420,.5*a,.12,380)},
+  Y:{n:'ボンゴ（低）',fn:(t,a)=>tone(t,'sine',300,.5*a,.15,270)},
+  q:{n:'コンガ（ミュート）',fn:(t,a)=>{tone(t,'sine',260,.4*a,.06);nz(t,'bandpass',1500,1,.2*a,.03);}},
+  Q:{n:'コンガ（オープン）',fn:(t,a)=>tone(t,'sine',240,.55*a,.3,225)},
+  L:{n:'コンガ（低）',fn:(t,a)=>tone(t,'sine',180,.55*a,.35,170)},
+  e:{n:'ティンバレス（高）',fn:(t,a)=>tone(t,'triangle',520,.4*a,.25)},
+  E:{n:'ティンバレス（低）',fn:(t,a)=>tone(t,'triangle',380,.4*a,.3)},
+  m:{n:'マラカス',fn:(t,a)=>nz(t,'highpass',6000,1,.2*a,.04)},
+  g:{n:'ギロ（短）',fn:(t,a)=>[0,.02,.04].forEach(d=>nz(t+d,'bandpass',3500,3,.2*a,.015))},
+  G:{n:'ギロ（長）',fn:(t,a)=>[0,.025,.05,.075,.1,.125].forEach(d=>nz(t+d,'bandpass',3500,3,.2*a,.015))},
+  v:{n:'カウベル',fn:(t,a)=>[587,845].forEach(f=>tone(t,'square',f,.12*a,.2))},
+  w:{n:'クラベス',fn:(t,a)=>tone(t,'sine',2500,.6*a,.05)},
   z:{n:'シェイカー',fn:(t,a)=>nz(t,'highpass',5500,1,.2*a,.06)},
 };
-const ROW_ORDER='CrbOhpzcsRTtk';
+const ROW_ORDER='CrbOhpzmgGvwyYqQLeEcsRTtk';
 // x=通常 X=強 o=弱（ゴースト） -=休符
 // ドラムパターン。rows の記号：X＝強く、x＝ふつう、o＝弱く（ゴーストノート）。kit＝鳴らすドラムセット（ジャンルに合わせた本物の録音）
 // feel：人が叩いているように揺らす量（jit＝タイミングの揺れ ms、lay：楽器ごとに後ろ／前にずらす ms）。fill：8小節ごとにフィルとクラッシュ
 // 記号：k キック、s スネア、R リム（サイドスティック）、c クラップ、h ハイハット（閉）、p ハイハット（足）、O オープンハイハット、r ライド、b ライドのカップ、C クラッシュ、t ロータム、T ハイタム、z シェイカー
 const DRUMS=[
   {id:'8beat',name:'8ビート',kit:'std',fill:1,beats:4,steps:16,rows:{h:'X-x-X-x-X-x-X-x-',s:'----X-------X---',k:'x-------x-x-----'}},
-  {id:'8shuffle',name:'8ビート（バウンス）',kit:'std',fill:1,beats:4,steps:16,swing:{unit:2,amt:.63},rows:{h:'X-x-X-x-X-x-X-x-',s:'----X-----o-X---',k:'x-----x-x-------'},note:'8分の裏を少し後ろにずらして弾ませる、バウンスのノリ。'},
+  {id:'8shuffle',name:'8ビート（バウンス）',kit:'std',fill:1,beats:4,steps:16,swing:{unit:4,amt:.64,only:'k'},rows:{h:'X-x-X-x-X-x-X-x-',s:'----X-------X---',k:'x--x---x-x----x-'},note:'ハイハットとスネアはまっすぐ、バスドラムだけが16分の裏で弾むノリ。'},
   {id:'16beat',name:'16ビート',kit:'std',fill:1,beats:4,steps:16,rows:{h:'XoxoXoxoXoxoXoxo',s:'----X--o-o--X--o',k:'x-----x---x--x--'},feel:{jit:4}},
   {id:'16shuffle',name:'16ビート（バウンス）',kit:'std',fill:1,beats:4,steps:16,swing:{unit:4,amt:.6},rows:{h:'XoxoXoxoXoxoXoxo',s:'----X--o-o--X--o',k:'x-----x---x--x--'},note:'16分の裏を少し後ろにずらして弾ませる、ハネた16ビート。'},
-  {id:'half',name:'ハーフタイム',kit:'std',fill:1,beats:4,steps:16,rows:{h:'X-x-x-x-X-x-x-x-',s:'--------X-----o-',k:'x--x------x-----'},note:'スネアは3拍目だけ。テンポの半分の速さに感じる、ゆったり重いノリ。'},
-  {id:'halfshuffle',name:'ハーフタイム（バウンス）',kit:'std',fill:1,beats:4,steps:16,swing:{unit:4,amt:.62},rows:{h:'X-x-x-x-X-x-x-x-',s:'--o---o-X--o--o-',k:'x--x------x-----'},note:'ゆったり重いハーフタイムを、16分の裏で弾ませる。小さなゴーストノートつき。'},
   {id:'pop',name:'アコースティック・ポップ',kit:'room',beats:4,steps:16,rows:{z:'xoxoxoxoxoxoxoxo',R:'----x-------x---',k:'x-----x-x-------'},feel:{lay:{R:6}}},
   {id:'ballad',name:'バラード',kit:'room',fill:1,beats:4,steps:16,rows:{h:'x-o-x-o-x-o-x-o-',R:'----x-------x---',k:'x-------x-x-----'},feel:{lay:{R:10,h:4}}},
   {id:'four',name:'4つ打ち（ダンス）',kit:'elec',beats:4,steps:16,rows:{O:'--x---x---x---x-',h:'x-o-x-o-x-o-x-o-',c:'----x-------x---',k:'X---X---X---X---'},feel:{jit:1}},
   {id:'funk',name:'ファンク',kit:'std',fill:1,beats:4,steps:16,rows:{h:'XxoxXxoxXxoxXxox',s:'----X--o-o--X--o',k:'x--x------x--x--'},feel:{jit:3}},
-  {id:'punk',name:'パンク（2ビート）',kit:'power',fill:1,beats:4,steps:16,rows:{h:'x-x-x-x-x-x-x-x-',s:'--X---X---X---X-',k:'x---x---x---x---'},feel:{lay:{s:-3}}},
+  {id:'punk',name:'パンク（2ビート）',kit:'power',vk:{s:'std'},fill:1,beats:4,steps:16,rows:{h:'x-x-x-x-x-x-x-x-',s:'--X---X---X---X-',k:'x---x---x---x---'},feel:{lay:{s:-3}}},
   {id:'metal',name:'メタル（ツーバス）',kit:'power',fill:1,beats:4,steps:16,rows:{r:'X---x---X---x---',s:'----X-------X---',k:'xxxxxxxxxxxxxxxx'},feel:{jit:3}},
   {id:'shuffle',name:'ブルース・シャッフル',kit:'room',fill:1,beats:4,steps:12,rows:{r:'X-xx-xX-xx-x',p:'---x-----x--',s:'---X-----X--',k:'x--o--x--o--'},note:'ライドで「タッ・タ」と跳ねる、ブルースの定番。'},
   {id:'swing',name:'ジャズ・スウィング',kit:'jazz',comp:1,beats:4,steps:12,rows:{r:'x--X-xx--X-x',p:'---x-----x--',k:'o--o--o--o--'},note:'ライドの「チーン・チキ」と2・4拍のハイハット。スネアは自由にコンピング。',feel:{lay:{r:-3,p:2}}},
   {id:'reggae',name:'レゲエ',kit:'std',beats:4,steps:16,rows:{h:'x-o-x-o-x-o-x-o-',R:'--------X-------',k:'--------X-------'},note:'3拍目だけにキックとリム。ギターは裏拍でカッティング。',feel:{lay:{R:8,k:8}}},
   {id:'bossa',name:'ボサノヴァ',kit:'brush',beats:4,steps:16,rows:{z:'xoxoxoxoxoxoxoxo',R:'x--x--x---x--x--',k:'x--xo--xx--xo--x'},note:'リムがボサノヴァ・クラーベ。テンポは120〜150が目安。'},
+  {id:'country',name:'カントリー（トレインビート）',kit:'std',vk:{s:'brush'},beats:4,steps:16,rows:{s:'xoxoXoxoxoxoXoxo',p:'----x-------x---',k:'x-------x-------'},note:'ブラシのスネアで16分を刻み、2・4拍を強く。汽車が走るようなノリ。',feel:{jit:5}},
+  {id:'country2',name:'カントリー（2ビート）',kit:'std',vk:{s:'brush'},fill:1,beats:4,steps:16,rows:{h:'x-o-x-o-x-o-x-o-',s:'----X-------X---',k:'x-------x-------'},note:'「ブン・チャッ」の2ビート。スネアはブラシ。ベースは1・3拍でルートと5度を交互に。'},
+  {id:'salsa',name:'ラテン（サルサ）',kit:'perc',beats:4,steps:16,
+    rows:{w:'----x---x-------x-----x-----x---',v:'X---x---X---x---',q:'o-o-x-o-o-o-----',Q:'------------X-X-',y:'X-x-x-xoX-x-x-xo',Y:'------x-------x-',z:'xoxoxoxoxoxoxoxo'},
+    note:'コンガのトゥンバオ、ボンゴのマルティージョ、カウベル、シェーカー。クラーベは2-3（2小節でひとまわり）。テンポは160〜200が目安。',feel:{jit:5}},
+  {id:'chacha',name:'ラテン（チャチャチャ）',kit:'perc',beats:4,steps:16,
+    rows:{v:'X---x---X---x---',G:'X-------X-------',g:'----x-x-----x-x-',q:'----x-------x---',Q:'------------X-X-',L:'X-------X-------',w:'x-----x-----x-------x---x-------',m:'x-x-x-x-x-x-x-x-'},
+    note:'ギロの「ギーッ・ギ・ギ」、カウベル、コンガの「チャチャチャ」。テンポは110〜130が目安。',feel:{jit:5}},
   {id:'waltz',name:'ワルツ（3/4）',kit:'brush',beats:3,steps:6,rows:{h:'x-o-o-',s:'--x-x-',k:'X-----'}},
   {id:'six8',name:'6/8 バラード',kit:'room',fill:1,ts:[6,8],beats:2,steps:6,rows:{h:'xoxxox',s:'---X--',k:'x-----'},note:'BPMは付点4分音符（1小節に2拍）で数えます。',feel:{lay:{s:8}}},
 ];
@@ -1449,7 +1467,7 @@ function metroHit(idx,t,l,v){
 const DRUM_SMP={k:['drum-kick',1],s:['drum-snare',.85],R:['drum-sidestick',.8],c:['drum-clap',.8],h:['drum-hat',.55],O:['drum-openhat',.5],r:['drum-ride',.5],t:['drum-tom',.8],z:['drum-shaker',.5]};
 /* ジャンルごとのドラムセット（MuseScore_General の録音、MIT）。選んだときに読み込む。強く叩いた音と弱く叩いた音を使い分ける */
 const KIT={man:null,loading:{},ready:{}};
-const KMIX={k:1,s:.85,R:.75,c:.8,h:.5,p:.45,O:.42,r:.55,b:.5,C:.48,t:.8,T:.8,z:.45};
+const KMIX={k:1,s:.85,R:.75,c:.8,h:.5,p:.45,O:.42,r:.55,b:.5,C:.48,t:.8,T:.8,z:.45,y:.7,Y:.7,q:.7,Q:.75,L:.75,e:.6,E:.6,m:.4,g:.5,G:.5,v:.5,w:.6};
 function loadKit(kit){
   if(!kit||KIT.ready[kit]||KIT.loading[kit]) return;
   const c=ac();
@@ -1460,10 +1478,10 @@ function loadKit(kit){
   }).catch(()=>{ KIT.loading[kit]=null; });
 }
 function kitHit(kit,k,t,a){
-  const ratio=KIT.ready[kit]&&KIT.man[kit]&&KIT.man[kit][k]; if(!ratio) return false;
+  const ratio=KIT.ready[kit]&&KIT.man[kit]&&KIT.man[kit][k]; if(!ratio) return false;   // KMIX にない音は 0.7
   const soft=a<.55, n=`kits/${kit}-${k}-${soft?'s':'h'}`; if(!SMP.buf[n]) return false;
   if(k==='h'||k==='p'||k==='O') choke('hh',t);
-  const r=playBuf(n,t,KMIX[k]*(soft?Math.min(1.6,a/ratio):a));
+  const r=playBuf(n,t,(KMIX[k]??.7)*(soft?Math.min(1.6,a/ratio):a));
   if(r&&(k==='O'||k==='h'||k==='p')) SMP.voices.hh=r;
   return true;
 }
@@ -1518,7 +1536,7 @@ function drumBar(d,g,i){
     return out;
   }
   const openAt=d.fill&&M.bar%4===3&&!fillBar&&i===g.beats*g.tpb-Math.max(1,Math.round(g.tpb/2));
-  for(const k in d.rows){ let ch=d.rows[k][i]; if(!ch||ch==='-') continue;
+  for(const k in d.rows){ const row=d.rows[k], nb=Math.max(1,Math.round(row.length/d.steps)); let ch=row[(M.bar%nb)*d.steps+i]; if(!ch||ch==='-') continue;   // 2小節で1まわりのパターン（クラーベなど）
     if(crash&&(k==='h'||k==='r'||k==='z')) continue;
     if(openAt&&k==='h'){ out.push(['O','x']); continue; }
     out.push([k,ch]); }
@@ -1538,13 +1556,13 @@ function swingOffset(d,g,i){
 }
 function humanHit(d,k,ch,t,i,g){
   const f=d.feel||{}, jit=(f.jit??6)/1000, lay=((f.lay&&f.lay[k])||0)/1000;
-  t+=swingOffset(d,g,i);
+  if(!d.swing||!d.swing.only||d.swing.only===k) t+=swingOffset(d,g,i);
   let v=ch==='X'?1:ch==='x'?.78:.3;
   if((k==='h'||k==='z'||k==='r')&&ch!=='X') v*=i%(g.tpb)===0?1:.88;          // 拍の頭を少し強く
   v*=1+(rnd()-.5)*(ch==='o'?.3:.14);                                        // 毎回少しずつ違う強さ
   const w={k:.5,s:.7,R:.7,C:.4}[k]??1;
   const tt=t+lay+(rnd()-.5)*2*jit*w;                                         // ほんの少し前後にずれる
-  drumHit(k,Math.max(tt,ctx.currentTime),v*M.vol,d.kit);
+  drumHit(k,Math.max(tt,ctx.currentTime),v*M.vol,(d.vk&&d.vk[k])||d.kit);
 }
 let showSig=()=>{};
 function drawDrumGrid(){
@@ -1555,7 +1573,7 @@ function drawDrumGrid(){
   el.style.gridTemplateColumns=`auto repeat(${d.steps},16px)`;
   const tpb=d.steps/d.beats; let s='';
   rows.forEach(k=>{s+=`<div class="rl">${DRUM_VOICES[k].n}</div>`;
-    [...d.rows[k]].forEach((ch,i)=>s+=`<div class="st${i%tpb===0?' beat1':''}${ch==='X'?' acc':ch==='x'?' on':ch==='o'?' gh':''}" data-i="${i}"></div>`);});
+    [...d.rows[k].slice(0,d.steps)].forEach((ch,i)=>s+=`<div class="st${i%tpb===0?' beat1':''}${ch==='X'?' acc':ch==='x'?' on':ch==='o'?' gh':''}" data-i="${i}"></div>`);});
   el.innerHTML=s; $('#drumNote').textContent=d.note||'';
 }
 function schedule(){
@@ -1616,7 +1634,7 @@ function syncPlayButtons(){
 function metroToggle(){ if(M.playing&&M.owner==='metro') transportStop(); else { transportStart('metro'); pendKick(); } }
 let termT=0; function flashTerm(txt){ const el=$('#tempoTerm'); el.textContent=txt; clearTimeout(termT); termT=setTimeout(()=>setBpm(M.bpm),1400); }
 function setRhythm(v){
-  M.rhythm=v;store.set('rhythm',v);M.subI=0;M.beat=0; const dd=drum(); if(dd) loadKit(dd.kit);
+  M.rhythm=v;store.set('rhythm',v);M.subI=0;M.beat=0; const dd=drum(); if(dd){ loadKit(dd.kit); Object.values(dd.vk||{}).forEach(loadKit); }
   $('#rhythmSel').value=v; const pr=$('#progRhythm'); if(pr) pr.value=v;
   drawDrumGrid();drawBeats();
 }
@@ -1720,7 +1738,7 @@ function initPend(){
     if(!$('[data-panel="metronome"]').hidden){e.preventDefault();metroToggle();}
     else if(!$('[data-panel="progressions"]').hidden){e.preventDefault();progToggle();}
   });
-  setBpm(M.bpm); if(!DRUMS.find(d=>d.id===M.rhythm)) M.rhythm='click'; setRhythm(M.rhythm);
+  setBpm(M.bpm); if(!DRUMS.find(d=>d.id===M.rhythm)) M.rhythm=M.rhythm==='half'||M.rhythm==='halfshuffle'?'8beat':'click'; setRhythm(M.rhythm);
 })();
 
 /* ---------- tuner ---------- */
