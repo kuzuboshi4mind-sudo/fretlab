@@ -610,8 +610,8 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
   <div class="sb">ギター練習帳</div>
   <button type="button" class="intro-go" id="introGo">はじめる</button>
 </div>
-<script>(function(){const el=document.getElementById('intro');window.__introT0=performance.now();let seen=false;try{seen=sessionStorage.getItem('fretlab.intro')==='1';sessionStorage.setItem('fretlab.intro','1');}catch(e){}
-if(seen){el.remove();return;}
+<script>(function(){const el=document.getElementById('intro');window.__introT0=performance.now();
+// オープニングは開くたびに出す（「はじめる」で入る）
 el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intro-out')el.remove();});})();</script>
 <div class="botanic" aria-hidden="true"></div>
 <div class="wrap">
