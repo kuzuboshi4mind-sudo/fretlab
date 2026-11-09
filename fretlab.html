@@ -129,17 +129,18 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .nt{font-size:1.15em;line-height:1;margin-right:2px}
 .nt.n3{position:relative;font-size:.82em;letter-spacing:-.12em;margin-right:5px}
 .nt.n3::before{content:"3";position:absolute;left:50%;top:-.95em;transform:translateX(-50%);font-size:.62em;font-weight:700;letter-spacing:0}
-/* 拍子のダイヤル：分子と分母を上下になぞって選ぶ */
-.sigdial{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px}
-.sigdial-bar{width:30px;height:2px;background:var(--fg);transform:rotate(-60deg);opacity:.5}
-.dial{position:relative;width:88px;height:132px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none;border:1px solid var(--line);border-radius:16px;background:var(--surface);
-  -webkit-mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);touch-action:pan-y}
+/* 拍子のダイヤル：楽譜の拍子記号と同じく、上が分子・下が分母。それぞれ左右になぞって選ぶ */
+.sigdial{display:flex;flex-direction:column;align-items:stretch;gap:2px;margin-top:6px;max-width:420px}
+.sigrow{display:flex;align-items:center;gap:10px}
+.sigcap{flex:0 0 64px;font-size:13px;font-weight:600;color:var(--fg);line-height:1.2}
+.sigcap small{display:block;font-size:10.5px;font-weight:400;color:var(--muted)}
+.sigdial-bar{flex:1;height:2px;background:var(--fg);border-radius:2px;margin:2px 0;opacity:.75}
+.dial{position:relative;flex:1;min-width:0;height:54px;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior:contain;scrollbar-width:none;border-radius:14px;background:var(--surface);border:1px solid var(--line);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 28%,#000 72%,transparent);mask-image:linear-gradient(90deg,transparent,#000 28%,#000 72%,transparent);touch-action:pan-x}
 .dial::-webkit-scrollbar{display:none}
-.dial .pad{height:44px}
-.dial button{display:block;width:100%;height:44px;scroll-snap-align:center;border:0;background:none;color:var(--muted);font:500 26px var(--display);cursor:pointer;transition:color .15s,transform .15s}
-.dial button[aria-selected="true"]{color:var(--fg);font-weight:700;transform:scale(1.12)}
-.sigdial{position:relative}
-.sigdial::before{content:"";position:absolute;left:50%;top:50%;width:min(100%,250px);height:44px;transform:translate(-50%,-50%);border-block:1px solid var(--line);pointer-events:none}
+.dial .pad{flex:0 0 calc(50% - 26px)}
+.dial button{flex:0 0 52px;height:52px;scroll-snap-align:center;border:0;background:none;color:var(--muted);font:500 26px var(--display);cursor:pointer;transition:color .15s,transform .15s}
+.dial button[aria-selected="true"]{color:var(--fg);font-weight:700;transform:scale(1.2)}
 .sig{display:flex;flex-direction:column;align-items:center;line-height:.9;font-family:var(--display);font-size:22px}
 .metro-start{width:100%;max-width:440px;background:transparent!important;color:var(--fg)!important;border:1.5px solid var(--fg)!important;border-radius:16px;font-size:20px;letter-spacing:.06em;padding:16px}
 .metro-start.on{background:var(--fg)!important;color:var(--bg)!important}
@@ -690,9 +691,9 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
         <div id="clickOpts" class="stack">
         <div><span class="label">拍子</span>
           <div class="sigdial" id="sigDial">
-            <div class="dial" id="dialTop" role="listbox" aria-label="拍子の分子（1小節の拍の数）"></div>
-            <div class="sigdial-bar" aria-hidden="true"></div>
-            <div class="dial" id="dialBot" role="listbox" aria-label="拍子の分母（1拍の音符）"></div>
+            <div class="sigrow"><span class="sigcap">分子<small>拍の数</small></span><div class="dial" id="dialTop" role="listbox" aria-label="拍子の分子（1小節の拍の数）"></div></div>
+            <div class="sigrow"><span class="sigcap"></span><div class="sigdial-bar" aria-hidden="true"></div></div>
+            <div class="sigrow"><span class="sigcap">分母<small>1拍の音符</small></span><div class="dial" id="dialBot" role="listbox" aria-label="拍子の分母（1拍の音符）"></div></div>
           </div></div>
         <div><span class="label">音符</span>
           <div class="seg" id="subSeg">
@@ -1406,27 +1407,37 @@ const DRUM_VOICES={
   h:{n:'ハット',fn:(t,a)=>nz(t,'highpass',7500,1,.32*a,.045)},
   O:{n:'オープン',fn:(t,a)=>nz(t,'highpass',7000,1,.28*a,.28)},
   r:{n:'ライド',fn:(t,a)=>{nz(t,'bandpass',5200,1.5,.26*a,.45);tone(t,'square',3150,.025*a,.4);}},
-  t:{n:'タム',fn:(t,a)=>tone(t,'sine',130,.7*a,.3,85)},
+  t:{n:'ロータム',fn:(t,a)=>tone(t,'sine',110,.7*a,.32,75)},
+  T:{n:'ハイタム',fn:(t,a)=>tone(t,'sine',170,.65*a,.26,120)},
+  p:{n:'ハット（足）',fn:(t,a)=>nz(t,'highpass',6500,1,.22*a,.035)},
+  b:{n:'カップ',fn:(t,a)=>tone(t,'sine',2600,.12*a,.5)},
+  C:{n:'クラッシュ',fn:(t,a)=>nz(t,'highpass',4000,.7,.4*a,1.2)},
   z:{n:'シェイカー',fn:(t,a)=>nz(t,'highpass',5500,1,.2*a,.06)},
 };
-const ROW_ORDER='rOhzcsRtk';
+const ROW_ORDER='CrbOhpzcsRTtk';
 // x=通常 X=強 o=弱（ゴースト） -=休符
+// ドラムパターン。rows の記号：X＝強く、x＝ふつう、o＝弱く（ゴーストノート）。kit＝鳴らすドラムセット（ジャンルに合わせた本物の録音）
+// feel：人が叩いているように揺らす量（jit＝タイミングの揺れ ms、lay：楽器ごとに後ろ／前にずらす ms）。fill：8小節ごとにフィルとクラッシュ
+// 記号：k キック、s スネア、R リム（サイドスティック）、c クラップ、h ハイハット（閉）、p ハイハット（足）、O オープンハイハット、r ライド、b ライドのカップ、C クラッシュ、t ロータム、T ハイタム、z シェイカー
 const DRUMS=[
-  {id:'8beat',name:'8ビート',beats:4,steps:16,rows:{h:'X-x-X-x-X-x-X-x-',s:'----X-------X---',k:'x-------x-x-----'}},
-  {id:'16beat',name:'16ビート',beats:4,steps:16,rows:{h:'Xoxoxoxoxoxoxoxo',s:'----X--o-o--X---',k:'x-----x---x--x--'}},
-  {id:'pop',name:'アコースティック・ポップ',beats:4,steps:16,rows:{z:'xoxoxoxoxoxoxoxo',R:'----x-------x---',k:'x-----x-x-------'}},
-  {id:'ballad',name:'バラード',beats:4,steps:16,rows:{h:'o-o-o-o-o-o-o-o-',R:'----x-------x---',k:'x-------x-------'}},
-  {id:'half',name:'ハーフタイム',beats:4,steps:16,rows:{h:'x-x-x-x-x-x-x-x-',s:'--------X-------',k:'x------x--x-----'}},
-  {id:'four',name:'4つ打ち（ダンス）',beats:4,steps:16,rows:{O:'--x---x---x---x-',h:'x---x---x---x---',c:'----x-------x---',k:'X---X---X---X---'}},
-  {id:'funk',name:'ファンク',beats:4,steps:16,rows:{h:'Xxxxxxxxxxxxxxxx',s:'----X--o-o--X--o',k:'x--x------x--x--'}},
-  {id:'punk',name:'パンク（2ビート）',beats:4,steps:16,rows:{h:'x-x-x-x-x-x-x-x-',s:'--X---X---X---X-',k:'x---x---x---x---'}},
-  {id:'metal',name:'メタル（ツーバス）',beats:4,steps:16,rows:{r:'X---x---X---x---',s:'----X-------X---',k:'xxxxxxxxxxxxxxxx'}},
-  {id:'shuffle',name:'シャッフル',beats:4,steps:12,rows:{h:'X-xx-xX-xx-x',s:'---X-----X--',k:'x-----x--o--'},note:'3連符の1拍目と3つ目を弾む「タッ・タ」のノリ。ブルースの定番。'},
-  {id:'swing',name:'ジャズ・スウィング',beats:4,steps:12,rows:{r:'x--X-xx--X-x',h:'---x-----x--',k:'o--o--o--o--'},note:'ライドの「チーン・チキ」と2・4拍のハイハット。'},
-  {id:'reggae',name:'レゲエ（ワンドロップ）',beats:4,steps:16,rows:{h:'x-x-x-x-x-x-x-x-',R:'--------X-------',k:'--------X-------'},note:'3拍目だけにキックとリム。ギターは裏拍でカッティング。'},
-  {id:'bossa',name:'ボサノヴァ',beats:4,steps:16,rows:{z:'xoxoxoxoxoxoxoxo',R:'x--x--x---x--x--',k:'x--xx--xx--xx--x'},note:'リムがボサノヴァ・クラーベ。テンポは120〜150が目安。'},
-  {id:'waltz',name:'ワルツ（3/4）',beats:3,steps:6,rows:{h:'x-x-x-',s:'--x-x-',k:'X-----'}},
-  {id:'six8',name:'6/8 バラード',beats:2,steps:6,rows:{h:'xoxxox',s:'---X--',k:'x-----'},note:'BPMは付点4分音符（1小節に2拍）で数えます。'},
+  {id:'8beat',name:'8ビート',kit:'std',fill:1,beats:4,steps:16,rows:{h:'X-x-X-x-X-x-X-x-',s:'----X-------X---',k:'x-------x-x-----'}},
+  {id:'8shuffle',name:'8ビート・シャッフル',kit:'std',fill:1,beats:4,steps:12,rows:{h:'X-xX-xX-xX-x',s:'---X-----X--',k:'x-----x-x---'},note:'8分音符を3連の「タッ・タ」で跳ねるノリ。'},
+  {id:'16beat',name:'16ビート',kit:'std',fill:1,beats:4,steps:16,rows:{h:'XoxoXoxoXoxoXoxo',s:'----X--o-o--X--o',k:'x-----x---x--x--'},feel:{jit:4}},
+  {id:'16shuffle',name:'16ビート・シャッフル',kit:'std',fill:1,beats:4,steps:24,rows:{h:'X-ox-oX-ox-oX-ox-oX-ox-o',s:'------X----o--o---X----o',k:'x--------x-----x--------'},note:'16分音符を跳ねさせるノリ（ハネた16ビート）。'},
+  {id:'half',name:'ハーフタイム',kit:'std',fill:1,beats:4,steps:16,rows:{h:'X-x-x-x-X-x-x-x-',s:'--------X-----o-',k:'x--x------x-----'},note:'スネアは3拍目だけ。テンポの半分の速さに感じる、ゆったり重いノリ。'},
+  {id:'halfshuffle',name:'ハーフタイム・シャッフル',kit:'std',fill:1,beats:4,steps:12,rows:{h:'X-xx-xX-xx-x',s:'-o--o-X--o-o',k:'x----x---x--'},note:'3連の真ん中に小さなゴーストノート、3拍目にスネア。'},
+  {id:'pop',name:'アコースティック・ポップ',kit:'room',beats:4,steps:16,rows:{z:'xoxoxoxoxoxoxoxo',R:'----x-------x---',k:'x-----x-x-------'},feel:{lay:{R:6}}},
+  {id:'ballad',name:'バラード',kit:'room',fill:1,beats:4,steps:16,rows:{h:'x-o-x-o-x-o-x-o-',R:'----x-------x---',k:'x-------x-x-----'},feel:{lay:{R:10,h:4}}},
+  {id:'four',name:'4つ打ち（ダンス）',kit:'elec',beats:4,steps:16,rows:{O:'--x---x---x---x-',h:'x-o-x-o-x-o-x-o-',c:'----x-------x---',k:'X---X---X---X---'},feel:{jit:1}},
+  {id:'funk',name:'ファンク',kit:'std',fill:1,beats:4,steps:16,rows:{h:'XxoxXxoxXxoxXxox',s:'----X--o-o--X--o',k:'x--x------x--x--'},feel:{jit:3}},
+  {id:'punk',name:'パンク（2ビート）',kit:'power',fill:1,beats:4,steps:16,rows:{h:'x-x-x-x-x-x-x-x-',s:'--X---X---X---X-',k:'x---x---x---x---'},feel:{lay:{s:-3}}},
+  {id:'metal',name:'メタル（ツーバス）',kit:'power',fill:1,beats:4,steps:16,rows:{r:'X---x---X---x---',s:'----X-------X---',k:'xxxxxxxxxxxxxxxx'},feel:{jit:3}},
+  {id:'shuffle',name:'ブルース・シャッフル',kit:'room',fill:1,beats:4,steps:12,rows:{r:'X-xx-xX-xx-x',p:'---x-----x--',s:'---X-----X--',k:'x--o--x--o--'},note:'ライドで「タッ・タ」と跳ねる、ブルースの定番。'},
+  {id:'swing',name:'ジャズ・スウィング',kit:'jazz',comp:1,beats:4,steps:12,rows:{r:'x--X-xx--X-x',p:'---x-----x--',k:'o--o--o--o--'},note:'ライドの「チーン・チキ」と2・4拍のハイハット。スネアは自由にコンピング。',feel:{lay:{r:-3,p:2}}},
+  {id:'reggae',name:'レゲエ',kit:'std',beats:4,steps:16,rows:{h:'x-o-x-o-x-o-x-o-',R:'--------X-------',k:'--------X-------'},note:'3拍目だけにキックとリム。ギターは裏拍でカッティング。',feel:{lay:{R:8,k:8}}},
+  {id:'bossa',name:'ボサノヴァ',kit:'brush',beats:4,steps:16,rows:{z:'xoxoxoxoxoxoxoxo',R:'x--x--x---x--x--',k:'x--xo--xx--xo--x'},note:'リムがボサノヴァ・クラーベ。テンポは120〜150が目安。'},
+  {id:'waltz',name:'ワルツ（3/4）',kit:'brush',beats:3,steps:6,rows:{h:'x-o-o-',s:'--x-x-',k:'X-----'}},
+  {id:'six8',name:'6/8 バラード',kit:'room',fill:1,beats:2,steps:6,rows:{h:'xoxxox',s:'---X--',k:'x-----'},note:'BPMは付点4分音符（1小節に2拍）で数えます。',feel:{lay:{s:8}}},
 ];
 // 録音音源の割り当て（[アクセント, 拍, 細分]）。null の音色は合成音のまま
 function metroHit(idx,t,l,v){
@@ -1436,7 +1447,28 @@ function metroHit(idx,t,l,v){
   S.fn(t,l,v);
 }
 const DRUM_SMP={k:['drum-kick',1],s:['drum-snare',.85],R:['drum-sidestick',.8],c:['drum-clap',.8],h:['drum-hat',.55],O:['drum-openhat',.5],r:['drum-ride',.5],t:['drum-tom',.8],z:['drum-shaker',.5]};
-function drumHit(k,t,a){
+/* ジャンルごとのドラムセット（MuseScore_General の録音、MIT）。選んだときに読み込む。強く叩いた音と弱く叩いた音を使い分ける */
+const KIT={man:null,loading:{},ready:{}};
+const KMIX={k:1,s:.85,R:.75,c:.8,h:.5,p:.45,O:.42,r:.55,b:.5,C:.48,t:.8,T:.8,z:.45};
+function loadKit(kit){
+  if(!kit||KIT.ready[kit]||KIT.loading[kit]) return;
+  const c=ac();
+  KIT.loading[kit]=(KIT.man?Promise.resolve(KIT.man):fetch('audio/kits/kits.json').then(r=>r.json()).then(m=>KIT.man=m)).then(man=>{
+    const vs=Object.keys(man[kit]||{});
+    return Promise.all(vs.flatMap(v=>['h','s'].map(l=>{const n=`kits/${kit}-${v}-${l}`;
+      return fetch('audio/'+n+'.mp3').then(r=>r.arrayBuffer()).then(b=>new Promise((ok,ng)=>c.decodeAudioData(b,ok,ng))).then(buf=>{SMP.buf[n]=buf;}).catch(()=>{});}))).then(()=>{KIT.ready[kit]=true;});
+  }).catch(()=>{ KIT.loading[kit]=null; });
+}
+function kitHit(kit,k,t,a){
+  const ratio=KIT.ready[kit]&&KIT.man[kit]&&KIT.man[kit][k]; if(!ratio) return false;
+  const soft=a<.55, n=`kits/${kit}-${k}-${soft?'s':'h'}`; if(!SMP.buf[n]) return false;
+  if(k==='h'||k==='p'||k==='O') choke('hh',t);
+  const r=playBuf(n,t,KMIX[k]*(soft?Math.min(1.6,a/ratio):a));
+  if(r&&(k==='O'||k==='h'||k==='p')) SMP.voices.hh=r;
+  return true;
+}
+function drumHit(k,t,a,kit){
+  if(kit){ if(kitHit(kit,k,t,a)) return; loadKit(kit); }
   const m=DRUM_SMP[k];
   if(m&&SMP.buf[m[0]]){ if(k==='h'||k==='O') choke('hh',t); const r=playBuf(m[0],t,a*m[1]); if((k==='h'||k==='O')&&r) SMP.voices.hh=r;
     if(k==='R'&&r){ const t0=Math.max(t,ctx.currentTime); r.g.gain.setValueAtTime(a*m[1],t0+.03); r.g.gain.setTargetAtTime(0,t0+.03,.03); r.s.stop(t0+.3); }   // リム：部屋の響きを削って、木の「コッ」だけ自然に減衰させる
@@ -1474,6 +1506,36 @@ function drawBeats(){
   const el=$('#beatDots'); el.innerHTML=''; const g=grid();
   for(let i=0;i<g.beats;i++){const d=document.createElement('div');d.className='beat'+(i===0&&M.accent?' acc':'');el.appendChild(d);}
 }
+/* 人が叩いているように：強さとタイミングを少しずつ揺らし、8小節ごとにフィル→次の頭でクラッシュ。4小節目の終わりはオープンハイハット */
+const rnd=()=>Math.random();
+function drumBar(d,g,i){
+  const out=[], beat=Math.floor(i/g.tpb), sub=i%g.tpb, lastBeat=beat===g.beats-1, fillBar=d.fill&&M.bar%8===7, crash=d.fill&&M.bar>0&&M.bar%8===0&&i===0;
+  if(fillBar&&lastBeat){
+    // フィル：最後の1拍をスネア→タムで
+    const pos=g.tpb===6?[0,2,3,5]:g.tpb===4?[0,1,2,3]:g.tpb===3?[0,1,2]:g.tpb===2?[0,1]:[0];
+    const j=pos.indexOf(sub); if(j>=0){ const seq=pos.length>=4?['s','s','T','t']:pos.length===3?['s','T','t']:['s','t']; out.push([seq[j],j===0?'x':'X']); }
+    if(sub===0) out.push(['k','x']);
+    return out;
+  }
+  const openAt=d.fill&&M.bar%4===3&&!fillBar&&i===g.beats*g.tpb-Math.max(1,Math.round(g.tpb/2));
+  for(const k in d.rows){ let ch=d.rows[k][i]; if(!ch||ch==='-') continue;
+    if(crash&&(k==='h'||k==='r'||k==='z')) continue;
+    if(openAt&&k==='h'){ out.push(['O','x']); continue; }
+    out.push([k,ch]); }
+  if(crash) out.push(['C','X']), d.rows.k&&d.rows.k[0]==='-'&&out.push(['k','x']);
+  // ジャズ：スネアとキックで自由に合いの手（コンピング）
+  if(d.comp&&sub===2&&rnd()<.16) out.push([rnd()<.75?'s':'k','o']);
+  return out;
+}
+function humanHit(d,k,ch,t,i,g){
+  const f=d.feel||{}, jit=(f.jit??6)/1000, lay=((f.lay&&f.lay[k])||0)/1000;
+  let v=ch==='X'?1:ch==='x'?.78:.3;
+  if((k==='h'||k==='z'||k==='r')&&ch!=='X') v*=i%(g.tpb)===0?1:.88;          // 拍の頭を少し強く
+  v*=1+(rnd()-.5)*(ch==='o'?.3:.14);                                        // 毎回少しずつ違う強さ
+  const w={k:.5,s:.7,R:.7,C:.4}[k]??1;
+  const tt=t+lay+(rnd()-.5)*2*jit*w;                                         // ほんの少し前後にずれる
+  drumHit(k,Math.max(tt,ctx.currentTime),v*M.vol,d.kit);
+}
 function drawDrumGrid(){
   const d=drum(); $('#drumBox').hidden=!d; $('#clickOpts').hidden=!!d;
   if(!d) return;
@@ -1490,7 +1552,7 @@ function schedule(){
     const g=grid(), d=drum(), t=M.next;
     if(d){
       const i=M.beat*g.tpb+M.subI;
-      for(const k in d.rows){const ch=d.rows[k][i];if(ch&&ch!=='-') drumHit(k,t,(ch==='X'?1:ch==='x'?.75:.35)*M.vol);}
+      drumBar(d,g,i).forEach(([k,ch])=>humanHit(d,k,ch,t,i,g));
       if(M.layer&&M.subI===0) metroHit(M.sound,t,M.beat===0?0:1,M.vol*.8);
     } else {
       const level=M.subI>0?2:(M.beat===0&&M.accent?0:1);
@@ -1542,7 +1604,7 @@ function syncPlayButtons(){
 function metroToggle(){ if(M.playing&&M.owner==='metro') transportStop(); else { transportStart('metro'); pendKick(); } }
 let termT=0; function flashTerm(txt){ const el=$('#tempoTerm'); el.textContent=txt; clearTimeout(termT); termT=setTimeout(()=>setBpm(M.bpm),1400); }
 function setRhythm(v){
-  M.rhythm=v;store.set('rhythm',v);M.subI=0;M.beat=0;
+  M.rhythm=v;store.set('rhythm',v);M.subI=0;M.beat=0; const dd=drum(); if(dd) loadKit(dd.kit);
   $('#rhythmSel').value=v; const pr=$('#progRhythm'); if(pr) pr.value=v;
   drawDrumGrid();drawBeats();
 }
@@ -1593,18 +1655,18 @@ function initPend(){
   };
   function makeDial(el,vals,onPick){
     el.innerHTML='<div class="pad"></div>'+vals.map(v=>`<button type="button" role="option" data-v="${v}">${v}</button>`).join('')+'<div class="pad"></div>';
-    const btns=[...el.querySelectorAll('button')], H=44; let cur=null, tm=0, quiet=false, touched=0;
+    const btns=[...el.querySelectorAll('button')], H=52; let cur=null, tm=0, quiet=false, touched=0;
     // 指・マウスのホイールで動かしたときだけ選び直す（画面に出た瞬間などの自動スクロールでは変えない）
     ['pointerdown','touchstart','wheel'].forEach(ev=>el.addEventListener(ev,()=>touched=Date.now(),{passive:true}));
     const mark=v=>btns.forEach(b=>b.setAttribute('aria-selected',String(+b.dataset.v===v)));
-    const set=(v,smooth)=>{ cur=v; mark(v); const i=vals.indexOf(v); if(i<0||!el.clientHeight) return; quiet=true; el.scrollTo({top:i*H,behavior:smooth?'smooth':'auto'}); setTimeout(()=>quiet=false,smooth?400:60); };
-    el.addEventListener('scroll',()=>{ const i=Math.max(0,Math.min(vals.length-1,Math.round(el.scrollTop/H))); mark(vals[i]);
+    const set=(v,smooth)=>{ cur=v; mark(v); const i=vals.indexOf(v); if(i<0||!el.clientWidth) return; quiet=true; el.scrollTo({left:i*H,behavior:smooth?'smooth':'auto'}); setTimeout(()=>quiet=false,smooth?400:60); };
+    el.addEventListener('scroll',()=>{ const i=Math.max(0,Math.min(vals.length-1,Math.round(el.scrollLeft/H))); mark(vals[i]);
       if(Date.now()-touched<4000) touched=Date.now();
-      clearTimeout(tm); tm=setTimeout(()=>{ const j=Math.max(0,Math.min(vals.length-1,Math.round(el.scrollTop/H)));
+      clearTimeout(tm); tm=setTimeout(()=>{ const j=Math.max(0,Math.min(vals.length-1,Math.round(el.scrollLeft/H)));
         if(quiet||Date.now()-touched>1500){ mark(cur); return; }
         if(vals[j]!==cur){ cur=vals[j]; onPick(cur); } },140); },{passive:true});
     btns.forEach(b=>b.addEventListener('click',()=>{ const v=+b.dataset.v; set(v,true); onPick(v); }));
-    el.tabIndex=0; el.addEventListener('keydown',e=>{ const i=vals.indexOf(cur); if(e.key==='ArrowDown'&&i<vals.length-1){e.preventDefault();set(vals[i+1],true);onPick(vals[i+1]);} if(e.key==='ArrowUp'&&i>0){e.preventDefault();set(vals[i-1],true);onPick(vals[i-1]);} });
+    el.tabIndex=0; el.addEventListener('keydown',e=>{ const i=vals.indexOf(cur); if((e.key==='ArrowRight'||e.key==='ArrowDown')&&i<vals.length-1){e.preventDefault();set(vals[i+1],true);onPick(vals[i+1]);} if((e.key==='ArrowLeft'||e.key==='ArrowUp')&&i>0){e.preventDefault();set(vals[i-1],true);onPick(vals[i-1]);} });
     // 隠れているあいだは位置を合わせられないので、見えたときに合わせ直す
     if(window.IntersectionObserver) new IntersectionObserver(es=>es.forEach(x=>{ if(x.isIntersecting&&cur!=null) set(cur,false); })).observe(el);
     return {set:v=>set(v,true)};
