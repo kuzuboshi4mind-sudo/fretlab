@@ -126,6 +126,20 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .mbtn:active{background:var(--line)}
 .mbtn svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .mbtn[aria-expanded="true"] svg{transform:rotate(180deg)}
+.nt{font-size:1.15em;line-height:1;margin-right:2px}
+.nt.n3{position:relative;font-size:.82em;letter-spacing:-.12em;margin-right:5px}
+.nt.n3::before{content:"3";position:absolute;left:50%;top:-.95em;transform:translateX(-50%);font-size:.62em;font-weight:700;letter-spacing:0}
+/* 拍子のダイヤル：分子と分母を上下になぞって選ぶ */
+.sigdial{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px}
+.sigdial-bar{width:30px;height:2px;background:var(--fg);transform:rotate(-60deg);opacity:.5}
+.dial{position:relative;width:88px;height:132px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none;border:1px solid var(--line);border-radius:16px;background:var(--surface);
+  -webkit-mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);touch-action:pan-y}
+.dial::-webkit-scrollbar{display:none}
+.dial .pad{height:44px}
+.dial button{display:block;width:100%;height:44px;scroll-snap-align:center;border:0;background:none;color:var(--muted);font:500 26px var(--display);cursor:pointer;transition:color .15s,transform .15s}
+.dial button[aria-selected="true"]{color:var(--fg);font-weight:700;transform:scale(1.12)}
+.sigdial{position:relative}
+.sigdial::before{content:"";position:absolute;left:50%;top:50%;width:min(100%,250px);height:44px;transform:translate(-50%,-50%);border-block:1px solid var(--line);pointer-events:none}
 .sig{display:flex;flex-direction:column;align-items:center;line-height:.9;font-family:var(--display);font-size:22px}
 .metro-start{width:100%;max-width:440px;background:transparent!important;color:var(--fg)!important;border:1.5px solid var(--fg)!important;border-radius:16px;font-size:20px;letter-spacing:.06em;padding:16px}
 .metro-start.on{background:var(--fg)!important;color:var(--bg)!important}
@@ -656,7 +670,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
         </div>
         <div class="beats" id="beatDots"></div>
         <div class="metro-bar">
-          <button class="mbtn" id="sigBtn" aria-label="拍子"><span class="sig"><b id="sigTop">4</b><b>4</b></span></button>
+          <button class="mbtn" id="sigBtn" aria-label="拍子"><span class="sig"><b id="sigTop">4</b><b id="sigBot">4</b></span></button>
           <button class="mbtn" id="sndBtn" aria-label="音色"><svg viewBox="0 0 32 32"><path d="M5 12h5l7-6v20l-7-6H5z"/><path d="M21 11.5a6 6 0 0 1 0 9M24.5 8a11 11 0 0 1 0 16"/></svg></button>
           <button class="mbtn" id="tapBtn" aria-label="タップでテンポ入力">TAP</button>
           <button class="mbtn" id="moreBtn" aria-label="詳細設定" aria-expanded="true"><svg viewBox="0 0 32 32"><path d="M8 12l8 8 8-8"/></svg></button>
@@ -669,16 +683,20 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           <div style="flex:1;min-width:150px"><label class="label" for="rhythmSel">リズム</label><select id="rhythmSel" style="width:100%"></select></div>
         </div>
         <div id="drumBox" hidden>
-          <div class="drumgrid-scroll"><div class="drumgrid" id="drumGrid"></div></div>
+          <div class="drumgrid-scroll" hidden><div class="drumgrid" id="drumGrid"></div></div>
           <div class="msg" id="drumNote"></div>
           <label class="check" style="margin-top:6px"><input type="checkbox" id="layerChk"> クリックも重ねる</label>
         </div>
         <div id="clickOpts" class="stack">
         <div><span class="label">拍子</span>
-          <div class="seg" id="beatsSeg"></div></div>
-        <div><span class="label">細分</span>
+          <div class="sigdial" id="sigDial">
+            <div class="dial" id="dialTop" role="listbox" aria-label="拍子の分子（1小節の拍の数）"></div>
+            <div class="sigdial-bar" aria-hidden="true"></div>
+            <div class="dial" id="dialBot" role="listbox" aria-label="拍子の分母（1拍の音符）"></div>
+          </div></div>
+        <div><span class="label">音符</span>
           <div class="seg" id="subSeg">
-            <button data-v="1">♩ 4分</button><button data-v="2">♪♪ 8分</button><button data-v="3">3連</button><button data-v="4">16分</button>
+            <button data-v="1"><span class="nt">♩</span> 4分</button><button data-v="2"><span class="nt">♫</span> 8分</button><button data-v="3"><span class="nt n3">♪♪♪</span> 3連</button><button data-v="4"><span class="nt">♬</span> 16分</button>
           </div></div>
         <label class="check"><input type="checkbox" id="accentChk"> 1拍目にアクセント</label>
         </div>
@@ -1420,7 +1438,9 @@ function metroHit(idx,t,l,v){
 const DRUM_SMP={k:['drum-kick',1],s:['drum-snare',.85],R:['drum-sidestick',.8],c:['drum-clap',.8],h:['drum-hat',.55],O:['drum-openhat',.5],r:['drum-ride',.5],t:['drum-tom',.8],z:['drum-shaker',.5]};
 function drumHit(k,t,a){
   const m=DRUM_SMP[k];
-  if(m&&SMP.buf[m[0]]){ if(k==='h'||k==='O') choke('hh',t); const r=playBuf(m[0],t,a*m[1]); if((k==='h'||k==='O')&&r) SMP.voices.hh=r; return; }
+  if(m&&SMP.buf[m[0]]){ if(k==='h'||k==='O') choke('hh',t); const r=playBuf(m[0],t,a*m[1]); if((k==='h'||k==='O')&&r) SMP.voices.hh=r;
+    if(k==='R'&&r){ const t0=Math.max(t,ctx.currentTime); r.g.gain.setValueAtTime(a*m[1],t0+.03); r.g.gain.setTargetAtTime(0,t0+.03,.03); r.s.stop(t0+.3); }   // リム：部屋の響きを削って、木の「コッ」だけ自然に減衰させる
+    return; }
   DRUM_VOICES[k].fn(t,a);
 }
 function rhythmOptions(sel){
@@ -1436,7 +1456,7 @@ function stopAllPlayback(){
   if(typeof T!=='undefined'&&T.loop){clearInterval(T.loop);T.loop=null;}
 }
 /* ---------- transport (metronome / drums / progression) ---------- */
-const M={bpm:store.get('bpm',96),beats:store.get('beats',4),sub:1,accent:store.get('accent',false),vol:0.7,sound:soundIndex(store.get('sound4',SOUND_OLD[store.get('sound3',0)]||'click1')),rhythm:store.get('rhythm','click'),layer:false,
+const M={bpm:store.get('bpm',96),beats:store.get('beats',4),den:store.get('den',4),sub:1,accent:store.get('accent',false),vol:0.7,sound:soundIndex(store.get('sound4',SOUND_OLD[store.get('sound3',0)]||'click1')),rhythm:store.get('rhythm','click'),layer:false,
   playing:false,next:0,beat:0,subI:0,bar:0,timer:null,queue:[],owner:null,startedAt:0};
 const tickHooks=[];  // (t, {beat,subI,bar,tpb,beats}) をオーディオ時刻で呼ぶ
 const drawHooks=[];  // 画面更新（実際に鳴った瞬間）
@@ -1564,16 +1584,42 @@ function initPend(){
   if(window.ResizeObserver) new ResizeObserver(pendAmp).observe(svg);
 }
 (function initMetro(){
-  const bs=$('#beatsSeg');
-  [1,2,3,4,5,6,7].forEach(n=>{const b=document.createElement('button');b.dataset.v=n;b.textContent=n===1?'1拍':`${n}/4`;bs.appendChild(b);});
-  segInit(bs,M.beats,v=>{M.beats=+v;M.beat=0;store.set('beats',M.beats);drawBeats();$('#sigTop').textContent=M.beats;});
-  $('#sigTop').textContent=M.beats;
+  // 拍子：分子（拍の数）と分母（1拍の音符）を別々のダイヤルで。テンポ（BPM）は分母の音符の速さ
+  const NUMS=[...Array(16)].map((_,i)=>i+1), DENS=[2,4,8,16];
+  const setSig=(n,d,from)=>{
+    M.beats=n; M.den=d; M.beat=0; M.subI=0; store.set('beats',n); store.set('den',d);
+    $('#sigTop').textContent=n; $('#sigBot').textContent=d; drawBeats();
+    if(from!=='top') dialTop.set(n); if(from!=='bot') dialBot.set(d);
+  };
+  function makeDial(el,vals,onPick){
+    el.innerHTML='<div class="pad"></div>'+vals.map(v=>`<button type="button" role="option" data-v="${v}">${v}</button>`).join('')+'<div class="pad"></div>';
+    const btns=[...el.querySelectorAll('button')], H=44; let cur=null, tm=0, quiet=false, touched=0;
+    // 指・マウスのホイールで動かしたときだけ選び直す（画面に出た瞬間などの自動スクロールでは変えない）
+    ['pointerdown','touchstart','wheel'].forEach(ev=>el.addEventListener(ev,()=>touched=Date.now(),{passive:true}));
+    const mark=v=>btns.forEach(b=>b.setAttribute('aria-selected',String(+b.dataset.v===v)));
+    const set=(v,smooth)=>{ cur=v; mark(v); const i=vals.indexOf(v); if(i<0||!el.clientHeight) return; quiet=true; el.scrollTo({top:i*H,behavior:smooth?'smooth':'auto'}); setTimeout(()=>quiet=false,smooth?400:60); };
+    el.addEventListener('scroll',()=>{ const i=Math.max(0,Math.min(vals.length-1,Math.round(el.scrollTop/H))); mark(vals[i]);
+      if(Date.now()-touched<4000) touched=Date.now();
+      clearTimeout(tm); tm=setTimeout(()=>{ const j=Math.max(0,Math.min(vals.length-1,Math.round(el.scrollTop/H)));
+        if(quiet||Date.now()-touched>1500){ mark(cur); return; }
+        if(vals[j]!==cur){ cur=vals[j]; onPick(cur); } },140); },{passive:true});
+    btns.forEach(b=>b.addEventListener('click',()=>{ const v=+b.dataset.v; set(v,true); onPick(v); }));
+    el.tabIndex=0; el.addEventListener('keydown',e=>{ const i=vals.indexOf(cur); if(e.key==='ArrowDown'&&i<vals.length-1){e.preventDefault();set(vals[i+1],true);onPick(vals[i+1]);} if(e.key==='ArrowUp'&&i>0){e.preventDefault();set(vals[i-1],true);onPick(vals[i-1]);} });
+    // 隠れているあいだは位置を合わせられないので、見えたときに合わせ直す
+    if(window.IntersectionObserver) new IntersectionObserver(es=>es.forEach(x=>{ if(x.isIntersecting&&cur!=null) set(cur,false); })).observe(el);
+    return {set:v=>set(v,true)};
+  }
+  const dialTop=makeDial($('#dialTop'),NUMS,v=>setSig(v,M.den,'top'));
+  const dialBot=makeDial($('#dialBot'),DENS,v=>setSig(M.beats,v,'bot'));
+  setSig(Math.min(16,Math.max(1,M.beats)),DENS.includes(M.den)?M.den:4);
   $('#accentChk').checked=M.accent;
   segInit($('#subSeg'),1,v=>{M.sub=+v;M.subI=0;});
   const ss=$('#soundSel'); SOUNDS.forEach((s,i)=>ss.add(new Option(s.name,i))); ss.value=M.sound;
   ss.addEventListener('change',()=>{M.sound=+ss.value;store.set('sound4',SOUNDS[M.sound].id);metroHit(M.sound,ac().currentTime+0.02,1,M.vol);});
   $('#sndBtn').addEventListener('click',()=>{M.sound=(M.sound+1)%SOUNDS.length;ss.value=M.sound;store.set('sound4',SOUNDS[M.sound].id);metroHit(M.sound,ac().currentTime+0.02,1,M.vol);flashTerm(SOUNDS[M.sound].name);});
-  $('#sigBtn').addEventListener('click',()=>{const n=M.beats>=7?1:M.beats+1;bs.querySelector(`[data-v="${n}"]`).click();});
+  // 上の拍子ボタン：よく使う拍子を順に切り替える
+  const COMMON=[[4,4],[3,4],[2,4],[6,8],[5,4],[7,8],[12,8],[1,4]];
+  $('#sigBtn').addEventListener('click',()=>{ const i=COMMON.findIndex(([n,d])=>n===M.beats&&d===M.den); const [n,d]=COMMON[(i+1)%COMMON.length]; setSig(n,d); flashTerm(`${n}/${d}`); });
   const more=v=>{$('#metroMore').hidden=!v;$('#moreBtn').setAttribute('aria-expanded',String(v));store.set('metroMore',v);};
   more(store.get('metroMore',true));
   $('#moreBtn').addEventListener('click',()=>more($('#metroMore').hidden));
