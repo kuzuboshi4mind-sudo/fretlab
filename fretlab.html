@@ -554,11 +554,12 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 /* opening: line-drawn guitar, strings, a pluck, then the wordmark (~2s) */
-.intro{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--bg);cursor:pointer;animation:intro-out .5s cubic-bezier(.4,0,.2,1) 1.5s forwards}
+.intro{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--bg);overflow:hidden}
+.intro.leaving{animation:intro-out .6s cubic-bezier(.4,0,.2,1) forwards}
 .intro::before{content:"";position:absolute;inset:0;background:url(img/paper.jpg) center/cover no-repeat;z-index:-1}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .intro::before{filter:invert(1);opacity:.32}}
 :root[data-theme="dark"] .intro::before{filter:invert(1);opacity:.32}
-.intro svg{height:min(44vh,330px);width:auto;overflow:visible;animation:intro-rise 2.04s cubic-bezier(.2,.7,.2,1) both}
+.intro>svg{height:min(44vh,330px);width:auto;overflow:visible;animation:intro-rise 2.04s cubic-bezier(.2,.7,.2,1) both}
 .intro .ln{fill:none;stroke:url(#introGold);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:intro-draw 0.9s cubic-bezier(.65,0,.35,1) forwards}
 .intro .st{fill:none;stroke:var(--cobalt-b);stroke-width:.7;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;opacity:.85;animation:intro-draw 0.48s cubic-bezier(.4,0,.2,1) forwards}
 .intro .pk{animation:intro-draw 0.48s cubic-bezier(.4,0,.2,1) forwards,intro-pluck 0.6s ease-out 1.14s}
@@ -567,17 +568,32 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 .intro .wm b{background:linear-gradient(180deg,var(--cobalt-a),var(--cobalt-b));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:inherit}
 .intro .wm span{background:linear-gradient(180deg,var(--gold-a),var(--gold-b));-webkit-background-clip:text;background-clip:text;color:transparent}
 .intro .sb{font-family:var(--serif);font-size:12px;letter-spacing:.5em;padding-left:.5em;color:var(--muted);opacity:0;animation:intro-word 0.72s ease 1.14s forwards}
+/* はじめるボタン：描き終わったころにふわっと出る */
+.intro-go{margin-top:22px;font-family:var(--serif);font-size:17px;font-weight:700;letter-spacing:.5em;padding:13px 30px 13px calc(30px + .5em);border-radius:999px;border:0;cursor:pointer;color:#1a140a;background:linear-gradient(180deg,var(--gold-a),var(--gold-b));box-shadow:0 8px 22px color-mix(in srgb,var(--gold-b) 35%,transparent),inset 0 1px 0 rgba(255,255,255,.45);opacity:0;animation:intro-btn .8s cubic-bezier(.2,.7,.2,1) 1.5s forwards;transition:transform .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent}
+.intro-go:active{transform:scale(.96)}
+.intro-go:focus-visible{outline:2px solid var(--cobalt-a);outline-offset:4px}
+.intro-go[disabled]{cursor:default}
+@keyframes intro-btn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+/* 押したとき：ギターが風で少し揺れる、葉と風の筋が流れる */
+.intro.blow>svg{animation:intro-sway 1.8s ease-in-out both}
+@keyframes intro-sway{0%{transform:none}25%{transform:rotate(-2.2deg) translateX(3px)}55%{transform:rotate(1.2deg)}80%{transform:rotate(-.5deg)}100%{transform:none}}
+.intro.blow .intro-go{animation:none;opacity:1;transform:scale(.97);filter:brightness(1.08)}
+.intro-wind{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.intro-wind .leaf{position:absolute;left:0;top:0;will-change:transform,opacity}
+.intro-wind .leaf svg{display:block;width:100%;height:100%}
+.intro-wind .gust{position:absolute;left:0;height:1.5px;border-radius:2px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--leaf) 55%,transparent),transparent);will-change:transform,opacity}
 @keyframes intro-draw{to{stroke-dashoffset:0}}
 @keyframes intro-rise{from{transform:translateY(8px) scale(.985)}to{transform:none}}
 @keyframes intro-word{from{opacity:0;letter-spacing:.7em;filter:blur(3px)}to{opacity:1;filter:none}}
 @keyframes intro-pluck{0%,100%{transform:none}20%{transform:translateX(1.4px)}40%{transform:translateX(-1.1px)}60%{transform:translateX(.7px)}80%{transform:translateX(-.3px)}}
 @keyframes intro-ripple{0%{opacity:.7;transform:scale(.6)}100%{opacity:0;transform:scale(2.6)}}
 @keyframes intro-out{to{opacity:0;visibility:hidden;transform:scale(1.015)}}
-@media (prefers-reduced-motion:reduce){.intro *{animation-duration:0.01s!important;animation-delay:0s!important}.intro{animation:intro-out .3s ease .6s forwards!important}}
+@media (prefers-reduced-motion:reduce){.intro *{animation-duration:0.01s!important;animation-delay:0s!important}.intro.leaving{animation:intro-out .3s ease forwards!important}}
 </style>
 
-<div class="intro" id="intro" aria-hidden="true">
-  <svg viewBox="0 -4 200 342">
+<div class="intro" id="intro" role="dialog" aria-label="Fretlab ギター練習帳">
+  <div class="intro-wind" id="introWind" aria-hidden="true"></div>
+  <svg viewBox="0 -4 200 342" aria-hidden="true">
     <defs><linearGradient id="introGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--gold-a)"/><stop offset="1" stop-color="var(--gold-b)"/></linearGradient></defs>
     <path class="ln" pathLength="1" style="animation-duration:1.02s" d="M100 122 C128 120 156 132 156 162 C156 186 144 196 146 210 C148 226 172 238 172 272 C172 312 140 332 100 332"/><path class="ln" pathLength="1" style="animation-duration:1.02s" d="M100 122 C72 120 44 132 44 162 C44 186 56 196 54 210 C52 226 28 238 28 272 C28 312 60 332 100 332"/>
     <circle class="ln" pathLength="1" style="animation-delay:0.216s;animation-duration:0.72s" cx="100" cy="196" r="18"/>
@@ -592,13 +608,11 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
   </svg>
   <div class="wm"><b>FRET</b><span>LAB</span></div>
   <div class="sb">ギター練習帳</div>
+  <button type="button" class="intro-go" id="introGo">はじめる</button>
 </div>
 <script>(function(){const el=document.getElementById('intro');window.__introT0=performance.now();let seen=false;try{seen=sessionStorage.getItem('fretlab.intro')==='1';sessionStorage.setItem('fretlab.intro','1');}catch(e){}
 if(seen){el.remove();return;}
-const done=()=>{if(el.isConnected)el.remove();};
-el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intro-out')done();});
-el.addEventListener('click',()=>{el.style.animation='intro-out .25s ease forwards';});
-setTimeout(done,3200);})();</script>
+el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intro-out')el.remove();});})();</script>
 <div class="botanic" aria-hidden="true"></div>
 <div class="wrap">
   <header class="top">
@@ -2910,33 +2924,83 @@ async function aiSend(text){
   aiRenderExamples(); aiRender();
 })();
 
-/* ---------- オープニングの音 ---------- */
-// 弦が描かれるのに合わせて開放的な和音（Emaj9）をハープのように上へ鳴らし、波紋が広がる瞬間にマリンバの余韻を重ねる。
-// ブラウザは「画面に触れる前」の音を止めることがある（iPhone など）。そのときは、オープニングに触れた瞬間に鳴らす。
-(function introSound(){
-  const el=document.getElementById('intro'); if(!el||!el.isConnected) return;
-  let done=false;
-  const play=(fromTap)=>{
-    if(done) return; done=true;
-    const c=ac(), now=c.currentTime, el_s=(performance.now()-(window.__introT0||performance.now()))/1000;
-    const at=x=>Math.max(0,fromTap?x*.45:x-el_s);          // 触れて鳴らすときは少し詰めて
+/* ---------- オープニング：「はじめる」で音・風・葉・弦の揺れ ---------- */
+// 押すと開放的な和音（Emaj9）をハープのように上へ鳴らし、マリンバの余韻を重ねる。
+// 同時に風が吹いて緑の葉が流れ、6本の弦が鳴った順に揺れて、ギターも少し風になびく。
+(function introStart(){
+  const el=document.getElementById('intro'), go=document.getElementById('introGo'); if(!el||!el.isConnected||!go) return;
+  const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const STRUM=.065, CHIME=[[64,.62,.7],[71,.68,.5],[76,.8,.38]];
+  const sound=()=>{
+    const c=ac(); c.resume&&c.resume().catch(()=>{});
+    const now=c.currentTime;
     const out=c.createGain(); out.gain.value=.55; out.connect(master);
     const dl=c.createDelay(1), fb=c.createGain(), lp=c.createBiquadFilter(), wet=c.createGain();
     dl.delayTime.value=.23; fb.gain.value=.32; lp.type='lowpass'; lp.frequency.value=2400; wet.gain.value=.3;
     out.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(wet); wet.connect(master);
     onBus(out,()=>{
-      [40,47,52,56,63,66].forEach((m,i)=>pluck(m,at(.52+i*.065),.26-i*.015,{kind:'guitar',str:'op'+i}));   // E B E G♯ D♯ F♯
-      [[64,1.14,.7],[71,1.2,.5],[76,1.32,.38]].forEach(([m,t,g])=>{ if(!sampleNote('chime',m,now+at(t),g)) pluck(m,at(t),g*.7,{kind:'nylon',str:'opc'}); });
+      [40,47,52,56,63,66].forEach((m,i)=>pluck(m,.02+i*STRUM,.26-i*.015,{kind:'guitar',str:'op'+i}));   // E B E G♯ D♯ F♯
+      CHIME.forEach(([m,t,g])=>{ if(!sampleNote('chime',m,now+t,g)) pluck(m,t,g*.7,{kind:'nylon',str:'opc'}); });
     });
     setTimeout(()=>{try{out.disconnect();wet.disconnect();}catch(e){}},5000);
   };
-  const c=ac();
-  const fresh=()=>el.isConnected&&performance.now()-(window.__introT0||0)<1400;   // 遅れて鳴り出さないように
-  const tryAuto=()=>{ if(c.state==='running'&&fresh()) play(false); };
-  if(c.state==='running'&&fresh()) play(false); else { c.resume().then(tryAuto).catch(()=>{}); setTimeout(tryAuto,120); }
-  // 自動で鳴らせなかったとき：オープニングに触れたら鳴らす
-  const tap=()=>{ if(!done&&el.isConnected){ ac(); play(true); } };
-  el.addEventListener('pointerdown',tap,{once:true});
+  // 弦：両端は止めたまま、真ん中がふくらむように揺らす（鳴った順に、だんだん小さく）
+  const strings=()=>{
+    const ps=[...el.querySelectorAll('.st')].map((p,i)=>{
+      const m=p.getAttribute('d').match(/M([\d.]+) ([\d.]+) L([\d.]+) ([\d.]+)/).slice(1).map(Number);
+      p.style.animation='none'; p.style.strokeDashoffset='0';
+      return {p,m,t0:.02+i*STRUM,f:7.5+i*.9,ph:Math.random()*6};
+    });
+    const t0=performance.now();
+    const step=()=>{
+      const t=(performance.now()-t0)/1000; let live=false;
+      ps.forEach(o=>{
+        const [x1,y1,x2,y2]=o.m, mx=(x1+x2)/2, my=(y1+y2)/2, u=t-o.t0;
+        let off=0;
+        if(u>0){ off=2.6*Math.exp(-u/.55)*Math.sin(2*Math.PI*o.f*u+o.ph); }
+        off+=1.4*Math.sin(Math.PI*Math.min(1,t/1.6))*Math.sin(t*4.2+o.ph*.3);   // 風でゆっくりたわむ
+        if(t<2.2) live=true;
+        o.p.setAttribute('d',`M${x1} ${y1} Q${(mx+off*2).toFixed(2)} ${my} ${x2} ${y2}`);
+      });
+      if(live&&el.isConnected) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+  // 風：緑の葉と風の筋を左から右へ流す
+  const wind=()=>{
+    const box=document.getElementById('introWind'); if(!box) return;
+    const W=innerWidth, H=innerHeight, greens=['#5f9e4f','#79b65a','#9ccc6b','#4c8a45','#b6d98a','#6aa884'];
+    const leafSVG=c=>`<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M3 21C3 11 9 4 21 3c-1 12-8 18-18 18z" fill="${c}"/><path d="M4 20C9 15 13 11 18 6" stroke="rgba(255,255,255,.5)" stroke-width="1" fill="none" stroke-linecap="round"/></svg>`;
+    const n=Math.round(Math.min(48,Math.max(26,W/14)));
+    for(let i=0;i<n;i++){
+      const d=document.createElement('div'); d.className='leaf';
+      const sz=16+Math.random()*24; d.style.width=d.style.height=sz+'px';
+      d.innerHTML=leafSVG(greens[i%greens.length]);
+      box.appendChild(d);
+      const y0=H*(.05+Math.random()*.9), dy=(Math.random()-.5)*H*.35, wave=20+Math.random()*50, r0=Math.random()*360, spin=(Math.random()<.5?-1:1)*(240+Math.random()*480);
+      const dur=1500+Math.random()*1000, delay=Math.random()*550;
+      const kf=[0,.25,.5,.75,1].map(k=>({
+        transform:`translate(${(-60+k*(W+120)).toFixed(0)}px,${(y0+dy*k+Math.sin(k*Math.PI*2.2)*wave).toFixed(0)}px) rotate(${(r0+spin*k).toFixed(0)}deg) rotateX(${(k*540).toFixed(0)}deg)`,
+        opacity:k===0?0:k===1?0:1, offset:k}));
+      kf[1].opacity=1;
+      d.animate(kf,{duration:dur,delay,easing:'cubic-bezier(.35,.1,.45,1)',fill:'both'});
+    }
+    for(let i=0;i<7;i++){
+      const g=document.createElement('div'); g.className='gust';
+      const w=W*(.25+Math.random()*.3); g.style.width=w+'px'; g.style.top=(H*(.1+Math.random()*.8)).toFixed(0)+'px';
+      box.appendChild(g);
+      g.animate([{transform:`translateX(${-w}px)`,opacity:0},{opacity:.9,offset:.3},{transform:`translateX(${W}px)`,opacity:0}],
+        {duration:900+Math.random()*500,delay:Math.random()*600,easing:'ease-in-out',fill:'both'});
+    }
+  };
+  let started=false;
+  go.addEventListener('click',()=>{
+    if(started) return; started=true; go.disabled=true;
+    try{ sound(); }catch(e){}
+    if(!calm){ el.classList.add('blow'); strings(); wind(); }
+    setTimeout(()=>el.classList.add('leaving'),calm?500:1900);
+    setTimeout(()=>{ if(el.isConnected) el.remove(); },calm?1200:2800);
+  });
 })();
 
 /* ---------- PWA ---------- */
