@@ -2,9 +2,9 @@
 Released under the MIT license ("I hereby release Fluid under the MIT license").
 Rendered with FluidSynth by tools/render_samples.py.
 
-kit-hat-*.wav（メトロノームのハイハット）:
+kit-hat-*.wav / kit-kick-*.wav（メトロノームのハイハット・バスドラム）:
 MuseScore_General SoundFont (MIT, parts PD or CC0) by S. Christian Collins
-（Jazz キットの音を FluidSynth で書き出し、長さを整えたもの）
+（ハイハットは Jazz キット、バスドラムは Standard キットの音を FluidSynth で書き出し、長さを整えたもの）
 
 metro-tick.wav / metro-tock.wav（メトロノームの音色「メトロノーム」）:
 持ち主から提供された機械式メトロノームの録音から切り出したもの
