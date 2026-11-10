@@ -525,7 +525,9 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .prog-title{font-size:22px}
 .prog-controls > div{display:flex;flex-direction:column}
 .bpm-mini{display:flex;align-items:center;gap:6px}
-.bpm-mini output{font-family:var(--display);font-weight:500;font-size:34px;min-width:2.4ch;text-align:center;font-variant-numeric:tabular-nums}
+.bpm-mini output,.bpm-in{font-family:var(--display);font-weight:500;font-size:34px;min-width:2.4ch;text-align:center;font-variant-numeric:tabular-nums}
+.bpm-in{width:4.2ch;min-width:84px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);padding:0 4px;line-height:1.2;touch-action:none;cursor:ns-resize}
+.bpm-in:focus{cursor:text;outline:2px solid var(--accent);outline-offset:1px}
 .bpm-mini .btn{min-width:40px;padding:4px}
 .bars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
 .bar{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 10px 8px;min-height:74px;display:flex;flex-direction:column;justify-content:space-between;position:relative}
@@ -895,7 +897,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           </div>
           <div class="row">
             <button class="btn primary big" id="progPlay">▶ 再生</button>
-            <div class="bpm-mini"><button class="btn" id="progBpmDown" aria-label="BPMを下げる">−</button><output id="progBpm">96</output><span class="unit">BPM</span><button class="btn" id="progBpmUp" aria-label="BPMを上げる">+</button></div>
+            <div class="bpm-mini"><button class="btn" id="progBpmDown" aria-label="BPMを下げる">−</button><input id="progBpm" class="bpm-in" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" value="96" aria-label="テンポ（BPM）。数字を入力するか、上下になぞって変更"><span class="unit">BPM</span><button class="btn" id="progBpmUp" aria-label="BPMを上げる">+</button></div>
             <label class="check"><input type="checkbox" id="progCount" checked> 1小節カウント</label>
             <label class="check"><input type="checkbox" id="progLoop" checked> ループ</label>
           </div>
@@ -1377,14 +1379,9 @@ function playShape(v,{capo=0,when=0}={}){
   if(!v) return; const t=tun(), k=ins().kind;
   // アルペジオ：同じ弦で次の音を弾くと前の音は止まる（本物と同じ）。弦をまたぐときだけ前の音が残る
   if(v.notes){ v.notes.forEach((x,i)=>pluck(t[x.s]+x.f+capo,when+i*0.2,0.6,{kind:k,str:'arp-s'+x.s})); return; }
-  // ギター・ウクレレのコードは、高い音を丸めたやさしい音で、少しゆっくりかき鳴らす
-  const c=ac(), bus=c.createGain(), lp=c.createBiquadFilter(), warm=c.createBiquadFilter();
-  lp.type='lowpass'; lp.frequency.value=k==='nylon'?2300:1700; lp.Q.value=.4;
-  warm.type='lowshelf'; warm.frequency.value=260; warm.gain.value=2.5;
-  bus.gain.value=.85; bus.connect(lp); lp.connect(warm); warm.connect(outNode());
+  // ギター・ウクレレのコードは、やさしい音色（pluck の音色）で少しゆっくりかき鳴らす
   let j=0;
-  onBus(bus,()=>v.frets.forEach((f,i)=>{ if(f!==null){ pluck(t[i]+f+capo,when+j*0.052+Math.random()*.008,0.36,{kind:k,str:i}); j++; } }));
-  setTimeout(()=>{ try{bus.disconnect();warm.disconnect();}catch(e){} },(when+5)*1000);
+  v.frets.forEach((f,i)=>{ if(f!==null){ pluck(t[i]+f+capo,when+j*0.052+Math.random()*.008,0.33,{kind:k,str:i}); j++; } });
 }
 const shapeStr=v=>v.notes?v.notes.map(x=>`${strNo(x.s)}弦${x.f}`).join(' → '):v.frets.map(x=>x===null?'x':x).join('-');
 // 楽器の切り替えボタン（各ページの見出しの右に置き、どこで切り替えても全ページに反映）
@@ -1464,8 +1461,21 @@ function pluckBuffer(freq){
   for(let i=len-2000;i<len;i++) d[i]*=(len-i)/2000;
   ksCache.set(key,buf); return buf;
 }
+// ギター・ウクレレの音色：高い音を丸め、重くなりやすい中低音（250〜400Hzあたり）を少し削る。どのページでも同じ音色に
+const TONE=new WeakMap();
+function toneChain(dest,kind){
+  let m=TONE.get(dest); if(!m){ m={}; TONE.set(dest,m); }
+  if(m[kind]) return m[kind];
+  const c=ac(), lp=c.createBiquadFilter(), mid=c.createBiquadFilter(), inp=c.createGain();
+  lp.type='lowpass'; lp.frequency.value=kind==='nylon'?2400:1900; lp.Q.value=.4;
+  mid.type='peaking'; mid.frequency.value=kind==='nylon'?380:320; mid.Q.value=.9; mid.gain.value=kind==='nylon'?-2:-4.5;
+  inp.connect(lp); lp.connect(mid); mid.connect(dest);
+  return m[kind]=inp;
+}
 // kind: guitar / bass / nylon、str: 弦番号（同じ弦の音を止めるため）
 function pluck(midi,when=0,gain=0.55,opt={}){
+  const kind0=opt.kind||'guitar';
+  if((kind0==='guitar'||kind0==='nylon')&&!opt.raw) return onBus(toneChain(outNode(),kind0),()=>pluck(midi,when,gain,{...opt,raw:1}));
   const c=ac(), kind=opt.kind||'guitar';
   const t0=c.currentTime+when;
   // dur（秒）を指定すると、その長さで指を離したように音を止める
@@ -1716,7 +1726,7 @@ function grid(){const d=drum();return d?{beats:d.beats,tpb:d.steps/d.beats}:{bea
 function setBpm(v){
   M.bpm=Math.max(30,Math.min(260,Math.round(v)));
   $('#bpmOut').textContent=M.bpm; pendWeight();
-  const pb=$('#progBpm'); if(pb) pb.textContent=M.bpm;
+  const pb=$('#progBpm'); if(pb&&document.activeElement!==pb) pb.value=M.bpm;
   $('#tempoTerm').textContent=TERMS.find(t=>M.bpm<t[0])[1];
   store.set('bpm',M.bpm);
 }
@@ -2511,7 +2521,17 @@ drawHooks.push(cur=>{
   $('#progPlay').addEventListener('click',progToggle);
   $('#progBpmDown').addEventListener('click',()=>setBpm(M.bpm-2));
   $('#progBpmUp').addEventListener('click',()=>setBpm(M.bpm+2));
-  $('#progBpm').textContent=M.bpm;
+  // テンポ：数字をタップして入力、または上下になぞって（ダイヤルのように）変える
+  { const el=$('#progBpm'); el.value=M.bpm;
+    const commit=()=>{ const v=parseInt(String(el.value).normalize('NFKC'),10); if(v) setBpm(v); el.value=M.bpm; };
+    el.addEventListener('change',commit); el.addEventListener('blur',commit);
+    el.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); el.blur(); } if(e.key==='ArrowUp'){ e.preventDefault(); setBpm(M.bpm+1); el.value=M.bpm; } if(e.key==='ArrowDown'){ e.preventDefault(); setBpm(M.bpm-1); el.value=M.bpm; } });
+    let y0=null, b0=0, moved=false;
+    el.addEventListener('pointerdown',e=>{ if(document.activeElement===el) return; y0=e.clientY; b0=M.bpm; moved=false; el.setPointerCapture(e.pointerId); e.preventDefault(); });
+    el.addEventListener('pointermove',e=>{ if(y0==null) return; const d=Math.round((y0-e.clientY)/4); if(Math.abs(y0-e.clientY)>5) moved=true; if(moved){ setBpm(b0+d); el.value=M.bpm; } });
+    const up=()=>{ if(y0==null) return; const tap=!moved; y0=null; if(tap){ el.focus(); el.select(); } };
+    el.addEventListener('pointerup',up); el.addEventListener('pointercancel',()=>{ y0=null; });
+    el.addEventListener('wheel',e=>{ e.preventDefault(); setBpm(M.bpm+(e.deltaY<0?1:-1)); el.value=M.bpm; },{passive:false}); }
   if(P.idx>=PROGS.length) P.idx=0;
   renderProgList(); renderProg(); instHooks.push(()=>{P.lastChord=null;renderProg();});
 })();
