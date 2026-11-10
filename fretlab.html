@@ -898,6 +898,10 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
     <div class="legend" style="margin-top:10px">
       <span><i style="background:var(--root)"></i>ルート</span><span><i style="background:var(--third)"></i>3度</span><span><i style="background:var(--fifth)"></i>5度</span><span><i style="background:var(--other)"></i>その他</span>
     </div>
+    <div class="card staff-card" id="scStaff">
+      <div class="staff-svg" id="scStaffSvg"></div>
+      <div class="staff-info" id="scStaffInfo"><span class="msg">指板の音をタップすると、五線譜での書き方が出ます。</span></div>
+    </div>
     <div class="scale-info">
       <div class="card stack">
         <div><span class="label">構成音</span><div class="scale-notes" id="scNotes"></div></div>
@@ -3411,11 +3415,11 @@ function staffSVG(m,{clef='treble',flat=false,write=0}={}){
   s+=up?`<line class="stem" x1="${x+6}" y1="${y-1}" x2="${x+6}" y2="${y-34}"/>`:`<line class="stem" x1="${x-6}" y1="${y+1}" x2="${x-6}" y2="${y+34}"/>`;
   return s+'</g></svg>';
 }
-function showStaff(s,f){
-  const m=tun()[s]+f, kind=ins().kind, bass=kind==='bass', flat=FLAT_ROOTS.has(F.key);
+function showStaff(s,f,{pre='fb',key=F.key,extra=''}={}){
+  const m=tun()[s]+f, kind=ins().kind, bass=kind==='bass', flat=FLAT_ROOTS.has(key);
   const write=INS==='uke'?0:12, sp=spell(m,flat), name=LETTERS[sp.li]+(sp.acc==='#'?'♯':sp.acc==='b'?'♭':''), dr=DOREMI[sp.li]+(sp.acc==='#'?'♯':sp.acc==='b'?'♭':'');
-  $('#fbStaffSvg').innerHTML=staffSVG(m,{clef:bass?'bass':'treble',flat,write});
-  $('#fbStaffInfo').innerHTML=`<b>${name}<sub style="font-size:.45em">${sp.oct}</sub></b><span class="doremi">${dr}</span>
+  $('#'+pre+'StaffSvg').innerHTML=staffSVG(m,{clef:bass?'bass':'treble',flat,write});
+  $('#'+pre+'StaffInfo').innerHTML=`<b>${name}<sub style="font-size:.45em">${sp.oct}</sub></b><span class="doremi">${dr}</span>${extra}
     <span class="msg">${strNo(s)}弦 ${f===0?'開放':f+'フレット'}・${mfreq(m).toFixed(1)} Hz</span>
     <span class="msg">${bass?'ヘ音記号':'ト音記号'}${write?'（ギター・ベースの楽譜は、実際の音より1オクターブ高く書きます）':''}</span>`;
 }
@@ -3465,7 +3469,7 @@ function renderScale(){
     if(f<S.range[0]||f>S.range[1]) return null;
     const semi=(m%12-r+12)%12; if(!set.has(semi)) return null;
     return {kind:kindOf(semi),label:S.label==='degree'?scDeg(semi):nn(m%12,r)};
-  });
+  },(s,f)=>{ const m=tun()[s]+f, semi=(m%12-r+12)%12; showStaff(s,f,{pre:'sc',key:r,extra:set.has(semi)?`<span class="msg">スケールの ${semi===0?'ルート':scDeg(semi)}</span>`:'<span class="msg">スケール外の音</span>'}); });
   $('#scNotes').innerHTML=sc.iv.map(i=>`<div class="tone"><b>${nn(r+i,r)}</b><small>${scDeg(i)}</small></div>`).join('');
   const steps=sc.iv.map((v,i)=>((sc.iv[i+1]??12)-v));
   $('#scFormula').textContent=steps.map(x=>x===1?'半':x===2?'全':x===3?'全半':x+'半音').join(' – ');
