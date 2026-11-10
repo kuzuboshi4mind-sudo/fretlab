@@ -2,7 +2,7 @@
 <script>(function(){// 最後に選んだカラーと振り子の色を、開いた瞬間から使う（端末の保存領域とクッキーの両方に覚えておく）
 var t=null,pc=null,nc=null;try{t=JSON.parse(localStorage.getItem('fretlab.theme'));pc=JSON.parse(localStorage.getItem('fretlab.pendColor'));nc=JSON.parse(localStorage.getItem('fretlab.tunerBg'));}catch(e){}
 try{var m=document.cookie.match(/(?:^|; )fretlab_theme=([a-z]+)/);if(!t&&m)t=m[1];var n=document.cookie.match(/(?:^|; )fretlab_pend=(%23[0-9a-fA-F]{6})/);if(!pc&&n)pc=decodeURIComponent(n[1]);var q=document.cookie.match(/(?:^|; )fretlab_tbg=(%23[0-9a-fA-F]{6})/);if(!nc&&q)nc=decodeURIComponent(q[1]);}catch(e){}
-var BG={light:'#f7f7f3',sage:'#f1f4ee',sakura:'#faf3f3',sky:'#f1f5f9',wood:'#f6eee2',dark:'#121412',navy:'#0f1522',bordeaux:'#1a0f12'},D=['dark','navy','bordeaux'],r=document.documentElement;if(t==='walnut')t='wood';
+var BG={light:'#f7f7f3',sage:'#f1f4ee',sakura:'#faf3f3',sky:'#f1f5f9',wood:'#f6eee2',dark:'#121412',navy:'#0f1522',bordeaux:'#1a0f12'},D=['dark','navy','bordeaux'],r=document.documentElement;if(t==='walnut')t='wood';if(!BG[t])t='wood';   // まだ選んでいなければライトウッド
 if(BG[t]){r.dataset.theme=t;r.dataset.scheme=D.indexOf(t)>=0?'dark':'light';var mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.content=BG[t];}
 if(pc&&/^#[0-9a-fA-F]{6}$/.test(pc))r.style.setProperty('--pend',pc);else pc=null;if(nc&&/^#[0-9a-fA-F]{6}$/.test(nc)){r.style.setProperty('--tbg',nc);var v=parseInt(nc.slice(1),16);if((.299*(v>>16)+.587*(v>>8&255)+.114*(v&255))/255>.6)r.dataset.tbg='light';}else nc=null;window.__fretPrefs={theme:BG[t]?t:null,pend:pc,tbg:nc};})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -535,6 +535,12 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .prog-controls > div{display:flex;flex-direction:column}
 .bpm-mini{display:flex;align-items:center;gap:6px}
 .prog-src{display:flex;margin-bottom:12px}.prog-src button{flex:1}
+.quick-keys{display:flex;flex-wrap:wrap;gap:6px;margin-top:-4px}
+.qk{min-width:44px;height:44px;padding:0 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:600 17px var(--mono);cursor:pointer;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.qk small{font:500 9.5px var(--body);color:var(--muted);margin-top:3px}
+.qk.qk-bar{min-width:72px;height:44px;background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-size:19px;overflow:hidden}
+.qk.qk-bar small{color:inherit;opacity:.8}
+.qk:active{transform:scale(.95)}
 .my-prog{width:100%;font-family:var(--mono);font-size:15px;line-height:1.6;resize:vertical;min-height:120px}
 #myProgMsg:empty{display:none} #myProgMsg.err{color:var(--bad)}
 .prog-item .del{float:right;border:0;background:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0 4px}
@@ -899,6 +905,18 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
         <div id="progMineBox" class="stack" hidden>
           <label class="label" for="myProgText">コードを並べて書く（小節は「|」か改行、1小節に2つ以上はスペースで区切る。「%」で前の小節をくり返し）</label>
           <textarea id="myProgText" class="search my-prog" rows="5" spellcheck="false" autocapitalize="off" placeholder="例：&#10;C | G/B | Am7 | Fmaj7&#10;Dm7 G7 | C | % | G13"></textarea>
+          <div class="quick-keys" id="myProgKeys" aria-label="よく使う記号を入れる">
+            <button type="button" class="qk qk-bar" data-ins=" | " aria-label="小節の区切り（縦線）">|<small>小節</small></button>
+            <button type="button" class="qk" data-ins=" " aria-label="スペース">␣<small>空白</small></button>
+            <button type="button" class="qk" data-ins="\n" aria-label="改行">↵<small>改行</small></button>
+            <button type="button" class="qk" data-ins=" % " aria-label="前の小節をくり返し">%<small>くり返し</small></button>
+            <button type="button" class="qk" data-ins="/" aria-label="オンコードの斜線">/</button>
+            <button type="button" class="qk" data-ins="#" aria-label="シャープ">♯</button>
+            <button type="button" class="qk" data-ins="b" aria-label="フラット">♭</button>
+            <button type="button" class="qk" data-ins="m" aria-label="マイナー">m</button>
+            <button type="button" class="qk" data-ins="7" aria-label="セブンス">7</button>
+            <button type="button" class="qk" data-ins="M7" aria-label="メジャーセブンス">M7</button>
+          </div>
           <div class="msg" id="myProgMsg"></div>
           <div class="row"><input id="myProgName" class="search" type="text" placeholder="名前（保存するとき）" style="flex:1;min-width:0"><button class="btn primary" id="myProgShow" type="button">表示する</button><button class="btn" id="myProgSave" type="button">保存</button></div>
           <div><span class="label">保存した進行</span><div class="prog-list" id="myProgList"></div></div>
@@ -1742,7 +1760,7 @@ function stopAllPlayback(){
   if(typeof T!=='undefined'&&T.loop){clearInterval(T.loop);T.loop=null;}
 }
 /* ---------- transport (metronome / drums / progression) ---------- */
-const M={bpm:store.get('bpm',96),beats:store.get('beats',4),den:store.get('den',4),sub:1,accent:store.get('accent',false),vol:0.7,sound:soundIndex(store.get('sound4',SOUND_OLD[store.get('sound3',0)]||'click1')),rhythm:store.get('rhythm','click'),layer:false,
+const M={bpm:(()=>{ let b=store.get('bpm',120); if(!store.get('bpm120',false)){ if(b===96) b=120; store.set('bpm120',true); } return b; })(),beats:store.get('beats',4),den:store.get('den',4),sub:1,accent:store.get('accent',false),vol:0.7,sound:soundIndex(store.get('sound4',SOUND_OLD[store.get('sound3',0)]||'click1')),rhythm:store.get('rhythm','click'),layer:false,
   playing:false,next:0,beat:0,subI:0,bar:0,timer:null,queue:[],owner:null,startedAt:0};
 const tickHooks=[];  // (t, {beat,subI,bar,tpb,beats}) をオーディオ時刻で呼ぶ
 const drawHooks=[];  // 画面更新（実際に鳴った瞬間）
@@ -2789,6 +2807,12 @@ drawHooks.push(cur=>{
   const showSrc=()=>{ $('#progListBox').hidden=P.src==='mine'; $('#progMineBox').hidden=P.src!=='mine'; };
   segInit($('#progSrc'),P.src,v=>{ P.src=v; store.set('pSrc',v); if(M.playing&&M.owner==='prog') transportStop(); showSrc(); renderProg(); });
   const tx=$('#myProgText'); tx.value=P.mine;
+  // 記号ボタン：タップした所（カーソルの位置）に入れる。キーボードは閉じない
+  $('#myProgKeys').addEventListener('pointerdown',e=>{ if(e.target.closest('.qk')) e.preventDefault(); });
+  $('#myProgKeys').addEventListener('click',e=>{ const b=e.target.closest('.qk'); if(!b) return;
+    const ins=b.dataset.ins.replace('\\n','\n'), st=tx.selectionStart??tx.value.length, en=tx.selectionEnd??st, v=tx.value;
+    const before=v.slice(0,st), clean=(ins.startsWith(' ')&&/\s$/.test(before))?ins.trimStart():ins;
+    tx.value=before+clean+v.slice(en); const pos=st+clean.length; tx.focus(); tx.setSelectionRange(pos,pos); });
   const applyMine=()=>{ P.mine=tx.value; P.mineName=$('#myProgName').value.trim()||null; store.set('myProg',P.mine); if(M.playing&&M.owner==='prog') transportStop(); renderProg(); };
   $('#myProgShow').addEventListener('click',applyMine);
   tx.addEventListener('keydown',e=>{ if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){ e.preventDefault(); applyMine(); } });
