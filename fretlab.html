@@ -1,10 +1,10 @@
 <title>Fretlab ギター練習帳</title>
 <script>(function(){// 最後に選んだカラーと振り子の色を、開いた瞬間から使う（端末の保存領域とクッキーの両方に覚えておく）
-var t=null,pc=null,nc=null;try{t=JSON.parse(localStorage.getItem('fretlab.theme'));pc=JSON.parse(localStorage.getItem('fretlab.pendColor'));nc=JSON.parse(localStorage.getItem('fretlab.needleColor'));}catch(e){}
-try{var m=document.cookie.match(/(?:^|; )fretlab_theme=([a-z]+)/);if(!t&&m)t=m[1];var n=document.cookie.match(/(?:^|; )fretlab_pend=(%23[0-9a-fA-F]{6})/);if(!pc&&n)pc=decodeURIComponent(n[1]);var q=document.cookie.match(/(?:^|; )fretlab_needle=(%23[0-9a-fA-F]{6})/);if(!nc&&q)nc=decodeURIComponent(q[1]);}catch(e){}
+var t=null,pc=null,nc=null;try{t=JSON.parse(localStorage.getItem('fretlab.theme'));pc=JSON.parse(localStorage.getItem('fretlab.pendColor'));nc=JSON.parse(localStorage.getItem('fretlab.tunerBg'));}catch(e){}
+try{var m=document.cookie.match(/(?:^|; )fretlab_theme=([a-z]+)/);if(!t&&m)t=m[1];var n=document.cookie.match(/(?:^|; )fretlab_pend=(%23[0-9a-fA-F]{6})/);if(!pc&&n)pc=decodeURIComponent(n[1]);var q=document.cookie.match(/(?:^|; )fretlab_tbg=(%23[0-9a-fA-F]{6})/);if(!nc&&q)nc=decodeURIComponent(q[1]);}catch(e){}
 var BG={light:'#f7f7f3',sage:'#f1f4ee',sakura:'#faf3f3',sky:'#f1f5f9',wood:'#f6eee2',dark:'#121412',navy:'#0f1522',bordeaux:'#1a0f12'},D=['dark','navy','bordeaux'],r=document.documentElement;if(t==='walnut')t='wood';
 if(BG[t]){r.dataset.theme=t;r.dataset.scheme=D.indexOf(t)>=0?'dark':'light';var mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.content=BG[t];}
-if(pc&&/^#[0-9a-fA-F]{6}$/.test(pc))r.style.setProperty('--pend',pc);else pc=null;if(nc&&/^#[0-9a-fA-F]{6}$/.test(nc))r.style.setProperty('--tneedle',nc);else nc=null;window.__fretPrefs={theme:BG[t]?t:null,pend:pc,needle:nc};})();</script>
+if(pc&&/^#[0-9a-fA-F]{6}$/.test(pc))r.style.setProperty('--pend',pc);else pc=null;if(nc&&/^#[0-9a-fA-F]{6}$/.test(nc))r.style.setProperty('--tbg',nc);else nc=null;window.__fretPrefs={theme:BG[t]?t:null,pend:pc,tbg:nc};})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -172,8 +172,8 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 
 /* tuner：この画面だけは明るい表示でも黒地に白 */
 [data-panel="tuner"]{
-  --bg:#0e100f; --surface:#161917; --panel:#1e221f; --line:#2c312d;
-  --fg:#f3f5f2; --muted:#9ba39c; --accent:#f3f5f2; --accent-ink:#0e100f; --accent-soft:#232a24;
+  --bg:var(--tbg,#0e100f); --surface:color-mix(in srgb,var(--bg) 93%,#fff); --panel:color-mix(in srgb,var(--bg) 87%,#fff); --line:color-mix(in srgb,var(--bg) 80%,#fff);
+  --fg:#f3f5f2; --muted:#9ba39c; --accent:#f3f5f2; --accent-ink:var(--bg); --accent-soft:color-mix(in srgb,var(--bg) 85%,#fff);
   --good:#7fd69a; --warn:#f0b35a; --root:#d9b56c;
   color-scheme:dark; color:var(--fg); background:var(--bg); border-radius:22px; padding:20px 16px 22px; margin-inline:-4px}
 [data-panel="tuner"] .panel-head p{color:var(--muted)}
@@ -234,7 +234,8 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .treadout span+span{color:var(--muted)}
 .gauge-wrap{display:flex;justify-content:center;position:relative}
 .tn-color-btn{top:-4px;right:2px}
-.tn-color-btn svg circle{fill:var(--tneedle,var(--warn))}
+.tn-color-btn svg circle{fill:var(--warn)}
+.gauge-wrap .pendcolors button{border-color:rgba(255,255,255,.4)}
 .gauge-wrap .pendcolors{top:40px;right:2px}
 .gauge{width:100%;max-width:560px;overflow:visible}
 .gauge .arc{fill:none;stroke:var(--line);stroke-width:1.5}
@@ -243,8 +244,8 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .gauge .zone{fill:var(--good);opacity:.2;transition:opacity .3s}
 .gauge text{fill:var(--muted);font-family:var(--mono);font-size:10px;text-anchor:middle}
 .gauge text.side{font-family:var(--body);font-size:10.5px;letter-spacing:.15em}
-#needle{transform-origin:150px 160px;transition:transform .16s ease-out}
-#needle line{stroke:var(--tneedle,var(--warn));stroke-width:3;stroke-linecap:round;transition:stroke .2s}
+#needle{transform-origin:150px 160px;transition:transform .45s cubic-bezier(.25,.6,.35,1)}
+#needle line{stroke:var(--warn);stroke-width:3;stroke-linecap:round;transition:stroke .2s}
 .gauge.idle #needle line{stroke:var(--muted);opacity:.5}
 .gauge.in #needle line{stroke:var(--good)}
 .gauge.in .zone{opacity:.45}
@@ -764,8 +765,8 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           </div>
         </div>
         <div class="gauge-wrap">
-          <button type="button" class="pend-color-btn tn-color-btn" id="needleColorBtn" aria-label="針の色を選ぶ" aria-haspopup="true" aria-expanded="false" aria-controls="needleColors"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.5-.2-.8-.4-1.1-.3-.3-.4-.6-.4-1 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.3"/><circle cx="10.5" cy="7" r="1.3"/><circle cx="15" cy="7.5" r="1.3"/></svg></button>
-          <div class="pendcolors" id="needleColors" role="radiogroup" aria-label="針の色" hidden></div>
+          <button type="button" class="pend-color-btn tn-color-btn" id="needleColorBtn" aria-label="チューナーの背景の色を選ぶ" aria-haspopup="true" aria-expanded="false" aria-controls="needleColors"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.5-.2-.8-.4-1.1-.3-.3-.4-.6-.4-1 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.3"/><circle cx="10.5" cy="7" r="1.3"/><circle cx="15" cy="7.5" r="1.3"/></svg></button>
+          <div class="pendcolors" id="needleColors" role="radiogroup" aria-label="チューナーの背景の色" hidden></div>
           <svg class="gauge" id="gauge" viewBox="17 0 266 178" aria-hidden="true">
             <path class="arc" id="gArc"/>
             <path class="zone" id="gZone"/>
@@ -1371,13 +1372,13 @@ function setTheme(id){ const t=THEMES.find(x=>x.id===id); if(!t) return; const r
   try{ document.cookie='fretlab_theme='+id+';max-age=315360000;path=/;SameSite=Lax'; }catch(e){} paintTheme(); }
 // 振り子・チューナーの針の色：8色から選ぶ（選ぶまではカラーに合わせた色）。右上のアイコンから開く
 const PEND_COLORS=[['キャラメル','#c08547'],['テラコッタ','#c8643c'],['ルビー','#b8323f'],['ローズ','#d97a93'],['オリーブ','#8a9a3a'],['エメラルド','#2f8f6a'],['サファイア','#2f6db0'],['ゴールド','#c9a227']];
-function colorPicker({btn,pop,key,cssVar,cookie,init}){
+function colorPicker({btn,pop,key,cssVar,cookie,init,colors=PEND_COLORS,autoLabel='カラーに合わせる'}){
   btn=$(btn); pop=$(pop); if(!btn||!pop) return;
   const set=c=>{ const r=document.documentElement; if(c) r.style.setProperty(cssVar,c); else r.style.removeProperty(cssVar); store.set(key,c||null);
     try{ document.cookie=cookie+'='+(c?encodeURIComponent(c):'')+';max-age='+(c?315360000:0)+';path=/;SameSite=Lax'; }catch(e){}
     pop.querySelectorAll('button').forEach(b=>b.setAttribute('aria-checked',String((b.dataset.c||null)===(c||null)))); };
-  PEND_COLORS.forEach(([n,c])=>{ const b=document.createElement('button'); b.type='button'; b.dataset.c=c; b.title=n; b.setAttribute('aria-label',n); b.setAttribute('role','radio'); b.style.background=c; b.addEventListener('click',()=>set(c)); pop.appendChild(b); });
-  const a=document.createElement('button'); a.type='button'; a.className='auto'; a.textContent='カラーに合わせる'; a.setAttribute('role','radio'); a.addEventListener('click',()=>set(null)); pop.appendChild(a);
+  colors.forEach(([n,c])=>{ const b=document.createElement('button'); b.type='button'; b.dataset.c=c; b.title=n; b.setAttribute('aria-label',n); b.setAttribute('role','radio'); b.style.background=c; b.addEventListener('click',()=>set(c)); pop.appendChild(b); });
+  const a=document.createElement('button'); a.type='button'; a.className='auto'; a.textContent=autoLabel; a.setAttribute('role','radio'); a.addEventListener('click',()=>set(null)); pop.appendChild(a);
   set(store.get(key,null)||init||null);
   const open=v=>{ pop.hidden=!v; btn.setAttribute('aria-expanded',String(v)); };
   btn.addEventListener('click',e=>{ e.stopPropagation(); open(pop.hidden); });
@@ -1386,7 +1387,9 @@ function colorPicker({btn,pop,key,cssVar,cookie,init}){
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!pop.hidden){ open(false); btn.focus(); } });
 }
 colorPicker({btn:'#pendColorBtn',pop:'#pendColors',key:'pendColor',cssVar:'--pend',cookie:'fretlab_pend',init:window.__fretPrefs&&window.__fretPrefs.pend});
-colorPicker({btn:'#needleColorBtn',pop:'#needleColors',key:'needleColor',cssVar:'--tneedle',cookie:'fretlab_needle',init:window.__fretPrefs&&window.__fretPrefs.needle});
+// チューナーの背景：白い文字が読みやすい、深い色の8種類
+const TUNER_BG=[['チャコール','#24272d'],['ネイビー','#0f1a33'],['ディープブルー','#0b2440'],['ティール','#0b2a2a'],['フォレスト','#10261b'],['ボルドー','#2c0f18'],['パープル','#211433'],['ブラウン','#2b1d13']];
+colorPicker({btn:'#needleColorBtn',pop:'#needleColors',key:'tunerBg',cssVar:'--tbg',cookie:'fretlab_tbg',init:window.__fretPrefs&&window.__fretPrefs.tbg,colors:TUNER_BG,autoLabel:'標準（黒）'});
 (function initThemes(){
   const pop=$('#themePop'), btn=$('#themeBtn');
   THEMES.forEach(t=>{ const b=document.createElement('button'); b.type='button'; b.className='theme-opt'; b.dataset.v=t.id; b.setAttribute('role','radio');
@@ -1936,7 +1939,7 @@ function tunerLoop(){
   const tm=chrom?T.target:ms[T.target??0], raw=(mf-tm)*100;
   // メーターはゆっくり追従させる（大きくずれたときだけ素早く寄せる）
   const dev=T.ema==null?0:Math.abs(raw-T.ema);
-  T.ema=T.ema==null?raw:T.ema+(raw-T.ema)*(dev>35?.4:.07);
+  T.ema=T.ema==null?raw:T.ema+(raw-T.ema)*(dev>35?.18:.035);   // 針はゆっくり（大きくずれたときだけ少し速く）
   const cents=Math.round(T.ema), n=ms.length, now=performance.now();
   // ±4セント以内が0.45秒続いたら「合った」（少し甘め）
   const near=Math.abs(T.ema)<=4;
