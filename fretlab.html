@@ -868,8 +868,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
   <section data-panel="fretboard" hidden>
     <div class="panel-head"><div><h2>指板音程表</h2><p>指板の全音名。タップで鳴ります。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
     <div class="board-tools">
-      <div><span class="label">表示</span><div class="seg" id="fbMode"><button data-v="name">音名</button><button data-v="degree">度数</button></div></div>
-      <div><label class="label" for="fbKey">キー（ルート）</label><select id="fbKey"></select></div>
+      <div><span class="label">表示</span><div class="seg" id="fbMode"><button data-v="name">音名</button><button data-v="degree">度数</button><button data-v="doremi">ドレミ</button></div></div>
       <div><label class="label" for="fbFind">この音だけ表示</label><select id="fbFind"></select></div>
       <div><label class="check" style="min-height:40px"><input type="checkbox" id="fbNatural"> ♯♭を除く</label></div>
     </div>
@@ -2279,7 +2278,8 @@ function renderBoard(el,dotFn,onPick,tuning=tun(),frets=FRETS){
     s+=`<rect class="hit" data-s="${st}" data-f="${f}" x="${x0}" y="${sy(st)-15}" width="${x1-x0}" height="30"/>`;
     const d=dotFn(st,f,tuning[st]+f);
     const rr=Math.min(d?(d.kind==='quiz'?13:11.5):0,f>0?(g.fx[f]-g.fx[f-1])/2+.5:99);   // 高いフレットは幅に合わせて小さく
-    if(d) s+=`<g class="dot k-${d.kind}"><circle cx="${fxc(f,g)}" cy="${sy(st)}" r="${rr.toFixed(1)}"/><text x="${fxc(f,g)}" y="${sy(st)}"${rr<11?` style="font-size:${(rr/11.5*100).toFixed(0)}%"`:''}>${d.label}</text></g>`;
+    const lw=d?[...String(d.label)].reduce((a,c)=>a+(/[ -~♯♭]/.test(c)?.6:1),0):0, fsc=Math.min(rr/11.5,lw>2?2.1/lw:1);   // 長い文字（ファ♯など）は小さく
+    if(d) s+=`<g class="dot k-${d.kind}"><circle cx="${fxc(f,g)}" cy="${sy(st)}" r="${rr.toFixed(1)}"/><text x="${fxc(f,g)}" y="${sy(st)}"${fsc<.99?` style="font-size:${(fsc*100).toFixed(0)}%"`:''}>${d.label}</text></g>`;
   }
   el.innerHTML=s+'</svg>';
   el.querySelector('svg').addEventListener('click',e=>{
@@ -3419,6 +3419,7 @@ async function recRender(){
 /* ---------- fretboard map + quiz ---------- */
 const F={mode:'name',key:0,find:-1,natural:false,quiz:null,score:0,total:0};
 const NAT=new Set([0,2,4,5,7,9,11]);
+const DOREMI_PC=['ド','ド♯','レ','レ♯','ミ','ファ','ファ♯','ソ','ソ♯','ラ','ラ♯','シ'];
 // 五線譜：タップした音を、楽器の楽譜の書き方で表示（ギターとベースは実際の音より1オクターブ高く書く）
 const LETTERS=['C','D','E','F','G','A','B'], DOREMI=['ド','レ','ミ','ファ','ソ','ラ','シ'];
 function spell(m,flat){ const pc=((m%12)+12)%12, sharp={0:[0,''],1:[0,'#'],2:[1,''],3:[1,'#'],4:[2,''],5:[3,''],6:[3,'#'],7:[4,''],8:[4,'#'],9:[5,''],10:[5,'#'],11:[6,'']}, fl={1:[1,'b'],3:[2,'b'],6:[4,'b'],8:[5,'b'],10:[6,'b']};
@@ -3469,11 +3470,12 @@ function renderFb(){
     if(F.find>=0&&pc!==F.find) return null;
     if(F.natural&&!NAT.has(pc)) return null;
     if(F.mode==='degree') return {kind:kindOf(semi),label:DEG[semi]};
-    return {kind:pc===F.key?'root':(NAT.has(pc)?'other':'dim'),label:nn(pc,F.key)};
+    if(F.mode==='doremi') return {kind:NAT.has(pc)?'other':'dim',label:DOREMI_PC[pc]};   // ドレミ（固定ド）
+    return {kind:NAT.has(pc)?'other':'dim',label:nn(pc,F.key)};
   },(s,f)=>{ if(!F.quiz) showStaff(s,f); },tun(),22);
   $('#fbLegend').innerHTML=F.quiz?'':(F.mode==='degree'
     ?'<span><i style="background:var(--root)"></i>ルート</span><span><i style="background:var(--third)"></i>3度</span><span><i style="background:var(--fifth)"></i>5度</span><span><i style="background:var(--other)"></i>その他</span>'
-    :'<span><i style="background:var(--root)"></i>キーの音</span><span><i style="background:var(--other)"></i>幹音（ドレミ…）</span><span><i style="background:var(--other);opacity:.35"></i>派生音（♯♭）</span>');
+    :'<span><i style="background:var(--other)"></i>幹音（ドレミ…）</span><span><i style="background:var(--other);opacity:.35"></i>派生音（♯♭）</span>');
 }
 function newQuiz(){
   F.quiz={s:Math.floor(Math.random()*tun().length),f:Math.floor(Math.random()*13),revealed:false};
@@ -3481,10 +3483,8 @@ function newQuiz(){
 }
 (function initFb(){
   segInit($('#fbMode'),'name',v=>{F.mode=v;renderFb();});
-  const k=$('#fbKey'), fd=$('#fbFind');
-  ROOT_LABELS.forEach((l,i)=>{k.add(new Option(l,i));});
+  const fd=$('#fbFind');
   fd.add(new Option('すべて',-1)); ROOT_LABELS.forEach((l,i)=>fd.add(new Option(l,i)));
-  k.addEventListener('change',()=>{F.key=+k.value;renderFb();});
   fd.addEventListener('change',()=>{F.find=+fd.value;renderFb();});
   $('#fbNatural').addEventListener('change',e=>{F.natural=e.target.checked;renderFb();});
   ROOT_LABELS.forEach((l,i)=>{const b=document.createElement('button');b.className='chip note';b.textContent=l;b.addEventListener('click',()=>{
