@@ -1288,10 +1288,11 @@ function parseChordName(txt){
   return {id:'custom',root,bass,iv,ess,deg,name,known:same&&bass==null?same.id:null,sym:sym+(bass!=null?'/'+(m[5]==='b'?NOTES_F:NOTES_S)[bass]:'')};
 }
 // ギター：0〜15フレットで、いちばん低い音がベース音になる押さえ方を探す（指は4本・4フレットの幅まで）
-function searchVoicings(root,ch){
+function searchVoicings(root,ch,needN){
   const t=tun(), n=t.length, bassPc=ch.bass!=null?ch.bass:root;
   const allow=new Set(ch.iv.map(i=>(root+i)%12)); if(ch.bass!=null) allow.add(ch.bass);
-  const k=Math.min(ch.ess.length,n-1), need=new Set(ch.ess.slice(0,Math.max(3,Math.min(k,5))).map(i=>(root+i)%12));
+  const k=Math.min(ch.ess.length,n-1); needN=needN??Math.max(3,Math.min(k,ch.ess.length>=6?4:5));   // 6音以上のコードは大事な4音だけ
+  const need=new Set(ch.ess.slice(0,needN).map(i=>(root+i)%12));
   if(ch.bass==null) need.add(root);
   const res=[], seen=new Set();
   for(let b=1;b<=12;b++){
@@ -1316,6 +1317,7 @@ function searchVoicings(root,ch){
     };
     rec(0);
   }
+  if(!res.length&&needN>3) return searchVoicings(root,ch,needN-1);   // 見つからないときは、省く音を1つ増やしてもう一度
   res.sort((a,b)=>a.cost-b.cost);
   const byPos=new Map(); res.forEach(v=>{ const a=byPos.get(v.pos)||[]; if(a.length<2){ a.push(v); byPos.set(v.pos,a); } });
   const list=[...byPos.values()].flat().sort((a,b)=>a.pos-b.pos||a.cost-b.cost).map(v=>({...v,label:v.pos===0?'オープンコード':`${v.pos}フレット付近`}));
@@ -2417,20 +2419,89 @@ const PROGS=[
   {c:'ラテン・その他',n:'ラテン・ツーコード（Im7–IV7）',p:'Im7 | IV7',d:'2小節のモントゥーノ風ループ。サルサやラテンロックのジャムに。'},
   {c:'ラテン・その他',n:'ワルツ（I–IV–V7–I）',p:'I | IV | V7 | I | I | IV | V7 | I',d:'3拍子の練習に。ドラムは「ワルツ（3/4）」で。'},
   {c:'ラテン・その他',n:'カントリー（I–IV–I–V7）',p:'I | I | IV | IV | I | I | V7 | V7',d:'2小節ずつのゆったりした進行。ベースランを入れる練習に。'},
+  // ジャズ・ボサノヴァ・ラテン（テンション・オンコード入り）
+  {c:'ジャズ',n:'ツーファイブワン（9th・13th）',p:'IIm9 | V13 | IM9 | IM9',d:'テンションを入れた定番のⅡ–Ⅴ–Ⅰ。9thと13thで一気にジャズらしい響きに。'},
+  {c:'ジャズ',n:'マイナー・ツーファイブ（♭9）',p:'IIm7b5 | V7b9 | Im6 | Im6',d:'m7(♭5)→7(♭9)→m6。マイナーキーでいちばん使う解決。'},
+  {c:'ジャズ',n:'裏コード（トライトーン代理）',p:'IIm7 | bII7 | IM7 | IM7',d:'V7を♭II7に置き換えると、ベースが半音で滑らかに下がる。'},
+  {c:'ジャズ',n:'バックドア・ツーファイブ',p:'IVm7 | bVII9 | IM7 | IM7',d:'IVm7→♭VII9からIへ。裏口から帰るような、やわらかい解決。'},
+  {c:'ジャズ',n:'3-6-2-5（オルタード）',p:'IIIm7 | VI7b9 | IIm9 | V13',d:'IIIm7からの長いターンアラウンド。VI7(♭9)が次のIIm9を強く呼ぶ。'},
+  {c:'ジャズ',n:'コルトレーン・チェンジ',p:'IM7 bIII7 | bVIM7 VII7 | IIIM7 | IIm7 V7',d:'長3度ずつ転調する「ジャイアント・ステップス」型。運指の難関。'},
+  {c:'ジャズ',n:'マイナー・ブルース',p:'Im7 | Im7 | Im7 | Im7 | IVm7 | IVm7 | Im7 | Im7 | bVI7 | V7alt | Im7 | V7alt',d:'12小節のマイナー・ブルース。♭VI7→V7altの緊張感がポイント。'},
+  {c:'ジャズ',n:'ジャズ・ブルース',p:'I7 | IV7 | I7 | Vm7 I7 | IV7 | #IVdim7 | I7 | VI7b9 | IIm7 | V7 | I7 VI7 | IIm7 V7',d:'ツーファイブやディミニッシュを入れたジャズの12小節ブルース。'},
+  {c:'ジャズ',n:'4度進行（枯葉型）',p:'IIm7 | V7 | IM7 | IVM7 | VIIm7b5 | III7b9 | VIm6 | VIm6',d:'メジャーのⅡ–Ⅴ–Ⅰから平行調のマイナーへ。スタンダードの定番の流れ。'},
+  {c:'ジャズ',n:'循環（テンション入り）',p:'IM7 VI7b9 | IIm9 V13 | IIIm7 VI7#9 | IIm7 V7b9',d:'I–VI–II–Vを、♭9・♯9・13でカラフルに。'},
+  {c:'ジャズ',n:'マイナー・ライン・クリシェ',p:'Im | ImM7 | Im7 | Im6',d:'ルートを残して内声だけが半音で下がる。哀愁のあるイントロに。'},
+  {c:'ジャズ',n:'パッシング・ディミニッシュ',p:'IM7 | #Idim7 | IIm7 | #IIdim7 | IIIm7 | VI7 | IIm7 | V7',d:'ディミニッシュでベースを半音ずつ上げていく。'},
+  {c:'ジャズ',n:'ペダル・ツーファイブ（オンコード）',p:'IIm7/V | V7sus4 | IM9 | IM9',d:'Vのベースを鳴らしたままIIm7を重ねる、モダンなサウンド。'},
+  {c:'ジャズ',n:'ドリアン・ヴァンプ',p:'Im11 | Im11 | IV13 | IV13',d:'m11と13の2コードを往復する、モーダルなジャムの定番。'},
+  {c:'ジャズ',n:'ベース下降のリハーモナイズ',p:'IM7 | VIIm7b5 III7b9 | VIm7 VIm7/V | IVM7#11 | IVm6 | IM7/III | bIIIdim7 | IIm9 V13',d:'ベースが半音・全音で下がっていく、バラードのリハモ。'},
+  {c:'ジャズ',n:'タッド・ダメロン・ターンアラウンド',p:'IM7 bIIIM7 | bVIM7 bIIM7',d:'I→♭III→♭VI→♭IIとM7で下がる、おしゃれなターンアラウンド。'},
+  {c:'ジャズ',n:'マイナー下降ベース（オンコード）',p:'Im | Im/bVII | Im/VI | bVIM7',d:'ルートを残してベースだけ半音ずつ下げる、映画音楽のような流れ。'},
+  {c:'ジャズ',n:'ツーファイブの連鎖（半音下降）',p:'IIIm7 VI7 | bIIIm7 bVI7 | IIm7 V7 | IM7',d:'ツーファイブを半音ずつ下げてIへ。スタンダードでよく出る形。'},
+  {c:'ジャズ',n:'オルタード解決',p:'IM7 | VI7alt | IIm9 | V7#9',d:'オルタード・テンションで強い緊張を作ってから解決。'},
+  {c:'ジャズ',n:'ジャズ・バラード',p:'IM9 | IVM7#11 | IIIm7 VI7b13 | IIm11 V7sus4',d:'♯11や♭13の柔らかい響き。ゆっくりのテンポで。'},
+  {c:'ボサノヴァ',n:'イパネマ型（半音下降）',p:'IM9 | IM9 | II9 | II9 | IIm9 | bII7#11 | IM9 | bII7#11',d:'II9の浮遊感から、♭II7(♯11)で半音下降して戻る、ボサノヴァの代名詞的な流れ。'},
+  {c:'ボサノヴァ',n:'ボサノヴァ・ツーファイブ',p:'IIm9 | V13 | IM9 | IM9',d:'9thと13thを入れた、やさしいⅡ–Ⅴ–Ⅰ。'},
+  {c:'ボサノヴァ',n:'マイナー・ボサノヴァ',p:'Im9 | IVm9 | IIm7b5 | V7b9',d:'m9のくすんだ響きで始まるマイナーのボサ。'},
+  {c:'ボサノヴァ',n:'6/9の浮遊',p:'I6/9 | I6/9 | IVM7#11 | IVM7#11',d:'6/9とM7(♯11)の2コード。明るく漂うようなサウンド。'},
+  {c:'ボサノヴァ',n:'ベース半音下降（オンコード）',p:'IM7 | IM7/VII | VIm7 | VIm7/V',d:'ベースがド→シ→ラ→ソと下がる、ボサノヴァらしい流れ。'},
+  {c:'ボサノヴァ',n:'サブドミナント・マイナー',p:'IVM7 | IVm6 | IIIm7 | VI7b9 | IIm9 | V7b9 | IM9 | IM9',d:'IVからIVm6への切ない色の変化がポイント。'},
+  {c:'ボサノヴァ',n:'ボサ・ターンアラウンド',p:'IM7 VI7b13 | IIm9 V7b9',d:'2小節でくり返すターンアラウンド。アルペジオの練習に。'},
+  {c:'ボサノヴァ',n:'ドッペルドミナントの浮遊',p:'IM9 | II13 | IIm9 | V13sus4',d:'II13の明るさからIIm9→V13sus4へ。ジョビン風。'},
+  {c:'ボサノヴァ',n:'マイナー・クリシェ（ボサ）',p:'Im | ImM7 | Im7 | Im6 | IVm7 | bVII9 | bIIIM7 | IIm7b5 V7b9',d:'ライン・クリシェから平行調へ動く、8小節のマイナー・ボサ。'},
+  {c:'ボサノヴァ',n:'ディミニッシュ経過（ボサ）',p:'IM7 | #Idim7 | IIm7 | V7b9',d:'#Idim7で半音上がってIIm7へ。'},
+  {c:'ボサノヴァ',n:'ペダル・ボサ（オンコード）',p:'IM7 | IIm7/I | IM7 | IIm7/I',d:'ベースをIに置いたまま上だけ動かす、穏やかなヴァンプ。'},
+  {c:'ボサノヴァ',n:'3-6-2-5（ボサ）',p:'IIIm7 | VI7b13 | IIm9 | V7b9',d:'♭13や♭9を入れた、メロウなターンアラウンド。'},
+  {c:'ボサノヴァ',n:'リディアン・ボサ（オンコード）',p:'IM7#11 | II/I | IM7#11 | II/I',d:'Iのベースの上でIIのトライアド。リディアンの開放的な響き。'},
+  {c:'ボサノヴァ',n:'マイナー下降（ボサ）',p:'Im | Im/bVII | bVI7 | V7',d:'ベースが下がっていくマイナーの定番。'},
+  {c:'ボサノヴァ',n:'♭VII9経由の終止',p:'IM9 | IVm6 | bVII9 | IM9',d:'サブドミナント・マイナーから♭VII9で戻る、やわらかい終止。'},
+  {c:'ラテン・その他',n:'サルサ・モントゥーノ',p:'I | IV | V7 | IV',d:'サルサの基本ループ。ピアノのモントゥーノのように刻んで。'},
+  {c:'ラテン・その他',n:'ソン・モントゥーノ（マイナー）',p:'Im | IVm | V7 | Im',d:'キューバのソンでよく使うマイナーの循環。'},
+  {c:'ラテン・その他',n:'チャチャチャ',p:'IIm7 | V7 | IM7 | VI7',d:'チャチャチャの軽快なツーファイブ。ドラムは「ラテン」系で。'},
+  {c:'ラテン・その他',n:'タンゴ',p:'Im | V7 | V7 | Im | Im7 | IVm6 | V7b9 | Im',d:'ハーモニックマイナーのドラマチックなタンゴの流れ。'},
+  {c:'ラテン・その他',n:'アンダルシア終止',p:'Im | bVII | bVI | V7',d:'フラメンコの代名詞。ベースがラ→ソ→ファ→ミと下がる。'},
+  {c:'ラテン・その他',n:'アンダルシア終止（♭9）',p:'Im | bVII | bVI | V7b9',d:'最後のV7(♭9)でよりスパニッシュに。'},
+  {c:'ラテン・その他',n:'マンボ・ヴァンプ',p:'IIm7 | V7 | IIm7 | V7',d:'マンボやラテン・ジャズでくり返すツーファイブ。'},
+  {c:'ラテン・その他',n:'ボレロ',p:'IM7 | VI7b9 | IIm7 | V7 | IIIm7 | VI7 | IIm7 | V7b9',d:'ゆったりした恋のバラード。テンポ70〜90で。'},
+  {c:'ラテン・その他',n:'メレンゲ',p:'I | V7 | V7 | I',d:'ドミニカのメレンゲ。I–V7の2コードで速いテンポに。'},
+  {c:'ラテン・その他',n:'ラテン・ジャズ・モントゥーノ',p:'IIm7 | V7b9 | IIm7 | V7b9',d:'ラテン・ジャズのモントゥーノ。♭9でキューバらしい色に。'},
+  {c:'ラテン・その他',n:'アフロ・キューバン・ヴァンプ',p:'Im11 | bVII13 | Im11 | bVII13',d:'6/8の感覚で乗るモーダルなヴァンプ。'},
+  {c:'ラテン・その他',n:'サンバ（I–VI7–II7–V7）',p:'I6 | VI7 | II7 | V7',d:'ドミナントが続く明るいサンバの循環。'},
+  {c:'ラテン・その他',n:'ショーロ風',p:'I | III7 | VIm | II7 | V7 | I',d:'ブラジルのショーロに出てくる、セカンダリードミナントの連続。'},
+  {c:'ラテン・その他',n:'ラテン・ポップ（オンコード）',p:'I | V/VII | VIm | IV',d:'ベースが下がるラテン・ポップの定番。'},
+  {c:'ラテン・その他',n:'フリジアン（ソレア風）',p:'I | bII | bIII | bII',d:'フラメンコのソレア風。ミ・ファ・ソ・ファの往復。'},
 ];
 /*ENDPROGS*/
 const QUAL={'':'maj',m:'m','7':'7',M7:'M7',m7:'m7',mM7:'mM7','6':'6',m6:'m6',sus2:'sus2',sus4:'sus4','7sus4':'7sus4',add9:'add9','9':'9',dim:'dim',dim7:'dim7',m7b5:'m7b5',aug:'aug'};
 const DEG_SEMI={I:0,II:2,III:4,IV:5,V:7,VI:9,VII:11};
+const ROMAN_RE=/^([b#]?)(VII|VI|V|IV|III|II|I)(.*)$/;
+const romanSemi=(acc,num)=>(DEG_SEMI[num]+(acc==='b'?-1:acc==='#'?1:0)+12)%12;
 function parseRoman(tok){
-  const m=/^([b#]?)(VII|VI|V|IV|III|II|I)(.*)$/.exec(tok); if(!m) throw new Error('bad chord '+tok);
-  const type=QUAL[m[3]]; if(!type) throw new Error('bad quality '+tok);
-  return {semi:(DEG_SEMI[m[2]]+(m[1]==='b'?-1:m[1]==='#'?1:0)+12)%12,type,acc:m[1],num:m[2],q:m[3]};
+  // オンコードは「IIm7/V」のように、ベース音も度数で書く（「I6/9」の /9 はコードの一部）
+  let bass=null, bm=null; const sl=tok.lastIndexOf('/');
+  if(sl>0&&(bm=ROMAN_RE.exec(tok.slice(sl+1)))&&bm[3]===''){ bass={semi:romanSemi(bm[1],bm[2]),txt:(bm[1]==='b'?'♭':bm[1]==='#'?'♯':'')+bm[2]}; tok=tok.slice(0,sl); }
+  const m=ROMAN_RE.exec(tok); if(!m) throw new Error('bad chord '+tok);
+  const semi=romanSemi(m[1],m[2]), type=QUAL[m[3]];
+  if(type&&!bass) return {semi,type,acc:m[1],num:m[2],q:m[3]};
+  // テンションやオンコード：自由入力と同じしくみで読む（C を基準に作り、キーに合わせて移す）
+  const tpl=parseChordName('C'+m[3]); if(!tpl) throw new Error('bad quality '+tok);
+  return {semi,type:type||'tpl',acc:m[1],num:m[2],q:m[3],tpl,bass};
 }
 function parseProg(p){return p.split('|').map(bar=>bar.trim().split(/\s+/).map(parseRoman));}
 const P={src:store.get('pSrc','list'),mine:store.get('myProg','C | G/B | Am7 | Fmaj7\nDm7 G7 | C | % | G13'),idx:store.get('pIdx',0),key:store.get('pKey',0),view:'chord',acc:store.get('pAcc','arp'),cat:'すべて',q:'',bars:null,lastChord:null};
 const prettyQ=q=>q.replace('m7b5','m7(♭5)');
+const TPL_CACHE=new Map();
 function chordAt(c){
   if(c.free) return {root:c.free.root,type:'free',name:c.free.name,roman:c.free.name,free:c.free};   // 自分の進行：書いたコード名のまま
+  if(c.tpl){   // テンション・オンコード入りの定番進行：キーに合わせてコード名を作る
+    const root=(P.key+c.semi)%12, names=c.acc==='b'?NOTES_F:c.acc==='#'?NOTES_S:(FLAT_ROOTS.has(P.key)?NOTES_F:NOTES_S);
+    const k=P.key+':'+c.semi+':'+c.q+':'+(c.bass?c.bass.semi:'');
+    let f=TPL_CACHE.get(k);
+    if(!f){ const bpc=c.bass?(P.key+c.bass.semi)%12:null, sym=c.tpl.sym.replace(/^maj/,'M');
+      const bn=c.bass&&c.bass.txt[0]==='♭'?NOTES_F:c.bass&&c.bass.txt[0]==='♯'?NOTES_S:names;   // ベース音は、その度数の ♭／♯ に合わせる
+      f={...c.tpl,root,bass:bpc,known:c.tpl.known&&bpc==null?c.tpl.known:null,name:names[root]+sym+(bpc!=null?'/'+bn[bpc]:'')}; TPL_CACHE.set(k,f); }
+    return {root,type:'free',name:f.name,roman:(c.acc==='b'?'♭':c.acc==='#'?'♯':'')+c.num+prettyQ(c.q).replace(/b(?=\d)/g,'♭').replace(/#/g,'♯')+(c.bass?'/'+c.bass.txt:''),free:f};
+  }
   const root=(P.key+c.semi)%12, names=c.acc==='b'?NOTES_F:c.acc==='#'?NOTES_S:(FLAT_ROOTS.has(P.key)?NOTES_F:NOTES_S);
   const ch=CHORDS.find(x=>x.id===c.type);
   return {root,type:c.type,name:names[root]+ch.sym,roman:(c.acc==='b'?'♭':c.acc==='#'?'♯':'')+c.num+prettyQ(c.q)};
@@ -2459,7 +2530,7 @@ function renderProgList(){
     if(P.cat!=='すべて'&&p.c!==P.cat) return;
     if(q&&!(p.n.toLowerCase().includes(q)||p.p.toLowerCase().includes(q)||p.d.includes(P.q))) return;
     const b=document.createElement('button');b.className='prog-item';b.setAttribute('aria-current',String(i===P.idx));
-    b.innerHTML=`<b><span class="no">${String(i+1).padStart(3,'0')}</span>${p.n}</b><small>${p.p.replace(/b(?=[IV])/g,'♭').replace(/#/g,'♯')}</small>`;
+    b.innerHTML=`<b><span class="no">${String(i+1).padStart(3,'0')}</span>${p.n}</b><small>${p.p.replace(/b(?=[IV\d])/g,'♭').replace(/#/g,'♯')}</small>`;
     b.addEventListener('click',()=>{P.idx=i;store.set('pIdx',i);renderProgList();renderProg();});
     list.appendChild(b);
   });
