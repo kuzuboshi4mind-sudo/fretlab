@@ -933,7 +933,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
             <div><label class="label" for="progKey">キー</label><select id="progKey"></select></div>
             <div><label class="label" for="progRhythm">リズム</label><select id="progRhythm"></select></div>
             <div><label class="label" for="progAcc">伴奏</label><select id="progAcc">
-              <option value="arp">アルペジオ1（8分・上下）</option><option value="arp2">アルペジオ2（指弾き・交互ベース）</option><option value="arp3">アルペジオ3（16分・流れる）</option><option value="whole">ジャーン（1拍目）</option><option value="strum">4分ストローク</option><option value="eighth">8分ストローク（ダウン・アップ）</option><option value="8beat">8ビート・ストローク</option><option value="16beat">16ビート・ストローク</option><option value="none">なし</option></select></div>
+              <option value="arp">アルペジオ1</option><option value="arp2">アルペジオ2</option><option value="arp3">アルペジオ3</option><option value="whole">ジャーン（1拍目）</option><option value="strum">4分ストローク</option><option value="eighth">8分ストローク（ダウン・アップ）</option><option value="8beat">8ビート・ストローク</option><option value="16beat">16ビート・ストローク</option><option value="none">なし</option></select></div>
             <div><span class="label">表示</span><div class="seg" id="progView"><button data-v="chord">コード</button><button data-v="roman">度数</button></div></div>
           </div>
           <div class="row">
@@ -1507,19 +1507,19 @@ function pluckBuffer(freq){
 }
 // ギター・ウクレレの音色：高い音を丸め、重くなりやすい中低音（250〜400Hzあたり）を少し削る。どのページでも同じ音色に
 const TONE=new WeakMap();
-function toneChain(dest,kind){
+function toneChain(dest,kind,bright){
   let m=TONE.get(dest); if(!m){ m={}; TONE.set(dest,m); }
-  if(m[kind]) return m[kind];
+  const key=kind+(bright?'+':''); if(m[key]) return m[key];
   const c=ac(), lp=c.createBiquadFilter(), mid=c.createBiquadFilter(), inp=c.createGain();
-  lp.type='lowpass'; lp.frequency.value=kind==='nylon'?2400:1900; lp.Q.value=.4;
+  lp.type='lowpass'; lp.frequency.value=(kind==='nylon'?2400:1900)*(bright?1.6:1); lp.Q.value=.4;   // アップ・ストロークは少し明るい音
   mid.type='peaking'; mid.frequency.value=kind==='nylon'?380:320; mid.Q.value=.9; mid.gain.value=kind==='nylon'?-2:-4.5;
   inp.connect(lp); lp.connect(mid); mid.connect(dest);
-  return m[kind]=inp;
+  return m[key]=inp;
 }
 // kind: guitar / bass / nylon、str: 弦番号（同じ弦の音を止めるため）
 function pluck(midi,when=0,gain=0.55,opt={}){
   const kind0=opt.kind||'guitar';
-  if((kind0==='guitar'||kind0==='nylon')&&!opt.raw) return onBus(toneChain(outNode(),kind0),()=>pluck(midi,when,gain,{...opt,raw:1}));
+  if((kind0==='guitar'||kind0==='nylon')&&!opt.raw) return onBus(toneChain(outNode(),kind0,opt.bright),()=>pluck(midi,when,gain,{...opt,raw:1}));
   const c=ac(), kind=opt.kind||'guitar';
   const t0=c.currentTime+when;
   // dur（秒）を指定すると、その長さで指を離したように音を止める
@@ -2608,7 +2608,7 @@ function strumAt(t,frets,{up=false,gain=.3,spread=.022,dur=0,ping=true,only=null
   const c=ac(); let idx=frets.map((f,i)=>f===null?null:i).filter(i=>i!==null);
   if(only==='low') idx=idx.slice(0,Math.max(3,idx.length-2)); if(only==='high') idx=idx.slice(-3);
   if(up) idx.reverse();
-  const tu=tun(), k=ins().kind; idx.forEach((s,j)=>{ const at=t+j*spread; pluck(tu[s]+frets[s],Math.max(0,at-c.currentTime),gain*(up?.72:1)*(.94+Math.random()*.12),{kind:k,str:s,dur:dur||undefined}); if(ping) boardPing(s,frets[s],at,dur?'mute':null); });
+  const tu=tun(), k=ins().kind; idx.forEach((s,j)=>{ const at=t+j*spread; pluck(tu[s]+frets[s],Math.max(0,at-c.currentTime),gain*(up?.72:1)*(.94+Math.random()*.12),{kind:k,str:s,dur:dur||undefined,bright:up}); if(ping) boardPing(s,frets[s],at,dur?'mute':null); });
 }
 /* ---------- 指板で、いま鳴っている場所を光らせる ---------- */
 function renderProgBoard(x){
@@ -2746,23 +2746,22 @@ tickHooks.push((t,info)=>{
   switch(P.acc){
     case 'whole': if(chordStart) strumAt(t,v.frets,{gain:.36,spread:.03}); break;
     case 'strum': strumAt(t,v.frets,{gain:n===0?.32:.22}); break;
-    case 'eighth': strumAt(t,v.frets,{gain:n===0?.3:.22,spread:.012}); strumAt(t+half,v.frets,{up:true,gain:.22,spread:.012}); break;
+    case 'eighth': strumAt(t,v.frets,{gain:n===0?.3:.24,spread:.012}); strumAt(t+half,v.frets,{up:true,gain:.12,spread:.011,only:'high'}); break;   // 裏のアップは弱く
     case '8beat': {   // 8ビート：ダウン・(休)・ダウン・アップ・(休)・アップ・ダウン・アップ
       const pat='D-DU-UDU'; [0,1].forEach(k=>{ const c=pat[(n*2+k)%8], acc=(n%2===1&&k===0); if(c==='D') strumAt(t+k*half,v.frets,{gain:acc?.32:.25,spread:.014}); if(c==='U') strumAt(t+k*half,v.frets,{up:true,gain:.2,spread:.012,only:'high'}); }); break; }
-    case '16beat': {  // 16ビート：2・4拍はミュートの「チャッ」、16分のアップを細かく
-      const pat='D.uUX.uUD.udX.uU'; [0,1,2,3].forEach(k=>{ const c=pat[(n*4+k)%16], d=k*q;
-        if(c==='D') strumAt(t+d,v.frets,{gain:.28,spread:.01}); else if(c==='d') strumAt(t+d,v.frets,{gain:.17,spread:.008,only:'high'});
-        else if(c==='U') strumAt(t+d,v.frets,{up:true,gain:.19,spread:.008,only:'high'}); else if(c==='u') strumAt(t+d,v.frets,{up:true,gain:.11,spread:.007,only:'high'});
-        else if(c==='X') strumAt(t+d,v.frets,{gain:.26,spread:.006,dur:.04}); }); break; }
+    case '16beat': {  // 16ビート：「タン・タン | タン・タカ | タカ・タン | タカ・ッ」（16分でダウン・アップを交互に）
+      const pat='D-D-D-DUDUD-DU--'; [0,1,2,3].forEach(k=>{ const c=pat[(n*4+k)%16], d=k*q, onBeat=k===0, back=onBeat&&(n===1||n===3);
+        if(c==='D') strumAt(t+d,v.frets,{gain:back?.3:onBeat?.27:.2,spread:.01});
+        else if(c==='U') strumAt(t+d,v.frets,{up:true,gain:.16,spread:.008,only:'high'}); }); break; }
     case 'arp': {   // アルペジオ1：8分で上がって下がる
       const order=[strs[0],...strs.slice(1),...strs.slice(1,-1).reverse()];
       [0,1].forEach(k=>pl(order[(n*2+k)%order.length],k*half,k?.36:.42)); break; }
     case 'arp2': {  // アルペジオ2：親指が低音弦を交互に、人さし指・中指が高音弦（トラヴィス風）
       const lo=strs[0], alt=strs[Math.min(2,strs.length-2)]??lo, hi=strs[strs.length-1], hi2=strs[strs.length-2]??hi;
       pl(n%2?alt:lo,0,.44); if(n===0) pl(hi,0,.3); pl(n%2?hi:hi2,half,.32); break; }
-    case 'arp3': {  // アルペジオ3：16分で流れるように上下
-      const order=[strs[0],...strs.slice(1),...strs.slice(1,-1).reverse()];
-      [0,1,2,3].forEach(k=>pl(order[(n*4+k)%order.length],k*q,k?.26:.34)); break; }
+    case 'arp3': {  // アルペジオ3：8分で「ベース・3弦・2弦・3弦・1弦・3弦・2弦・3弦」（3拍目はベースを替える）
+      const L=strs.length, lo=strs[0], alt=strs[Math.min(1,L-4)]??lo, s3=strs[L-3]??lo, s2=strs[L-2]??s3, s1=strs[L-1]??s2;
+      const pat=[lo,s3,s2,s3,s1,s3,s2,s3]; [0,1].forEach(k=>{ const i=(n*2+k)%8; pl(i===4?s1:i===0&&n===2?alt:pat[i],k*half,i===0?.42:i===4?.34:.3); if(i===4) pl(n===2?alt:lo,k*half,.36); }); break; }
   }
 });
 drawHooks.push(cur=>{
