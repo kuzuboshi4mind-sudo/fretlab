@@ -7,7 +7,7 @@ if(BG[t]){r.dataset.theme=t;r.dataset.scheme=D.indexOf(t)>=0?'dark':'light';var 
 if(pc&&/^#[0-9a-fA-F]{6}$/.test(pc))r.style.setProperty('--pend',pc);else pc=null;if(nc&&/^#[0-9a-fA-F]{6}$/.test(nc)){r.style.setProperty('--tbg',nc);var v=parseInt(nc.slice(1),16);if((.299*(v>>16)+.587*(v>>8&255)+.114*(v&255))/255>.6)r.dataset.tbg='light';}else nc=null;window.__fretPrefs={theme:BG[t]?t:null,pend:pc,tbg:nc};})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Noto+Music&display=swap">
 <style>
 /* Layout: quiet white page with hairlines; ebony fretboard is the one dark object; a soft paper texture sits behind everything */
 :root{
@@ -283,6 +283,18 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .board .inl{fill:var(--inlay);opacity:.55}
 .board .fnum{fill:var(--muted);font-family:var(--mono);font-size:11px;text-anchor:middle}
 .board .hit{fill:transparent;cursor:pointer}
+.staff-card{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.staff-svg svg{display:block;width:210px;height:auto}
+.staff-svg .sl{stroke:var(--fg);stroke-width:1;opacity:.75}
+.staff-svg .clef{font-family:"Noto Music","Apple Symbols","Segoe UI Symbol",serif;fill:var(--fg)}
+.staff-svg .note{fill:var(--fg)}.staff-svg .stem{stroke:var(--fg);stroke-width:1.4}
+.staff-svg .acc{font-family:"Noto Music","Apple Symbols",serif;fill:var(--fg);font-size:22px}
+.staff-svg .oct{font-family:var(--serif);font-size:10px;fill:var(--fg)}
+.staff-svg .pop{animation:notepop .35s cubic-bezier(.2,.8,.3,1.3)}
+@keyframes notepop{from{transform:translateY(-6px);opacity:0}to{transform:none;opacity:1}}
+.staff-info b{font-family:var(--display);font-size:34px;font-weight:600;line-height:1}
+.staff-info .doremi{font-size:18px;margin-left:8px}
+.staff-info .msg{display:block;margin-top:4px}
 #progBoard .dot{opacity:.42}
 .board .ping{fill:var(--pend);stroke:#fff;stroke-width:2;pointer-events:none;animation:ping .55s cubic-bezier(.2,.7,.3,1) forwards;transform-box:fill-box;transform-origin:center}
 .board .ping-ring{fill:none;stroke:var(--pend);stroke-width:2.5;pointer-events:none;animation:pingring .7s ease-out forwards;transform-box:fill-box;transform-origin:center}
@@ -855,6 +867,10 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
     </div>
     <div class="board-scroll" id="fbBoard"></div>
     <div class="legend" id="fbLegend" style="margin-top:10px"></div>
+    <div class="card staff-card" id="fbStaff">
+      <div class="staff-svg" id="fbStaffSvg"></div>
+      <div class="staff-info" id="fbStaffInfo"><span class="msg">指板の音をタップすると、五線譜での書き方が出ます。</span></div>
+    </div>
     <div class="card quiz">
       <div>
         <b>指板クイズ</b>　<span class="msg"><b>?</b>の音名は？</span>
@@ -3376,6 +3392,33 @@ async function recRender(){
 /* ---------- fretboard map + quiz ---------- */
 const F={mode:'name',key:0,find:-1,natural:false,quiz:null,score:0,total:0};
 const NAT=new Set([0,2,4,5,7,9,11]);
+// 五線譜：タップした音を、楽器の楽譜の書き方で表示（ギターとベースは実際の音より1オクターブ高く書く）
+const LETTERS=['C','D','E','F','G','A','B'], DOREMI=['ド','レ','ミ','ファ','ソ','ラ','シ'];
+function spell(m,flat){ const pc=((m%12)+12)%12, sharp={0:[0,''],1:[0,'#'],2:[1,''],3:[1,'#'],4:[2,''],5:[3,''],6:[3,'#'],7:[4,''],8:[4,'#'],9:[5,''],10:[5,'#'],11:[6,'']}, fl={1:[1,'b'],3:[2,'b'],6:[4,'b'],8:[5,'b'],10:[6,'b']};
+  const [li,acc]=flat&&fl[pc]?fl[pc]:sharp[pc]; const oct=Math.floor(m/12)-1+(flat&&pc===11&&false?1:0); return {li,acc,oct}; }
+function staffSVG(m,{clef='treble',flat=false,write=0}={}){
+  const w=m+write, sp=spell(w,flat), d=sp.oct*7+sp.li;           // 音の高さ（ドから数えた白鍵の段）
+  const base=clef==='bass'?18:30, y=80-(d-base)*5, x=128;           // ト音記号：下の線＝ミ4、ヘ音記号：下の線＝ソ2
+  let s=`<svg viewBox="0 0 210 130" role="img" aria-label="五線譜">`;
+  for(let i=0;i<5;i++) s+=`<line class="sl" x1="8" y1="${40+i*10}" x2="202" y2="${40+i*10}"/>`;
+  s+=clef==='bass'?`<text class="clef" x="12" y="62" font-size="38">𝄢</text>`:`<text class="clef" x="10" y="82" font-size="54">𝄞</text>`;
+  if(write) s+=`<text class="oct" x="${clef==='bass'?22:24}" y="${clef==='bass'?92:108}">8</text>`;
+  for(let ly=90;ly<=y;ly+=10) s+=`<line class="sl" x1="${x-11}" y1="${ly}" x2="${x+11}" y2="${ly}"/>`;   // 加線
+  for(let ly=30;ly>=y;ly-=10) s+=`<line class="sl" x1="${x-11}" y1="${ly}" x2="${x+11}" y2="${ly}"/>`;
+  s+=`<g class="pop">`;
+  if(sp.acc) s+=`<text class="acc" x="${x-24}" y="${y+7}">${sp.acc==='#'?'♯':'♭'}</text>`;
+  const up=y>=60; s+=`<ellipse class="note" cx="${x}" cy="${y}" rx="6.6" ry="4.9" transform="rotate(-20 ${x} ${y})"/>`;
+  s+=up?`<line class="stem" x1="${x+6}" y1="${y-1}" x2="${x+6}" y2="${y-34}"/>`:`<line class="stem" x1="${x-6}" y1="${y+1}" x2="${x-6}" y2="${y+34}"/>`;
+  return s+'</g></svg>';
+}
+function showStaff(s,f){
+  const m=tun()[s]+f, kind=ins().kind, bass=kind==='bass', flat=FLAT_ROOTS.has(F.key);
+  const write=INS==='uke'?0:12, sp=spell(m,flat), name=LETTERS[sp.li]+(sp.acc==='#'?'♯':sp.acc==='b'?'♭':''), dr=DOREMI[sp.li]+(sp.acc==='#'?'♯':sp.acc==='b'?'♭':'');
+  $('#fbStaffSvg').innerHTML=staffSVG(m,{clef:bass?'bass':'treble',flat,write});
+  $('#fbStaffInfo').innerHTML=`<b>${name}<sub style="font-size:.45em">${sp.oct}</sub></b><span class="doremi">${dr}</span>
+    <span class="msg">${strNo(s)}弦 ${f===0?'開放':f+'フレット'}・${mfreq(m).toFixed(1)} Hz</span>
+    <span class="msg">${bass?'ヘ音記号':'ト音記号'}${write?'（ギター・ベースの楽譜は、実際の音より1オクターブ高く書きます）':''}</span>`;
+}
 function renderFb(){
   renderBoard($('#fbBoard'),(s,f,m)=>{
     if(F.quiz){ if(s===F.quiz.s&&f===F.quiz.f) return {kind:'quiz',label:F.quiz.revealed?nn(m%12,F.key):'?'}; return null; }
@@ -3384,7 +3427,7 @@ function renderFb(){
     if(F.natural&&!NAT.has(pc)) return null;
     if(F.mode==='degree') return {kind:kindOf(semi),label:DEG[semi]};
     return {kind:pc===F.key?'root':(NAT.has(pc)?'other':'dim'),label:nn(pc,F.key)};
-  });
+  },(s,f)=>{ if(!F.quiz) showStaff(s,f); });
   $('#fbLegend').innerHTML=F.quiz?'':(F.mode==='degree'
     ?'<span><i style="background:var(--root)"></i>ルート</span><span><i style="background:var(--third)"></i>3度</span><span><i style="background:var(--fifth)"></i>5度</span><span><i style="background:var(--other)"></i>その他</span>'
     :'<span><i style="background:var(--root)"></i>キーの音</span><span><i style="background:var(--other)"></i>幹音（ドレミ…）</span><span><i style="background:var(--other);opacity:.35"></i>派生音（♯♭）</span>');
