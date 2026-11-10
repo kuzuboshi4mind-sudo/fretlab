@@ -1445,10 +1445,6 @@ const DRUMS=[
   {id:'swing',name:'ジャズ・スウィング',kit:'jazz',comp:1,beats:4,steps:12,rows:{r:'x--X-xx--X-x',p:'---x-----x--',k:'o--o--o--o--'},note:'ライドの「チーン・チキ」と2・4拍のハイハット。スネアは自由にコンピング。',feel:{lay:{r:-3,p:2}}},
   {id:'reggae',name:'レゲエ',kit:'std',beats:4,steps:16,rows:{h:'x-o-x-o-x-o-x-o-',R:'--------X-------',k:'--------X-------'},note:'3拍目だけにキックとリム。ギターは裏拍でカッティング。',feel:{lay:{R:8,k:8}}},
   {id:'bossa',name:'ボサノヴァ',kit:'brush',beats:4,steps:16,rows:{z:'xoxoxoxoxoxoxoxo',R:'x--x--x---x--x--',k:'x--xo--xx--xo--x'},note:'リムがボサノヴァ・クラーベ。テンポは120〜150が目安。'},
-  {id:'country',name:'カントリー',kit:'brush',beats:4,steps:16,rows:{s:'--o-x-o---o-x-o-',p:'----x-------x---',k:'x-------x-------'},note:'ブラシのスネアでやさしく「ブン・チャッ」の2ビート。ベースは1・3拍でルートと5度を交互に。',feel:{jit:6,lay:{s:8}}},
-  {id:'latin',name:'ラテン',kit:'latin',beats:4,steps:16,
-    rows:{w:'----x---x-------x-----x-----x---',v:'X---x---X---x---',G:'X-------X-------',g:'----x-x-----x-x-',y:'X-o-x-o-X-o-x-o-',Y:'------x-------x-',q:'o-o-X-o-o-o-----',Q:'------------X---',L:'--------------X-',z:'x-o-x-o-x-o-x-o-'},
-    note:'本物のコンガ・ボンゴ・ギロ・シェイカー・カウベル・クラベスによるソン／サルサのリズム。クラーベは2-3（2小節でひとまわり）。テンポは100〜180が目安。',feel:{jit:7,lay:{G:-4,g:-4}}},
   {id:'waltz',name:'ワルツ（3/4）',kit:'brush',beats:3,steps:6,rows:{h:'x-o-o-',s:'--x-x-',k:'X-----'}},
   {id:'six8',name:'6/8 バラード',kit:'room',fill:1,ts:[6,8],beats:2,steps:6,rows:{h:'xoxxox',s:'---X--',k:'x-----'},note:'BPMは付点4分音符（1小節に2拍）で数えます。',feel:{lay:{s:8}}},
 ];
@@ -1481,7 +1477,7 @@ function kitHit(kit,k,t,a){
   return true;
 }
 function drumHit(k,t,a,kit){
-  if(kit){ if(kitHit(kit,k,t,a)) return; loadKit(kit); if(kit==='latin') return; }   // ラテンは読み込むまで鳴らさない（電子音で代わりに鳴らさない）
+  if(kit){ if(kitHit(kit,k,t,a)) return; loadKit(kit); }
   const m=DRUM_SMP[k];
   if(m&&SMP.buf[m[0]]){ if(k==='h'||k==='O') choke('hh',t); const r=playBuf(m[0],t,a*m[1]); if((k==='h'||k==='O')&&r) SMP.voices.hh=r;
     if(k==='R'&&r){ const t0=Math.max(t,ctx.currentTime); r.g.gain.setValueAtTime(a*m[1],t0+.03); r.g.gain.setTargetAtTime(0,t0+.03,.03); r.s.stop(t0+.3); }   // リム：部屋の響きを削って、木の「コッ」だけ自然に減衰させる
@@ -1733,7 +1729,7 @@ function initPend(){
     if(!$('[data-panel="metronome"]').hidden){e.preventDefault();metroToggle();}
     else if(!$('[data-panel="progressions"]').hidden){e.preventDefault();progToggle();}
   });
-  setBpm(M.bpm); if(!DRUMS.find(d=>d.id===M.rhythm)) M.rhythm={half:'8beat',halfshuffle:'8beat',punk:'8beat',country2:'country',salsa:'latin',chacha:'latin'}[M.rhythm]||'click'; setRhythm(M.rhythm);
+  setBpm(M.bpm); if(!DRUMS.find(d=>d.id===M.rhythm)) M.rhythm={half:'8beat',halfshuffle:'8beat',punk:'8beat'}[M.rhythm]||'click'; setRhythm(M.rhythm);
 })();
 
 /* ---------- tuner ---------- */

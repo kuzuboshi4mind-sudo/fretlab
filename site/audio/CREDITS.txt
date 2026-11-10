@@ -12,7 +12,3 @@ metro-tick.wav / metro-tock.wav（メトロノームの音色「メトロノー�
 kits/*.mp3（ドラムパターンのドラムセット：std・room・power・elec・jazz・brush）:
 MuseScore_General SoundFont (MIT, parts PD or CC0) by S. Christian Collins
 （各キットの音を FluidSynth で強弱2段階に書き出したもの）
-
-kits/latin-*.mp3（ラテンのパーカッション：コンガ・ボンゴ・ギロ・シェイカー・カウベル・クラベス・カバサ）:
-Versilian Community Sample Library (VCSL) by Versilian Studios / Sam Gossner — CC0 1.0
-https://github.com/sgossner/VCSL
