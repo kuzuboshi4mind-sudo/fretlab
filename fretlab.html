@@ -285,7 +285,13 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .board .fnum{fill:var(--muted);font-family:var(--mono);font-size:11px;text-anchor:middle}
 .board .hit{fill:transparent;cursor:pointer}
 .staff-card{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.staff-svg{display:flex;align-items:center;gap:4px}
 .staff-svg svg{display:block;width:210px;height:auto}
+.staff-svg svg.tabsvg{width:118px}
+.tabsvg .tl{stroke:var(--fg);stroke-width:1;opacity:.75}
+.tabsvg .tabw{font:700 11px var(--body);fill:var(--fg);letter-spacing:.02em}
+.tabsvg .fr{font:700 15px var(--mono);fill:var(--fg)}
+.tabsvg .frbg{fill:var(--surface)}
 .staff-svg .sl{stroke:var(--fg);stroke-width:1;opacity:.75}
 .staff-svg .clef{font-family:"Noto Music","Apple Symbols","Segoe UI Symbol",serif;fill:var(--fg)}
 .staff-svg .note{fill:var(--fg)}.staff-svg .stem{stroke:var(--fg);stroke-width:1.4}
@@ -870,7 +876,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
     <div class="legend" id="fbLegend" style="margin-top:10px"></div>
     <div class="card staff-card" id="fbStaff">
       <div class="staff-svg" id="fbStaffSvg"></div>
-      <div class="staff-info" id="fbStaffInfo"><span class="msg">指板の音をタップすると、五線譜での書き方が出ます。</span></div>
+      <div class="staff-info" id="fbStaffInfo"><span class="msg">指板の音をタップすると、五線譜とTABでの書き方が出ます。</span></div>
     </div>
     <div class="card quiz">
       <div>
@@ -901,7 +907,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
     </div>
     <div class="card staff-card" id="scStaff">
       <div class="staff-svg" id="scStaffSvg"></div>
-      <div class="staff-info" id="scStaffInfo"><span class="msg">指板の音をタップすると、五線譜での書き方が出ます。</span></div>
+      <div class="staff-info" id="scStaffInfo"><span class="msg">指板の音をタップすると、五線譜とTABでの書き方が出ます。</span></div>
     </div>
     <div class="scale-info">
       <div class="card stack">
@@ -3431,10 +3437,20 @@ function staffSVG(m,{clef='treble',flat=false,write=0}={}){
   s+=up?`<line class="stem" x1="${x+6}" y1="${y-1}" x2="${x+6}" y2="${y-34}"/>`:`<line class="stem" x1="${x-6}" y1="${y+1}" x2="${x-6}" y2="${y+34}"/>`;
   return s+'</g></svg>';
 }
+// TAB：上の線が1弦。押さえる弦の線の上にフレット番号
+function tabSVG(s,f){
+  const n=tun().length, gap=n>4?11:13, top=65-gap*(n-1)/2, y=st=>top+(n-1-st)*gap, x=78, txt=String(f), w=txt.length*9+6;
+  let o=`<svg class="tabsvg" viewBox="0 0 118 130" role="img" aria-label="TAB ${strNo(s)}弦 ${f}フレット">`;
+  for(let i=0;i<n;i++) o+=`<line class="tl" x1="6" y1="${y(i)}" x2="114" y2="${y(i)}"/>`;
+  o+=`<line class="tl" x1="6" y1="${y(n-1)}" x2="6" y2="${y(0)}"/>`;
+  ['T','A','B'].forEach((c,i)=>o+=`<text class="tabw" x="13" y="${65-14+i*14+4}">${c}</text>`);
+  o+=`<g class="pop"><rect class="frbg" x="${x-w/2}" y="${y(s)-8}" width="${w}" height="16"/><text class="fr" x="${x}" y="${y(s)+5}" text-anchor="middle">${txt}</text></g>`;
+  return o+'</svg>';
+}
 function showStaff(s,f,{pre='fb',key=F.key,extra=''}={}){
   const m=tun()[s]+f, kind=ins().kind, bass=kind==='bass', flat=FLAT_ROOTS.has(key);
   const write=INS==='uke'?0:12, sp=spell(m,flat), name=LETTERS[sp.li]+(sp.acc==='#'?'♯':sp.acc==='b'?'♭':''), dr=DOREMI[sp.li]+(sp.acc==='#'?'♯':sp.acc==='b'?'♭':'');
-  $('#'+pre+'StaffSvg').innerHTML=staffSVG(m,{clef:bass?'bass':'treble',flat,write});
+  $('#'+pre+'StaffSvg').innerHTML=staffSVG(m,{clef:bass?'bass':'treble',flat,write})+tabSVG(s,f);
   $('#'+pre+'StaffInfo').innerHTML=`<b>${name}<sub style="font-size:.45em">${sp.oct}</sub></b><span class="doremi">${dr}</span>${extra}
     <span class="msg">${strNo(s)}弦 ${f===0?'開放':f+'フレット'}・${mfreq(m).toFixed(1)} Hz</span>
     <span class="msg">${bass?'ヘ音記号':'ト音記号'}${write?'（ギター・ベースの楽譜は、実際の音より1オクターブ高く書きます）':''}</span>`;
