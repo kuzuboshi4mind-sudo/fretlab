@@ -953,7 +953,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
             <div><label class="label" for="progKey">キー</label><select id="progKey"></select></div>
             <div><label class="label" for="progRhythm">リズム</label><select id="progRhythm"></select></div>
             <div><label class="label" for="progAcc">伴奏</label><select id="progAcc">
-              <option value="arp">アルペジオ1</option><option value="arp2">アルペジオ2</option><option value="arp3">アルペジオ3</option><option value="whole">ジャーン（1拍目）</option><option value="strum">4分ストローク</option><option value="eighth">8分ストローク（ダウン・アップ）</option><option value="8beat">8ビート・ストローク</option><option value="16beat">16ビート・ストローク</option><option value="none">なし</option></select></div>
+              <option value="arp">アルペジオ1</option><option value="arp2">アルペジオ2</option><option value="arp3">アルペジオ3</option><option value="three">スリーフィンガー</option><option value="whole">ジャーン（1拍目）</option><option value="strum">4分ストローク</option><option value="eighth">8分ストローク（ダウン・アップ）</option><option value="8beat">8ビート・ストローク</option><option value="16beat">16ビート・ストローク</option><option value="none">なし</option></select></div>
             <div><span class="label">表示</span><div class="seg" id="progView"><button data-v="chord">コード</button><button data-v="roman">度数</button></div></div>
           </div>
           <div class="row">
@@ -2626,9 +2626,12 @@ function showNowNext(bi,ci){
 function progToggle(){ if(M.playing&&M.owner==='prog') transportStop(); else {P.lastChord=null;transportStart('prog');} }
 function strumAt(t,frets,{up=false,gain=.3,spread=.022,dur=0,ping=true,only=null}={}){
   const c=ac(); let idx=frets.map((f,i)=>f===null?null:i).filter(i=>i!==null);
-  if(only==='low') idx=idx.slice(0,Math.max(3,idx.length-2)); if(only==='high') idx=idx.slice(-3);
+  const all=idx.slice(), soft=new Set();
+  if(only==='low') idx=idx.slice(0,Math.max(3,idx.length-2));
+  if(only==='light') idx=idx.slice(-4);
+  if(only==='high'){ idx=idx.slice(-3); if(up){ all.forEach(s=>{ if(!idx.includes(s)){ soft.add(s); } }); idx=all; } }   // アップでも低い弦がほんの少し鳴る
   if(up) idx.reverse();
-  const tu=tun(), k=ins().kind; idx.forEach((s,j)=>{ const at=t+j*spread; pluck(tu[s]+frets[s],Math.max(0,at-c.currentTime),gain*(up?.72:1)*(.94+Math.random()*.12),{kind:k,str:s,dur:dur||undefined,bright:up}); if(ping) boardPing(s,frets[s],at,dur?'mute':null); });
+  const tu=tun(), k=ins().kind; idx.forEach((s,j)=>{ const at=t+j*spread; pluck(tu[s]+frets[s],Math.max(0,at-c.currentTime),gain*(up?.72:1)*(soft.has(s)?.24:1)*(.94+Math.random()*.12),{kind:k,str:s,dur:dur||undefined,bright:up}); if(ping) boardPing(s,frets[s],at,dur?'mute':null); });
 }
 /* ---------- 指板で、いま鳴っている場所を光らせる ---------- */
 function renderProgBoard(x){
@@ -2756,7 +2759,7 @@ tickHooks.push((t,info)=>{
       case '8beat': pl(rt,0,.72); pl(n%2?oct:rt,half,.5); break;
       case '16beat': [[0,rt,.74],[3*q,oct,.42]].concat(n%2?[[2*q,five,.5]]:[]).forEach(([d,m,g])=>pl(m,d,g)); break;
       case 'arp': pl([rt,five,oct,five][n%4],0,.7); break;
-      case 'arp2': pl(n%2?five:rt,0,.72); pl(oct,half,.48); break;
+      case 'arp2': case 'three': pl(n%2?five:rt,0,.72); pl(oct,half,.48); break;
       case 'arp3': pl([rt,five,oct,ten][(n*2)%4],0,.66); pl([rt,five,oct,ten][(n*2+1)%4],half,.5); break;
     }
     return;
@@ -2769,16 +2772,21 @@ tickHooks.push((t,info)=>{
     case 'eighth': strumAt(t,v.frets,{gain:n===0?.3:.24,spread:.012}); strumAt(t+half,v.frets,{up:true,gain:.12,spread:.011,only:'high'}); break;   // 裏のアップは弱く
     case '8beat': {   // 8ビート：ダウン・(休)・ダウン・アップ・(休)・アップ・ダウン・アップ
       const pat='D-DU-UDU'; [0,1].forEach(k=>{ const c=pat[(n*2+k)%8], acc=(n%2===1&&k===0); if(c==='D') strumAt(t+k*half,v.frets,{gain:acc?.32:.25,spread:.014}); if(c==='U') strumAt(t+k*half,v.frets,{up:true,gain:.2,spread:.012,only:'high'}); }); break; }
-    case '16beat': {  // 16ビート：「タン・タン | タン・タカ | タカ・タン | タカ・ッ」（16分でダウン・アップを交互に）
-      const pat='D-D-D-DUDUD-DU--'; [0,1,2,3].forEach(k=>{ const c=pat[(n*4+k)%16], d=k*q, onBeat=k===0, back=onBeat&&(n===1||n===3);
-        if(c==='D') strumAt(t+d,v.frets,{gain:back?.3:onBeat?.27:.2,spread:.01});
-        else if(c==='U') strumAt(t+d,v.frets,{up:true,gain:.16,spread:.008,only:'high'}); }); break; }
+    case '16beat': {  // 16ビート：「タン・タン | タン・タカ | タカ・タン | タン・タカ」を全部軽く（16分でダウン・アップを交互に）
+      const pat='D-D-D-DUDUD-D-DU'; [0,1,2,3].forEach(k=>{ const c=pat[(n*4+k)%16], d=k*q, back=k===0&&(n===1||n===3);
+        if(c==='D') strumAt(t+d,v.frets,{gain:back?.21:.18,spread:.008,only:'light'});
+        else if(c==='U') strumAt(t+d,v.frets,{up:true,gain:.15,spread:.007,only:'high'}); }); break; }
     case 'arp': {   // アルペジオ1：8分で上がって下がる
       const order=[strs[0],...strs.slice(1),...strs.slice(1,-1).reverse()];
       [0,1].forEach(k=>pl(order[(n*2+k)%order.length],k*half,k?.36:.42)); break; }
     case 'arp2': {  // アルペジオ2：親指が低音弦を交互に、人さし指・中指が高音弦（トラヴィス風）
       const lo=strs[0], alt=strs[Math.min(2,strs.length-2)]??lo, hi=strs[strs.length-1], hi2=strs[strs.length-2]??hi;
       pl(n%2?alt:lo,0,.44); if(n===0) pl(hi,0,.3); pl(n%2?hi:hi2,half,.32); break; }
+    case 'three': {  // スリーフィンガー：16分で「親指・人さし指・中指」（親指は低音弦を交互に）
+      const L=strs.length, lo=strs[0], alt=strs[Math.min(L>=5?2:1,L-3)]??lo, i2=strs[L-2]??lo, m1=strs[L-1]??i2;
+      const roll=['P','i','m','P','i','m','P','i']; [0,1,2,3].forEach(k=>{ const pos=(n*4+k)%8, c=roll[pos], d=k*q;
+        if(c==='P'){ const pi=[0,3,6,8,11,14].indexOf(n*4+k); pl(pi%2?alt:lo,d,pi===0?.4:.31); }   // 親指はベース弦を交互に
+        else pl(c==='i'?i2:m1,d,c==='m'?.26:.24); }); break; }
     case 'arp3': {  // アルペジオ3：8分で「ベース・3弦・2弦・3弦・1弦・3弦・2弦・3弦」（3拍目はベースを替える）
       const L=strs.length, lo=strs[0], alt=strs[Math.min(1,L-4)]??lo, s3=strs[L-3]??lo, s2=strs[L-2]??s3, s1=strs[L-1]??s2;
       const pat=[lo,s3,s2,s3,s1,s3,s2,s3]; [0,1].forEach(k=>{ const i=(n*2+k)%8; pl(i===4?s1:i===0&&n===2?alt:pat[i],k*half,i===0?.42:i===4?.34:.3); if(i===4) pl(n===2?alt:lo,k*half,.36); }); break; }
