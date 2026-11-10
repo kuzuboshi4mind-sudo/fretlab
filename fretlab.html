@@ -2582,36 +2582,53 @@ function strumAt(t,frets,{up=false,gain=.3,spread=.022}={}){
 const countBars=()=>$('#progCount').checked?1:0;
 // ウォーキングベース：ジャズの進行（またはジャズ・スウィングのリズム）をベースで弾くとき
 const walkOn=()=>(P.src==='list'&&PROGS[P.idx]&&PROGS[P.idx].c==='ジャズ')||M.rhythm==='swing';
-function chordIvs(x){   // 3度・5度・7度（または6度）の半音
-  const iv=(x.free?x.free.iv:(CHORDS.find(c=>c.id===x.type)||CHORDS[0]).iv).map(i=>i%12);
+function chordIvs(x){   // 3度・5度・7度（または6度）と、テンションの半音
+  const raw=(x.free?x.free.iv:(CHORDS.find(c=>c.id===x.type)||CHORDS[0]).iv), iv=raw.map(i=>i%12);
   const third=iv.find(i=>i===3||i===4)??iv.find(i=>i===5||i===2)??4, fifth=iv.find(i=>i===7||i===6||i===8)??7, sev=iv.find(i=>i===10||i===11||i===9);
-  return {third,fifth,sev};
+  let tens=raw.filter(i=>i>12).map(i=>i%12);
+  if(!tens.length){   // テンションが書かれていなければ、よく合うものを使う
+    if(fifth===6) tens=third===3&&sev===10?[5]:[];          // m7(♭5)・dim：11度だけ
+    else if(third===3) tens=[2,5];                            // マイナー：9度・11度
+    else tens=[2,9];                                          // メジャー・ドミナント：9度・13度
+  }
+  return {third,fifth,sev,tens};
 }
 const LOW=28, HIGH=50;   // E1〜D3
 const near=(pc,ref)=>{ let best=null; for(let m=LOW;m<=HIGH;m++) if(m%12===pc&&(best==null||Math.abs(m-ref)<Math.abs(best-ref))) best=m; return best; };
+const pick=a=>a[Math.floor(Math.random()*a.length)];
 function walkLine(x,nx,len){
   const rootPc=x.free&&x.free.bass!=null?x.free.bass:x.root, nRoot=nx.free&&nx.free.bass!=null?nx.free.bass:nx.root;
-  const prev=P.walkLast??36, r=near(rootPc,prev), {third,fifth,sev}=chordIvs(x);
-  // 高すぎたら下へ、低すぎたら上へ。真ん中なら次のコードの方へ
+  const prev=P.walkLast??36, r=near(rootPc,prev), {third,fifth,sev,tens}=chordIvs(x);
+  // 使う音：1・3・5・7度（コードトーン）を中心に、テンション（9・11・13度）も
+  const chordPcs=[0,third,fifth,sev??(third===3?10:9)].map(i=>(x.root+i)%12), tensPcs=tens.map(i=>(x.root+i)%12);
+  const pool=[]; for(let m=LOW;m<=HIGH;m++){ const pc=m%12; if(chordPcs.includes(pc)) pool.push({m,w:pc===rootPc?1.8:3}); else if(tensPcs.includes(pc)) pool.push({m,w:2.3}); }
+  // 行き先（次のルート）と向き：高すぎたら下へ、低すぎたら上へ
   let target=near(nRoot,r);
   const up=r>=43?false:r<=33?true:(target===r?Math.random()<.5:target>r);
-  const s7=sev??12;
-  const mids=up?[r+third,r+fifth,r+s7]:[r+s7-12,r+fifth-12,r+third-12];
-  if(up&&target<r) target+=12; if(!up&&target>r) target-=12;
+  if(up&&target<=r) target+=12; if(!up&&target>=r) target-=12;
   if(target>HIGH) target-=12; if(target<LOW) target+=12;
-  let line;
-  if(len===1) line=[r];
-  else {
-    line=[r,...mids.slice(0,Math.max(0,len-2))];
-    while(line.length<len-1) line.push(line[line.length-1]);
-    const last=line[line.length-1], from=last<target?-1:1;
-    let app=Math.random()<.75?target+from:target+from*2;   // 半音（ときどき全音）で次のルートへ
-    if(app===last) app=target-from;                           // 同じ音が続くときは反対側の半音から
+  // 次のコードへの入り方：半音上下（おもに）／5度から（サークル）／全音
+  const approaches=()=>{ const o=[]; const ch=Math.random();
+    if(ch<.6) o.push(target-1,target+1); else if(ch<.85) o.push(target-5,target+7,target+7-12); else o.push(target-2,target+2);
+    return o.filter(m=>m>=LOW&&m<=HIGH); };
+  const line=[r];
+  if(len>1){
+    let cur=r;
+    for(let i=1;i<len-1;i++){
+      const remain=len-1-i;   // 入りの音までの残り
+      const cands=pool.filter(o=>o.m!==cur&&Math.abs(o.m-cur)<=5&&(up?o.m>cur-2:o.m<cur+2));
+      const toward=c=>-Math.abs((target-(up?1:-1)*1)-c.m)/(remain+1)*.3;   // 行き先に少しずつ近づく
+      const scored=(cands.length?cands:pool.filter(o=>o.m!==cur)).map(o=>({m:o.m,s:o.w+toward(o)+(Math.abs(o.m-cur)<=2?.9:0)+Math.random()*1.2}));
+      scored.sort((a,b)=>b.s-a.s); cur=scored[0].m; line.push(cur);
+    }
+    const last=line[line.length-1];
+    const apps=approaches().filter(m=>m!==last); let app=apps.length?apps.sort((a,b)=>Math.abs(a-last)-Math.abs(b-last))[0]:target-1;
+    if(Math.abs(app-last)>7) app=apps.find(m=>Math.abs(m-last)<=7)??(last<target?target-1:target+1);
     line.push(app);
   }
-  line=line.map(m=>m<LOW?m+12:m>HIGH?m-12:m);
-  P.walkLast=line[line.length-1];
-  return line;
+  const out=line.map(m=>m<LOW?m+12:m>HIGH?m-12:m);
+  P.walkLast=out[out.length-1];
+  return out;
 }
 
 tickHooks.push((t,info)=>{
