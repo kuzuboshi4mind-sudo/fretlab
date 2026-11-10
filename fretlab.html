@@ -2,7 +2,7 @@
 <script>(function(){// 最後に選んだカラーと振り子の色を、開いた瞬間から使う（端末の保存領域とクッキーの両方に覚えておく）
 var t=null,pc=null,nc=null;try{t=JSON.parse(localStorage.getItem('fretlab.theme'));pc=JSON.parse(localStorage.getItem('fretlab.pendColor'));nc=JSON.parse(localStorage.getItem('fretlab.needleColor'));}catch(e){}
 try{var m=document.cookie.match(/(?:^|; )fretlab_theme=([a-z]+)/);if(!t&&m)t=m[1];var n=document.cookie.match(/(?:^|; )fretlab_pend=(%23[0-9a-fA-F]{6})/);if(!pc&&n)pc=decodeURIComponent(n[1]);var q=document.cookie.match(/(?:^|; )fretlab_needle=(%23[0-9a-fA-F]{6})/);if(!nc&&q)nc=decodeURIComponent(q[1]);}catch(e){}
-var BG={light:'#f7f7f3',sage:'#f1f4ee',sakura:'#faf3f3',sky:'#f1f5f9',dark:'#121412',navy:'#0f1522',bordeaux:'#1a0f12',walnut:'#18130f'},D=['dark','navy','bordeaux','walnut'],r=document.documentElement;
+var BG={light:'#f7f7f3',sage:'#f1f4ee',sakura:'#faf3f3',sky:'#f1f5f9',wood:'#f6eee2',dark:'#121412',navy:'#0f1522',bordeaux:'#1a0f12'},D=['dark','navy','bordeaux'],r=document.documentElement;if(t==='walnut')t='wood';
 if(BG[t]){r.dataset.theme=t;r.dataset.scheme=D.indexOf(t)>=0?'dark':'light';var mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.content=BG[t];}
 if(pc&&/^#[0-9a-fA-F]{6}$/.test(pc))r.style.setProperty('--pend',pc);else pc=null;if(nc&&/^#[0-9a-fA-F]{6}$/.test(nc))r.style.setProperty('--tneedle',nc);else nc=null;window.__fretPrefs={theme:BG[t]?t:null,pend:pc,needle:nc};})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -64,7 +64,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px
 :root[data-theme="sky"]{--bg:#f1f5f9;--surface:#fafcfe;--panel:#e5edf4;--line:#d4dfea;--fg:#14202c;--muted:#788797;--accent:#2f6db0;--accent-ink:#f6faff;--accent-soft:#dbe7f3;--pend:#4f8fd0;--leaf:#7fa3c5;--wash:rgba(130,175,225,.14);--tint:rgba(150,195,240,.18)}
 :root[data-theme="navy"]{--bg:#0f1522;--surface:#151d2d;--panel:#1b2537;--line:#28344a;--fg:#e6ecf5;--muted:#8b97ab;--accent:#8fb3ff;--accent-ink:#0f1522;--accent-soft:#1e2b44;--pend:#9fbcf0;--leaf:#6f8fc0;--wash:rgba(90,130,220,.10);--tint:rgba(30,60,140,.30)}
 :root[data-theme="bordeaux"]{--bg:#1a0f12;--surface:#221418;--panel:#2b1a1f;--line:#3a242b;--fg:#f3e7e9;--muted:#a88f94;--accent:#e39aa8;--accent-ink:#1a0f12;--accent-soft:#3a1f27;--root:#d6a96b;--pend:#e8a07e;--leaf:#b0707e;--wash:rgba(180,70,90,.10);--tint:rgba(110,20,40,.32);--cobalt-a:#e9a3b2;--cobalt-b:#c06a80}
-:root[data-theme="walnut"]{--bg:#18130f;--surface:#201914;--panel:#29201a;--line:#392d24;--fg:#f1e8dc;--muted:#a39483;--accent:#e2b878;--accent-ink:#18130f;--accent-soft:#3a2c1f;--pend:#e2a76a;--leaf:#a8885f;--wash:rgba(180,130,70,.10);--tint:rgba(110,70,30,.30);--cobalt-a:#e8c48c;--cobalt-b:#c4955a}
+:root[data-theme="wood"]{--bg:#f6eee2;--surface:#fcf8f1;--panel:#efe3d1;--line:#e3d3bc;--fg:#2e2116;--muted:#8f7b66;--accent:#8a5a2b;--accent-ink:#fff8ef;--accent-soft:#f0e1cb;--root:#8a5a2b;--pend:#b07a3e;--leaf:#a88a5f;--wash:rgba(190,150,90,.12);--tint:rgba(205,165,105,.20);--cobalt-a:#9a6a35;--cobalt-b:#6a4420;--gold-a:#d9b27a;--gold-b:#9c6f35}
 .wrap{position:relative;z-index:1}
 .wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
 h1,h2,h3{text-wrap:balance;margin:0}
@@ -265,6 +265,7 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .a4{display:flex;align-items:center;gap:8px;font-family:var(--mono)}
 .a4 .btn{min-width:40px;padding:4px}
 .howto p{margin:0 0 8px;font-size:13.5px;color:var(--muted)}
+#micMsg.retry{cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .howto b{color:var(--fg);font-weight:500}
 
 /* fretboard */
@@ -778,10 +779,9 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
         <div class="tstate" id="tState"></div>
         <div class="strings-row" id="stringBtns"></div>
         <div class="row" style="justify-content:center;margin-top:6px">
-          <button class="btn primary big" id="micBtn">マイクで測る</button>
           <button class="btn" id="autoBtn" aria-pressed="true">自動で弦を判定</button>
         </div>
-        <div class="msg" id="micMsg" style="text-align:center;margin-inline:auto">1本ずつ鳴らしてください。</div>
+        <div class="msg" id="micMsg" style="text-align:center;margin-inline:auto">マイクを準備しています…</div>
       </div>
       <div class="card stack">
         <div><span class="label">基準ピッチ A4</span>
@@ -1358,7 +1358,7 @@ const THEMES=[
   {id:'light',name:'ライト',bg:'#f7f7f3',c2:'#161816'},{id:'dark',name:'ダーク',bg:'#121412',c2:'#e9ebe6',dark:1},
   {id:'sage',name:'セージ',bg:'#f1f4ee',c2:'#2f5a3c'},{id:'sakura',name:'サクラ',bg:'#faf3f3',c2:'#a94f66'},
   {id:'sky',name:'スカイ',bg:'#f1f5f9',c2:'#2f6db0'},{id:'navy',name:'ネイビー',bg:'#0f1522',c2:'#8fb3ff',dark:1},
-  {id:'bordeaux',name:'ボルドー',bg:'#1a0f12',c2:'#e39aa8',dark:1},{id:'walnut',name:'ウォールナット',bg:'#18130f',c2:'#e2b878',dark:1},
+  {id:'bordeaux',name:'ボルドー',bg:'#1a0f12',c2:'#e39aa8',dark:1},{id:'wood',name:'ライトウッド',bg:'#f6eee2',c2:'#8a5a2b'},
 ];
 function curTheme(){return document.documentElement.dataset.theme||(darkMQ.matches?'dark':'light');}
 function paintTheme(){
@@ -1396,7 +1396,7 @@ colorPicker({btn:'#needleColorBtn',pop:'#needleColors',key:'needleColor',cssVar:
   document.addEventListener('click',e=>{ if(!pop.hidden&&!pop.contains(e.target)) open(false); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!pop.hidden){ open(false); btn.focus(); } });
 })();
-{ const pt=window.__fretPrefs&&window.__fretPrefs.theme; if(pt&&!store.get('theme',null)) setTheme(pt); }   // クッキーからだけ戻せたときは、保存し直す
+{ const pt=window.__fretPrefs&&window.__fretPrefs.theme, st=store.get('theme',null); if(pt&&(!st||st==='walnut')) setTheme(pt); }   // クッキーからだけ戻せたとき・名前を変えた色は、保存し直す
 darkMQ.addEventListener('change',paintTheme); paintTheme();
 
 const TABS=['metronome','tuner','chords','progressions','fretboard','scales','songs','tab','log','ai','tips'];
@@ -1992,11 +1992,10 @@ function drawTrace(){
 function micStop(note='測定を止めました。'){
   if(!T.stream) return;
   T.stream.getTracks().forEach(t=>t.stop());T.stream=null;T.analyser=null;cancelAnimationFrame(T.raf);
-  $('#micBtn').textContent='マイクで測る'; if(note) $('#micMsg').textContent=note; audioMode();
+  if(note) $('#micMsg').textContent=note; audioMode();
 }
-function micToggle(){ if(T.stream) micStop(); else micStart(); }
 async function micStart(){
-  const btn=$('#micBtn'), msg=$('#micMsg');
+  const msg=$('#micMsg');
   if(T.stream||T.starting) return; T.starting=true;
   ac();
   try{
@@ -2007,13 +2006,13 @@ async function micStart(){
     // マイク感度を上げる（約4倍）＋楽器の音域以外のノイズを落とす
     const pre=ctx.createGain(); pre.gain.value=4; const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=T.inst.startsWith('bass')||T.inst==='chrom'?25:62; T.hp=hp; T.floor=null; const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2200;
     T.buf=new Float32Array(T.analyser.fftSize); src.connect(pre); pre.connect(hp); hp.connect(lp); lp.connect(T.analyser); T.tuned=new Set(); T.locked=null; T.lockAt=0; T.hist=[]; T.trace=[];
-    btn.textContent='測定を止める'; msg.textContent='聴いています…'; tunerLoop();
+    msg.textContent='聴いています…1本ずつ鳴らしてください。'; msg.classList.remove('retry'); tunerLoop();
     store.set('micOK',true);
     if(store.get('tab')!=='tuner'||document.hidden) micStop(null);  // 許可を待つ間に画面を離れたとき
   }catch(e){
     T.stream=null; audioMode();
     if(e&&e.name==='NotAllowedError') store.set('micOK',false);
-    msg.textContent='マイクを使えません。弦のボタンで基準音を鳴らせます。';
+    msg.textContent='マイクを使えません。ここをタップしてもう一度試す（弦のボタンで基準音も鳴らせます）'; msg.classList.add('retry');
   }finally{ T.starting=false; }
 }
 (function initTuner(){
@@ -2024,26 +2023,25 @@ async function micStart(){
   $('#a4Down').addEventListener('click',()=>setA4(a4-1));
   $('#a4Up').addEventListener('click',()=>setA4(a4+1));
   $('#loopChk').addEventListener('change',e=>{if(!e.target.checked) clearInterval(T.loop);});
-  $('#micBtn').addEventListener('click',micToggle);
+  $('#micMsg').addEventListener('click',()=>{ if(!T.stream) micStart(); });
   buildGauge(); addEventListener('resize',buildGauge);
   if(window.ResizeObserver) new ResizeObserver(()=>buildGauge()).observe($('#gauge'));
   setA4(store.get('a4',440));
   drawTrace();
 })();
-// チューナーを開いたらすぐ聴き始める（一度マイクを許可していれば、ボタンを押さなくてよい）。離れたらマイクを止める
+// チューナーを開いたらすぐ聴き始める（初めてのときはマイクの許可を聞かれる）。離れたらマイクを止める
 function micGranted(){ try{ return navigator.permissions.query({name:'microphone'}).then(r=>r.state==='granted',()=>false); }catch(e){ return Promise.resolve(false); } }
 function tunerAuto(id){
   if(typeof T==='undefined') return;
   if(id!=='tuner'){ micStop(null); return; }
   if(T.stream||document.hidden) return;
-  if(store.get('micOK',false)) micStart();       // タップ直後なので、必要なら許可の確認が出る
-  else micGranted().then(ok=>{ if(ok&&store.get('tab')==='tuner') micStart(); });
+  micStart();       // タップ直後なので、必要なら許可の確認が出る
 }
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden) micStop(null);
-  else if(store.get('tab')==='tuner') micGranted().then(ok=>{ if(ok&&store.get('tab')==='tuner') micStart(); });
+  else if(store.get('tab')==='tuner'&&!$('[data-panel="tuner"]').hidden) micStart();
 });
-if(store.get('tab')==='tuner') micGranted().then(ok=>{ if(ok&&store.get('tab')==='tuner') micStart(); });
+if(store.get('tab')==='tuner') micStart();
 
 /* ---------- fretboard renderer ---------- */
 const FRETS=15;
