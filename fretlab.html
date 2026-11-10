@@ -1,10 +1,10 @@
 <title>Fretlab ギター練習帳</title>
 <script>(function(){// 最後に選んだカラーと振り子の色を、開いた瞬間から使う（端末の保存領域とクッキーの両方に覚えておく）
-var t=null,pc=null;try{t=JSON.parse(localStorage.getItem('fretlab.theme'));pc=JSON.parse(localStorage.getItem('fretlab.pendColor'));}catch(e){}
-try{var m=document.cookie.match(/(?:^|; )fretlab_theme=([a-z]+)/);if(!t&&m)t=m[1];var n=document.cookie.match(/(?:^|; )fretlab_pend=(%23[0-9a-fA-F]{6})/);if(!pc&&n)pc=decodeURIComponent(n[1]);}catch(e){}
+var t=null,pc=null,nc=null;try{t=JSON.parse(localStorage.getItem('fretlab.theme'));pc=JSON.parse(localStorage.getItem('fretlab.pendColor'));nc=JSON.parse(localStorage.getItem('fretlab.needleColor'));}catch(e){}
+try{var m=document.cookie.match(/(?:^|; )fretlab_theme=([a-z]+)/);if(!t&&m)t=m[1];var n=document.cookie.match(/(?:^|; )fretlab_pend=(%23[0-9a-fA-F]{6})/);if(!pc&&n)pc=decodeURIComponent(n[1]);var q=document.cookie.match(/(?:^|; )fretlab_needle=(%23[0-9a-fA-F]{6})/);if(!nc&&q)nc=decodeURIComponent(q[1]);}catch(e){}
 var BG={light:'#f7f7f3',sage:'#f1f4ee',sakura:'#faf3f3',sky:'#f1f5f9',dark:'#121412',navy:'#0f1522',bordeaux:'#1a0f12',walnut:'#18130f'},D=['dark','navy','bordeaux','walnut'],r=document.documentElement;
 if(BG[t]){r.dataset.theme=t;r.dataset.scheme=D.indexOf(t)>=0?'dark':'light';var mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.content=BG[t];}
-if(pc&&/^#[0-9a-fA-F]{6}$/.test(pc))r.style.setProperty('--pend',pc);else pc=null;window.__fretPrefs={theme:BG[t]?t:null,pend:pc};})();</script>
+if(pc&&/^#[0-9a-fA-F]{6}$/.test(pc))r.style.setProperty('--pend',pc);else pc=null;if(nc&&/^#[0-9a-fA-F]{6}$/.test(nc))r.style.setProperty('--tneedle',nc);else nc=null;window.__fretPrefs={theme:BG[t]?t:null,pend:pc,needle:nc};})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -232,7 +232,10 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .ttarget{font-size:13px;color:var(--muted);letter-spacing:.06em}
 .treadout{font-family:var(--mono);font-size:14px;color:var(--fg);font-variant-numeric:tabular-nums;display:flex;gap:12px}
 .treadout span+span{color:var(--muted)}
-.gauge-wrap{display:flex;justify-content:center}
+.gauge-wrap{display:flex;justify-content:center;position:relative}
+.tn-color-btn{top:-4px;right:2px}
+.tn-color-btn svg circle{fill:var(--tneedle,var(--warn))}
+.gauge-wrap .pendcolors{top:40px;right:2px}
 .gauge{width:100%;max-width:560px;overflow:visible}
 .gauge .arc{fill:none;stroke:var(--line);stroke-width:1.5}
 .gauge .tk{stroke:var(--muted);stroke-width:1.2}
@@ -240,8 +243,8 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .gauge .zone{fill:var(--good);opacity:.2;transition:opacity .3s}
 .gauge text{fill:var(--muted);font-family:var(--mono);font-size:10px;text-anchor:middle}
 .gauge text.side{font-family:var(--body);font-size:10.5px;letter-spacing:.15em}
-#needle{transform-origin:150px 160px;transition:transform .14s ease-out}
-#needle line{stroke:var(--warn);stroke-width:3;stroke-linecap:round;transition:stroke .2s}
+#needle{transform-origin:150px 160px;transition:transform .16s ease-out}
+#needle line{stroke:var(--tneedle,var(--warn));stroke-width:3;stroke-linecap:round;transition:stroke .2s}
 .gauge.idle #needle line{stroke:var(--muted);opacity:.5}
 .gauge.in #needle line{stroke:var(--good)}
 .gauge.in .zone{opacity:.45}
@@ -760,12 +763,14 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           </div>
         </div>
         <div class="gauge-wrap">
+          <button type="button" class="pend-color-btn tn-color-btn" id="needleColorBtn" aria-label="針の色を選ぶ" aria-haspopup="true" aria-expanded="false" aria-controls="needleColors"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.5-.2-.8-.4-1.1-.3-.3-.4-.6-.4-1 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.3"/><circle cx="10.5" cy="7" r="1.3"/><circle cx="15" cy="7.5" r="1.3"/></svg></button>
+          <div class="pendcolors" id="needleColors" role="radiogroup" aria-label="針の色" hidden></div>
           <svg class="gauge" id="gauge" viewBox="17 0 266 178" aria-hidden="true">
-            <path class="arc" d="M42.6 98.0 A124 124 0 0 1 257.4 98.0"/>
-            <path class="zone" d="M150 160 L136.8 34.7 A126 126 0 0 1 163.2 34.7 Z"/>
-            <line class="tk lg" x1="42.6" y1="98.0" x2="56.5" y2="106.0"/><text x="28.8" y="94.0">−50</text><line class="tk" x1="49.7" y1="87.1" x2="56.2" y2="91.8"/><line class="tk" x1="57.9" y1="77.0" x2="63.8" y2="82.4"/><line class="tk" x1="67.0" y1="67.9" x2="72.4" y2="73.8"/><line class="tk" x1="77.1" y1="59.7" x2="81.8" y2="66.2"/><line class="tk lg" x1="88.0" y1="52.6" x2="96.0" y2="66.5"/><text x="80.0" y="42.8">−25</text><line class="tk" x1="99.6" y1="46.7" x2="102.8" y2="54.0"/><line class="tk" x1="111.7" y1="42.1" x2="114.2" y2="49.7"/><line class="tk" x1="124.2" y1="38.7" x2="125.9" y2="46.5"/><line class="tk z" x1="137.0" y1="36.7" x2="137.9" y2="44.6"/><line class="tk lg z" x1="150.0" y1="36.0" x2="150.0" y2="52.0"/><text x="150.0" y="24.0">0</text><line class="tk z" x1="163.0" y1="36.7" x2="162.1" y2="44.6"/><line class="tk" x1="175.8" y1="38.7" x2="174.1" y2="46.5"/><line class="tk" x1="188.3" y1="42.1" x2="185.8" y2="49.7"/><line class="tk" x1="200.4" y1="46.7" x2="197.2" y2="54.0"/><line class="tk lg" x1="212.0" y1="52.6" x2="204.0" y2="66.5"/><text x="220.0" y="42.8">+25</text><line class="tk" x1="222.9" y1="59.7" x2="218.2" y2="66.2"/><line class="tk" x1="233.0" y1="67.9" x2="227.6" y2="73.8"/><line class="tk" x1="242.1" y1="77.0" x2="236.2" y2="82.4"/><line class="tk" x1="250.3" y1="87.1" x2="243.8" y2="91.8"/><line class="tk lg" x1="257.4" y1="98.0" x2="243.5" y2="106.0"/><text x="271.2" y="94.0">+50</text>
-            <text class="side" x="40" y="172">♭ 低い</text><text class="side" x="260" y="172">高い ♯</text>
-            <g id="needle"><line x1="150" y1="160" x2="150" y2="44"/></g>
+            <path class="arc" id="gArc"/>
+            <path class="zone" id="gZone"/>
+            <g id="gTicks"></g>
+            <text class="side" id="gSideL" y="172">♭ 低い</text><text class="side" id="gSideR" y="172">高い ♯</text>
+            <g id="needle"><line x1="150" y1="160" x2="150" y2="12"/></g>
             <circle class="lk" cx="150" cy="160" r="16"/><circle class="lk l2" cx="150" cy="160" r="16"/>
             <circle class="hub" cx="150" cy="160" r="7"/><path class="ck" pathLength="1" d="M144 160.5 L148.5 165 L157 155.5"/>
           </svg>
@@ -783,10 +788,8 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           <div class="a4"><button class="btn" id="a4Down" aria-label="A4を下げる">−</button><output id="a4Out">440</output> Hz<button class="btn" id="a4Up" aria-label="A4を上げる">+</button></div></div>
         <label class="check"><input type="checkbox" id="loopChk"> 弦ボタンの基準音を繰り返し鳴らす</label>
         <div class="howto">
-          <span class="label">メーターの読み方</span>
-          <p>線が<b>左</b>に流れていたら音が低いので、ペグを<b>締めて</b>上げます。<b>右</b>なら高いので、一度少し<b>緩めてから</b>下から合わせ直すと狂いにくくなります。中央の帯（±5セント）に線がまっすぐ収まれば完了です。</p>
-          <p>ベースの低い弦は、音が出てから一瞬待つと安定して読み取れます。ウクレレのHigh-G（4弦が高いG）にも対応しています。</p>
-          <p><b>クロマチック</b>は弦を決めずに、鳴らした音にいちばん近い音（12音すべて）を表示します。変則チューニングや、ほかの楽器・歌の音程確認に。</p>
+          <p>針が<b>左</b>なら低いので締める。<b>右</b>なら高いので、一度緩めてから合わせ直す。中央の帯で止まれば完了です。</p>
+          <p><b>クロマチック</b>は、鳴らした音にいちばん近い音を表示します。</p>
         </div>
       </div>
     </div>
@@ -1366,22 +1369,24 @@ function paintTheme(){
 }
 function setTheme(id){ const t=THEMES.find(x=>x.id===id); if(!t) return; const r=document.documentElement; r.dataset.theme=id; r.dataset.scheme=t.dark?'dark':'light'; store.set('theme',id);
   try{ document.cookie='fretlab_theme='+id+';max-age=315360000;path=/;SameSite=Lax'; }catch(e){} paintTheme(); }
-// 振り子の色：8色から選ぶ（選ぶまではカラーに合わせた色）
+// 振り子・チューナーの針の色：8色から選ぶ（選ぶまではカラーに合わせた色）。右上のアイコンから開く
 const PEND_COLORS=[['キャラメル','#c08547'],['テラコッタ','#c8643c'],['ルビー','#b8323f'],['ローズ','#d97a93'],['オリーブ','#8a9a3a'],['エメラルド','#2f8f6a'],['サファイア','#2f6db0'],['ゴールド','#c9a227']];
-function setPendColor(c){ const r=document.documentElement; if(c) r.style.setProperty('--pend',c); else r.style.removeProperty('--pend'); store.set('pendColor',c||null);
-  try{ document.cookie='fretlab_pend='+(c?encodeURIComponent(c):'')+';max-age='+(c?315360000:0)+';path=/;SameSite=Lax'; }catch(e){}
-  document.querySelectorAll('#pendColors button').forEach(b=>b.setAttribute('aria-checked',String((b.dataset.c||null)===(c||null)))); }
-(function initPendColors(){
-  const el=$('#pendColors'); if(!el) return;
-  const a=document.createElement('button'); a.type='button'; a.className='auto'; a.textContent='カラーに合わせる'; a.setAttribute('role','radio'); a.addEventListener('click',()=>setPendColor(null)); el.appendChild(a);
-  PEND_COLORS.forEach(([n,c])=>{ const b=document.createElement('button'); b.type='button'; b.dataset.c=c; b.title=n; b.setAttribute('aria-label',n); b.setAttribute('role','radio'); b.style.background=c; b.addEventListener('click',()=>setPendColor(c)); el.appendChild(b); });
-  setPendColor(store.get('pendColor',null)||(window.__fretPrefs&&window.__fretPrefs.pend)||null);
-  const btn=$('#pendColorBtn'), open=v=>{ el.hidden=!v; btn.setAttribute('aria-expanded',String(v)); };
-  btn.addEventListener('click',e=>{ e.stopPropagation(); open(el.hidden); });
-  el.addEventListener('click',e=>{ e.stopPropagation(); if(e.target.closest('button')) setTimeout(()=>open(false),180); });
-  document.addEventListener('click',()=>{ if(!el.hidden) open(false); });
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!el.hidden){ open(false); btn.focus(); } });
-})();
+function colorPicker({btn,pop,key,cssVar,cookie,init}){
+  btn=$(btn); pop=$(pop); if(!btn||!pop) return;
+  const set=c=>{ const r=document.documentElement; if(c) r.style.setProperty(cssVar,c); else r.style.removeProperty(cssVar); store.set(key,c||null);
+    try{ document.cookie=cookie+'='+(c?encodeURIComponent(c):'')+';max-age='+(c?315360000:0)+';path=/;SameSite=Lax'; }catch(e){}
+    pop.querySelectorAll('button').forEach(b=>b.setAttribute('aria-checked',String((b.dataset.c||null)===(c||null)))); };
+  PEND_COLORS.forEach(([n,c])=>{ const b=document.createElement('button'); b.type='button'; b.dataset.c=c; b.title=n; b.setAttribute('aria-label',n); b.setAttribute('role','radio'); b.style.background=c; b.addEventListener('click',()=>set(c)); pop.appendChild(b); });
+  const a=document.createElement('button'); a.type='button'; a.className='auto'; a.textContent='カラーに合わせる'; a.setAttribute('role','radio'); a.addEventListener('click',()=>set(null)); pop.appendChild(a);
+  set(store.get(key,null)||init||null);
+  const open=v=>{ pop.hidden=!v; btn.setAttribute('aria-expanded',String(v)); };
+  btn.addEventListener('click',e=>{ e.stopPropagation(); open(pop.hidden); });
+  pop.addEventListener('click',e=>{ e.stopPropagation(); if(e.target.closest('button')) setTimeout(()=>open(false),180); });
+  document.addEventListener('click',()=>{ if(!pop.hidden) open(false); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!pop.hidden){ open(false); btn.focus(); } });
+}
+colorPicker({btn:'#pendColorBtn',pop:'#pendColors',key:'pendColor',cssVar:'--pend',cookie:'fretlab_pend',init:window.__fretPrefs&&window.__fretPrefs.pend});
+colorPicker({btn:'#needleColorBtn',pop:'#needleColors',key:'needleColor',cssVar:'--tneedle',cookie:'fretlab_needle',init:window.__fretPrefs&&window.__fretPrefs.needle});
 (function initThemes(){
   const pop=$('#themePop'), btn=$('#themeBtn');
   THEMES.forEach(t=>{ const b=document.createElement('button'); b.type='button'; b.className='theme-opt'; b.dataset.v=t.id; b.setAttribute('role','radio');
@@ -1853,15 +1858,15 @@ function setA4(v){a4=Math.max(430,Math.min(450,v));$('#a4Out').textContent=a4;ks
 // YIN 法：自己相関より誤検出（オクターブ違い）が少なく、小さな音でも安定しやすい
 function yin(x,sr,fmin,fmax){
   const N=x.length; let rms=0; for(let i=0;i<N;i++) rms+=x[i]*x[i]; rms=Math.sqrt(rms/N);
-  if(rms<0.0025) return null;
+  if(rms<0.002) return null;
   const tauMin=Math.max(2,Math.floor(sr/fmax)), tauMax=Math.min(Math.floor(sr/fmin),Math.floor(N/2)), W=N-tauMax;
   const d=new Float32Array(tauMax+2);
   for(let tau=1;tau<=tauMax+1&&tau<N-W;tau++){ let s=0; for(let j=0;j<W;j++){ const v=x[j]-x[j+tau]; s+=v*v; } d[tau]=s; }
   let run=0; const dp=new Float32Array(tauMax+2); dp[0]=1;
   for(let tau=1;tau<=tauMax+1;tau++){ run+=d[tau]; dp[tau]=run?d[tau]*tau/run:1; }
   let tau=-1;
-  for(let t=tauMin;t<=tauMax;t++){ if(dp[t]<0.12){ while(t+1<=tauMax&&dp[t+1]<dp[t]) t++; tau=t; break; } }
-  if(tau<0){ let mi=tauMin; for(let t=tauMin;t<=tauMax;t++) if(dp[t]<dp[mi]) mi=t; if(dp[mi]>0.3) return null; tau=mi; }
+  for(let t=tauMin;t<=tauMax;t++){ if(dp[t]<0.15){ while(t+1<=tauMax&&dp[t+1]<dp[t]) t++; tau=t; break; } }
+  if(tau<0){ let mi=tauMin; for(let t=tauMin;t<=tauMax;t++) if(dp[t]<dp[mi]) mi=t; if(dp[mi]>0.35) return null; tau=mi; }
   const a=dp[tau-1]??dp[tau], b=dp[tau], c=dp[tau+1]??dp[tau], den=a+c-2*b;
   const tt=den?tau+(a-c)/(2*den):tau;
   return {f:sr/tt,conf:1-b,rms};
@@ -1871,8 +1876,17 @@ function detectPitch(){
   const I=INSTR[T.inst], d=I.dec, N=d===2?4096:2048, full=T.buf;
   const src=full.subarray(full.length-N*d); let x=src;
   if(d>1){ x=new Float32Array(N); for(let i=0;i<N;i++){let s=0;for(let k=0;k<d;k++) s+=src[i*d+k]; x[i]=s/d;} }
+  // まわりの雑音の大きさを覚えておき、それよりはっきり大きい音だけを読む
+  let rms=0; for(let i=0;i<x.length;i++) rms+=x[i]*x[i]; rms=Math.sqrt(rms/x.length);
+  if(T.floor==null) T.floor=rms;
+  const gate=Math.max(.0025,T.floor*2.4);
+  const noise=()=>{ if(rms<gate) T.floor+=(rms-T.floor)*(rms<T.floor?.3:.02); return null; };   // 静かなときだけ、まわりの雑音の大きさを学ぶ
+  if(rms<gate) return noise();
   const r=yin(x,ctx.sampleRate/d,I.min,I.max);
-  return r&&r.f>=I.min&&r.f<=I.max?r:null;
+  if(!r||r.f<I.min||r.f>I.max||r.conf<.78) return noise();     // 音程のはっきりしない音（話し声・物音）は読まない
+  // 2回続けてほぼ同じ高さのときだけ使う（一瞬の雑音を無視）
+  const prev=T.prevF; T.prevF=r.f; if(!prev||Math.abs(1200*Math.log2(r.f/prev))>60) return null;
+  return r;
 }
 // 合った音と同じ音名で、マリンバの和音をやさしく転がすように鳴らす（根音・3度・5度・オクターブ）。小さなエコーで余韻を残す
 function tunerChime(m){
@@ -1924,11 +1938,11 @@ function tunerLoop(){
   const dev=T.ema==null?0:Math.abs(raw-T.ema);
   T.ema=T.ema==null?raw:T.ema+(raw-T.ema)*(dev>35?.4:.07);
   const cents=Math.round(T.ema), n=ms.length, now=performance.now();
-  // ±3セント以内が0.6秒続いたら「合った」
-  const near=Math.abs(T.ema)<=3;
-  if(near){ if(!T.lockAt) T.lockAt=now; } else if(Math.abs(T.ema)>8){ T.lockAt=0; if(T.locked===T.target){ T.locked=null; setLocked(false); } }
+  // ±4セント以内が0.45秒続いたら「合った」（少し甘め）
+  const near=Math.abs(T.ema)<=4;
+  if(near){ if(!T.lockAt) T.lockAt=now; } else if(Math.abs(T.ema)>10){ T.lockAt=0; if(T.locked===T.target){ T.locked=null; setLocked(false); } }
   let all=false;
-  if(near&&T.lockAt&&now-T.lockAt>600&&T.locked!==T.target){
+  if(near&&T.lockAt&&now-T.lockAt>450&&T.locked!==T.target){
     T.locked=T.target; if(!chrom) T.tuned.add(T.target); setLocked(true); tunerChime(tm); markString(); T.drawAt=0;
     all=!chrom&&T.tuned.size===ms.length;
   }
@@ -1941,7 +1955,7 @@ function tunerLoop(){
   $('#tTarget').textContent=chrom?`クロマチック：${NOTES_S[((tm%12)+12)%12]} に合わせています`:`${n-(T.target??0)}弦をチューニング中${T.auto?'（自動）':''}`;
   $('#tCents').textContent=(cents>0?'+ ':cents<0?'− ':'± ')+Math.min(999,Math.abs(cents))+' cent';
   $('#tHz').textContent=fm.toFixed(1)+' Hz';
-  const ok=Math.abs(cents)<=5, st=$('#tState');
+  const ok=Math.abs(cents)<=TOK, st=$('#tState');
   if(all){ st.className='tstate good all'; st.textContent='全弦チューニング完了！'; }
   else if(!(st.classList.contains('all')&&ok)){
     st.className='tstate '+(ok?'good':'warn');
@@ -1951,11 +1965,29 @@ function tunerLoop(){
 }
 function trimTrace(){ if(T.trace.length>160) T.trace.length=160; }
 // 針のメーター：最新の値で針を振る（音が止まると中央に戻る）
+// メーターの目盛りは画面の幅に合わせて作り直す：針の先が画面の左右の端（少し内側）まで届く角度に
+const TOK=6;   // 中央の帯：±6セントで「合っている」
+let GA=60;     // ±50セントのときの針の角度
+function buildGauge(){
+  const svg=$('#gauge'); if(!svg) return; const r=svg.getBoundingClientRect();
+  if(r.width){ const k=r.width/266, cx=r.left+(150-17)*k, W=document.documentElement.clientWidth||innerWidth;
+    GA=Math.max(50,Math.min(80,Math.asin(Math.min(1,(Math.min(cx,W-cx)-8)/(148*k)))*180/Math.PI)); }
+  const R=124, P=(deg,rad)=>{const a=deg*Math.PI/180;return [150+rad*Math.sin(a),160-rad*Math.cos(a)];}, f=n=>n.toFixed(1);
+  const [ax,ay]=P(-GA,R),[bx,by]=P(GA,R); $('#gArc').setAttribute('d',`M${f(ax)} ${f(ay)} A${R} ${R} 0 0 1 ${f(bx)} ${f(by)}`);
+  const zA=GA*TOK/50, [z1x,z1y]=P(-zA,126),[z2x,z2y]=P(zA,126); $('#gZone').setAttribute('d',`M150 160 L${f(z1x)} ${f(z1y)} A126 126 0 0 1 ${f(z2x)} ${f(z2y)} Z`);
+  let h='';
+  for(let c=-50;c<=50;c+=5){ const d=GA*c/50, big=c%25===0, z=Math.abs(c)<=5, [x1,y1]=P(d,R),[x2,y2]=P(d,R-(big?16:8));
+    h+=`<line class="tk${big?' lg':''}${z?' z':''}" x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}"/>`;
+    if(big){ const out=Math.abs(c)<50, [tx,ty]=P(d,out?R+13:R-30); h+=`<text x="${f(tx)}" y="${f(ty+3)}">${c>0?'+':c<0?'−':''}${Math.abs(c)}</text>`; } }   // ±50 は弧の内側に（画面の端で切れないように）
+  $('#gTicks').innerHTML=h;
+  $('#gSideL').setAttribute('x','56'); $('#gSideR').setAttribute('x','244');
+  drawTrace();
+}
 function drawTrace(){
   const g=$('#gauge'); if(!g) return; const c0=T.trace[0];
   const v=c0==null?0:Math.max(-50,Math.min(50,c0));
-  $('#needle').style.transform=`rotate(${v*1.2}deg)`;
-  g.classList.toggle('idle',c0==null); g.classList.toggle('in',c0!=null&&Math.abs(c0)<=5);
+  $('#needle').style.transform=`rotate(${(v/50*GA).toFixed(2)}deg)`;
+  g.classList.toggle('idle',c0==null); g.classList.toggle('in',c0!=null&&Math.abs(c0)<=TOK);
 }
 function micStop(note='測定を止めました。'){
   if(!T.stream) return;
@@ -1973,7 +2005,7 @@ async function micStart(){
     T.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
     const src=ctx.createMediaStreamSource(T.stream); T.analyser=ctx.createAnalyser(); T.analyser.fftSize=8192;
     // マイク感度を上げる（約4倍）＋楽器の音域以外のノイズを落とす
-    const pre=ctx.createGain(); pre.gain.value=4; const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=22; const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2200;
+    const pre=ctx.createGain(); pre.gain.value=4; const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=T.inst.startsWith('bass')||T.inst==='chrom'?25:62; T.hp=hp; T.floor=null; const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2200;
     T.buf=new Float32Array(T.analyser.fftSize); src.connect(pre); pre.connect(hp); hp.connect(lp); lp.connect(T.analyser); T.tuned=new Set(); T.locked=null; T.lockAt=0; T.hist=[]; T.trace=[];
     btn.textContent='測定を止める'; msg.textContent='聴いています…'; tunerLoop();
     store.set('micOK',true);
@@ -1985,7 +2017,7 @@ async function micStart(){
   }finally{ T.starting=false; }
 }
 (function initTuner(){
-  segInit($('#instSeg'),T.inst,v=>{T.inst=v;T.tuning=0;T.target=null;T.auto=true;T.tuned=new Set();T.locked=null;setLocked(false);syncAuto();T.hist=[];T.trace=[];renderTunings();renderStrings();drawTrace();});
+  segInit($('#instSeg'),T.inst,v=>{T.inst=v; if(T.hp) T.hp.frequency.value=v.startsWith('bass')||v==='chrom'?25:62;T.tuning=0;T.target=null;T.auto=true;T.tuned=new Set();T.locked=null;setLocked(false);syncAuto();T.hist=[];T.trace=[];renderTunings();renderStrings();drawTrace();});
   renderTunings();
   $('#tuningSel').addEventListener('change',e=>{T.tuning=+e.target.value;T.target=null;T.tuned=new Set();T.locked=null;setLocked(false);renderStrings();});
   $('#autoBtn').addEventListener('click',()=>{T.auto=true;syncAuto();});
@@ -1993,6 +2025,8 @@ async function micStart(){
   $('#a4Up').addEventListener('click',()=>setA4(a4+1));
   $('#loopChk').addEventListener('change',e=>{if(!e.target.checked) clearInterval(T.loop);});
   $('#micBtn').addEventListener('click',micToggle);
+  buildGauge(); addEventListener('resize',buildGauge);
+  if(window.ResizeObserver) new ResizeObserver(()=>buildGauge()).observe($('#gauge'));
   setA4(store.get('a4',440));
   drawTrace();
 })();
