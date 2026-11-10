@@ -1375,7 +1375,8 @@ function instVoicing(root,type){
 // 形（frets 配列 or ベースの notes）を鳴らす
 function playShape(v,{capo=0,when=0}={}){
   if(!v) return; const t=tun(), k=ins().kind;
-  if(v.notes){ v.notes.forEach((x,i)=>pluck(t[x.s]+x.f+capo,when+i*0.2,0.6,{kind:k,str:'arp'+i})); return; }
+  // アルペジオ：同じ弦で次の音を弾くと前の音は止まる（本物と同じ）。弦をまたぐときだけ前の音が残る
+  if(v.notes){ v.notes.forEach((x,i)=>pluck(t[x.s]+x.f+capo,when+i*0.2,0.6,{kind:k,str:'arp-s'+x.s})); return; }
   // ギター・ウクレレのコードは、高い音を丸めたやさしい音で、少しゆっくりかき鳴らす
   const c=ac(), bus=c.createGain(), lp=c.createBiquadFilter(), warm=c.createBiquadFilter();
   lp.type='lowpass'; lp.frequency.value=k==='nylon'?2300:1700; lp.Q.value=.4;
