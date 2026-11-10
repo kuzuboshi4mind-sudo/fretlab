@@ -283,6 +283,15 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .board .inl{fill:var(--inlay);opacity:.55}
 .board .fnum{fill:var(--muted);font-family:var(--mono);font-size:11px;text-anchor:middle}
 .board .hit{fill:transparent;cursor:pointer}
+#progBoard .dot{opacity:.42}
+.board .ping{fill:var(--pend);stroke:#fff;stroke-width:2;pointer-events:none;animation:ping .55s cubic-bezier(.2,.7,.3,1) forwards;transform-box:fill-box;transform-origin:center}
+.board .ping-ring{fill:none;stroke:var(--pend);stroke-width:2.5;pointer-events:none;animation:pingring .7s ease-out forwards;transform-box:fill-box;transform-origin:center}
+@keyframes ping{0%{transform:scale(.4);opacity:1}35%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:0}}
+@keyframes pingring{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.2);opacity:0}}
+.diagram .dot.hit circle,.diagram .mk.hit{animation:dhit .35s ease-out}
+@keyframes dhit{0%{transform:scale(1.45);filter:brightness(1.4)}100%{transform:scale(1)}}
+.diagram .dot circle,.diagram .mk{transform-box:fill-box;transform-origin:center}
+@media (prefers-reduced-motion:reduce){.board .ping,.board .ping-ring{animation-duration:.01s}}
 .board .hit:hover{fill:rgba(255,255,255,.07)}
 .dot circle{stroke:rgba(0,0,0,.25);stroke-width:1}
 .dot text{font-family:var(--body);font-weight:700;font-size:11px;text-anchor:middle;dominant-baseline:central;pointer-events:none}
@@ -906,7 +915,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
             <div><label class="label" for="progKey">キー</label><select id="progKey"></select></div>
             <div><label class="label" for="progRhythm">リズム</label><select id="progRhythm"></select></div>
             <div><label class="label" for="progAcc">伴奏</label><select id="progAcc">
-              <option value="arp">アルペジオ</option><option value="whole">ジャーン（1拍目）</option><option value="strum">4分ストローク</option><option value="eighth">8分ストローク</option><option value="none">なし</option></select></div>
+              <option value="arp">アルペジオ1（8分・上下）</option><option value="arp2">アルペジオ2（指弾き・交互ベース）</option><option value="arp3">アルペジオ3（16分・流れる）</option><option value="whole">ジャーン（1拍目）</option><option value="strum">4分ストローク</option><option value="eighth">8分ストローク（ダウン・アップ）</option><option value="8beat">8ビート・ストローク</option><option value="16beat">16ビート・ストローク</option><option value="none">なし</option></select></div>
             <div><span class="label">表示</span><div class="seg" id="progView"><button data-v="chord">コード</button><button data-v="roman">度数</button></div></div>
           </div>
           <div class="row">
@@ -921,6 +930,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           <div class="card nn-card"><span class="label">今のコード</span><div class="nn-name" id="nowName">–</div><div id="nowDia"></div></div>
           <div class="card nn-card"><span class="label">次のコード</span><div class="nn-name dim" id="nextName">–</div><div id="nextDia"></div></div>
         </div>
+        <div class="card"><span class="label">指板（いま鳴っている場所が光ります）</span><div class="board-scroll" id="progBoard"></div></div>
       </div>
     </div>
   </section>
@@ -2250,9 +2260,9 @@ function diagram(v,root,type){
   if(frets) frets.forEach((f,i)=>{ if(f===null){const y=sy(i);s+=`<g class="x"><line x1="11" y1="${y-4}" x2="19" y2="${y+4}"/><line x1="19" y1="${y-4}" x2="11" y2="${y+4}"/></g>`;} });
   notes.forEach(x=>{
     const y=sy(x.s), semi=((t[x.s]+x.f-root)%12+12)%12;
-    if(x.f===0&&frets){s+=`<circle class="mk" cx="15" cy="${y}" r="4.5"/>`;return;}
+    if(x.f===0&&frets){s+=`<circle class="mk" data-s="${x.s}" data-f="0" cx="15" cy="${y}" r="4.5"/>`;return;}
     const cx=x.f===0?15:(fx(x.f-base)+fx(x.f-base+1))/2;
-    s+=`<g class="dot k-${kindOf(semi)}"><circle cx="${cx}" cy="${y}" r="7.5"/><text x="${cx}" y="${y}">${chordDeg(semi,type)}</text></g>`;
+    s+=`<g class="dot k-${kindOf(semi)}" data-s="${x.s}" data-f="${x.f}"><circle cx="${cx}" cy="${y}" r="7.5"/><text x="${cx}" y="${y}">${chordDeg(semi,type)}</text></g>`;
   });
   return s+'</svg>';
 }
@@ -2573,11 +2583,48 @@ function showNowNext(bi,ci){
   const a=chordAt(cur), b=chordAt(nx), va=voicingOf(a), vb=voicingOf(b);
   $('#nowName').textContent=a.name; $('#nextName').textContent=b.name;
   $('#nowDia').innerHTML=va?diagramOf(va,a):''; $('#nextDia').innerHTML=vb?diagramOf(vb,b):'';
+  renderProgBoard(a);
 }
 function progToggle(){ if(M.playing&&M.owner==='prog') transportStop(); else {P.lastChord=null;transportStart('prog');} }
-function strumAt(t,frets,{up=false,gain=.3,spread=.022}={}){
-  const c=ac(); const idx=frets.map((f,i)=>f===null?null:i).filter(i=>i!==null); if(up) idx.reverse();
-  const tu=tun(), k=ins().kind; idx.forEach((s,j)=>pluck(tu[s]+frets[s],Math.max(0,t-c.currentTime)+j*spread,gain*(up?.7:1),{kind:k,str:s}));
+function strumAt(t,frets,{up=false,gain=.3,spread=.022,dur=0,ping=true,only=null}={}){
+  const c=ac(); let idx=frets.map((f,i)=>f===null?null:i).filter(i=>i!==null);
+  if(only==='low') idx=idx.slice(0,Math.max(3,idx.length-2)); if(only==='high') idx=idx.slice(-3);
+  if(up) idx.reverse();
+  const tu=tun(), k=ins().kind; idx.forEach((s,j)=>{ const at=t+j*spread; pluck(tu[s]+frets[s],Math.max(0,at-c.currentTime),gain*(up?.72:1)*(.94+Math.random()*.12),{kind:k,str:s,dur:dur||undefined}); if(ping) boardPing(s,frets[s],at,dur?'mute':null); });
+}
+/* ---------- 指板で、いま鳴っている場所を光らせる ---------- */
+function renderProgBoard(x){
+  const el=$('#progBoard'); if(!el) return;
+  const chordPcs=new Set((x.free?x.free.iv:(CHORDS.find(c=>c.id===x.type)||CHORDS[0]).iv).map(i=>(x.root+i)%12)); if(x.free&&x.free.bass!=null) chordPcs.add(x.free.bass);
+  const lab=semi=>x.free?withCustom(x.free,()=>chordDeg(semi,'custom')):chordDeg(semi,x.type);
+  renderBoard(el,(st,f,m)=>{ const pc=m%12; if(!chordPcs.has(pc)) return null; const semi=(pc-x.root+12)%12; return {kind:kindOf(semi),label:lab(semi)}; });
+}
+function boardPing(st,f,at,kind){
+  const fire=()=>{
+    const svg=$('#progBoard svg'); if(svg&&f!=null){
+      const n=tun().length, cx=fxc(f), cy=G.top+(n-1-st)*G.gap, NS='http://www.w3.org/2000/svg';
+      const c=document.createElementNS(NS,'circle'); c.setAttribute('class','ping'); c.setAttribute('cx',cx); c.setAttribute('cy',cy); c.setAttribute('r',kind==='mute'?7:10);
+      const r=document.createElementNS(NS,'circle'); r.setAttribute('class','ping-ring'); r.setAttribute('cx',cx); r.setAttribute('cy',cy); r.setAttribute('r',11);
+      svg.appendChild(r); svg.appendChild(c); setTimeout(()=>{c.remove();r.remove();},750);
+      // 光った場所が見えるように、指板を横にずらす
+      const box=svg.parentElement, k=svg.clientWidth/G.W, px=cx*k;
+      if(px<box.scrollLeft+30||px>box.scrollLeft+box.clientWidth-30) box.scrollTo({left:Math.max(0,px-box.clientWidth/2),behavior:'smooth'});
+    }
+    const d=document.querySelector(`#nowDia [data-s="${st}"][data-f="${f}"]`);
+    if(d){ d.classList.remove('hit'); void d.getBBox(); d.classList.add('hit'); }
+  };
+  const wait=Math.max(0,(at-ctx.currentTime)*1000); wait<5?fire():setTimeout(fire,wait);
+}
+// ベースの音を、手の位置に近い弦・フレットに置く（指板で光らせる場所）
+function bassPos(m){
+  const t=tun(), hand=P.hand??3; let best=null;
+  t.forEach((o,s)=>{ const f=m-o; if(f<0||f>15) return; const c=Math.abs(f-hand-1)+(f===0?.5:0)+(f>hand+3||f<hand-1?2:0); if(!best||c<best.c) best={s,f,c}; });
+  if(best){ if(best.f>0&&(best.f>P.hand+3||best.f<P.hand)) P.hand=Math.max(1,best.f-1); }
+  return best;
+}
+function bassNote(m,at,g,opt={}){
+  pluck(m,Math.max(0,at-ctx.currentTime),g,{kind:'bass',str:'b',...opt});
+  const p=bassPos(m); if(p) boardPing(p.s,p.f,at,opt.dur?'mute':null);
 }
 const countBars=()=>$('#progCount').checked?1:0;
 // ウォーキングベース：ジャズの進行（またはジャズ・スウィングのリズム）をベースで弾くとき
@@ -2595,37 +2642,48 @@ function chordIvs(x){   // 3度・5度・7度（または6度）と、テンシ�
 }
 const LOW=28, HIGH=50;   // E1〜D3
 const near=(pc,ref)=>{ let best=null; for(let m=LOW;m<=HIGH;m++) if(m%12===pc&&(best==null||Math.abs(m-ref)<Math.abs(best-ref))) best=m; return best; };
-const pick=a=>a[Math.floor(Math.random()*a.length)];
+// コードに合うスケール（ウォーキングの経過音に使う）
+function chordScale(x){
+  const {third,fifth,sev}=chordIvs(x), raw=(x.free?x.free.iv:(CHORDS.find(c=>c.id===x.type)||CHORDS[0]).iv).filter(i=>i>12).map(i=>i%12);
+  if(fifth===6&&sev===9) return [0,2,3,5,6,8,9,11];                 // dim7
+  if(fifth===6) return [0,1,3,5,6,8,10];                            // m7(♭5)：ロクリアン
+  if(fifth===8&&third===4) return [0,2,4,6,8,10];                   // aug：ホールトーン
+  if(third===3) return sev===11||sev==null?[0,2,3,5,7,9,11]:[0,2,3,5,7,9,10];   // mM7・m6：メロディックマイナー／m7：ドリアン
+  if(sev===10){ if(raw.some(i=>i===1||i===3||i===8)) return [0,1,3,4,6,8,10];   // オルタード
+    return [0,2,4,5,7,9,10]; }                                       // ドミナント：ミクソリディアン
+  return raw.includes(6)?[0,2,4,6,7,9,11]:[0,2,4,5,7,9,11];          // メジャー：アイオニアン（♯11ならリディアン）
+}
 function walkLine(x,nx,len){
   const rootPc=x.free&&x.free.bass!=null?x.free.bass:x.root, nRoot=nx.free&&nx.free.bass!=null?nx.free.bass:nx.root;
   const prev=P.walkLast??36, r=near(rootPc,prev), {third,fifth,sev,tens}=chordIvs(x);
-  // 使う音：1・3・5・7度（コードトーン）を中心に、テンション（9・11・13度）も
-  const chordPcs=[0,third,fifth,sev??(third===3?10:9)].map(i=>(x.root+i)%12), tensPcs=tens.map(i=>(x.root+i)%12);
-  const pool=[]; for(let m=LOW;m<=HIGH;m++){ const pc=m%12; if(chordPcs.includes(pc)) pool.push({m,w:pc===rootPc?1.8:3}); else if(tensPcs.includes(pc)) pool.push({m,w:2.3}); }
-  // 行き先（次のルート）と向き：高すぎたら下へ、低すぎたら上へ
+  const ct=[third,fifth,sev??(third===3?10:9)], scale=chordScale(x).map(i=>(x.root+i)%12), nScale=chordScale(nx).map(i=>(nx.root+i)%12);
+  const inScale=m=>scale.includes(((m%12)+12)%12);
+  // 向き：高すぎたら下へ、低すぎたら上へ。真ん中なら次のルートの方へ
   let target=near(nRoot,r);
   const up=r>=43?false:r<=33?true:(target===r?Math.random()<.5:target>r);
   if(up&&target<=r) target+=12; if(!up&&target>=r) target-=12;
   if(target>HIGH) target-=12; if(target<LOW) target+=12;
-  // 次のコードへの入り方：半音上下（おもに）／5度から（サークル）／全音
-  const approaches=()=>{ const o=[]; const ch=Math.random();
-    if(ch<.6) o.push(target-1,target+1); else if(ch<.85) o.push(target-5,target+7,target+7-12); else o.push(target-2,target+2);
-    return o.filter(m=>m>=LOW&&m<=HIGH); };
-  const line=[r];
-  if(len>1){
-    let cur=r;
-    for(let i=1;i<len-1;i++){
-      const remain=len-1-i;   // 入りの音までの残り
-      const cands=pool.filter(o=>o.m!==cur&&Math.abs(o.m-cur)<=5&&(up?o.m>cur-2:o.m<cur+2));
-      const toward=c=>-Math.abs((target-(up?1:-1)*1)-c.m)/(remain+1)*.3;   // 行き先に少しずつ近づく
-      const scored=(cands.length?cands:pool.filter(o=>o.m!==cur)).map(o=>({m:o.m,s:o.w+toward(o)+(Math.abs(o.m-cur)<=2?.9:0)+Math.random()*1.2}));
-      scored.sort((a,b)=>b.s-a.s); cur=scored[0].m; line.push(cur);
-    }
-    const last=line[line.length-1];
-    const apps=approaches().filter(m=>m!==last); let app=apps.length?apps.sort((a,b)=>Math.abs(a-last)-Math.abs(b-last))[0]:target-1;
-    if(Math.abs(app-last)>7) app=apps.find(m=>Math.abs(m-last)<=7)??(last<target?target-1:target+1);
-    line.push(app);
-  }
+  const dir=up?1:-1;
+  // 3拍目（強拍）に置くコードトーン：ルートから3〜9半音、次のルートへ近い所
+  const ctPitches=[]; for(let m=LOW;m<=HIGH;m++){ const iv=((m-x.root)%12+12)%12; if(ct.includes(iv)||iv===0&&m!==r) ctPitches.push(m); }
+  const pickStrong=(from)=>{ const c=ctPitches.filter(m=>(m-from)*dir>=3&&(m-from)*dir<=9);
+    const sc=c.map(m=>({m,s:-Math.abs(Math.abs(target-m)-3)+Math.random()*1.4+(((m-x.root)%12+12)%12===0?-1:0)})).sort((a,b)=>b.s-a.s); return sc.length?sc[0].m:from+dir*(fifth); };
+  // 弱拍の経過音：2つの音の間にあるスケールの音（なければ半音）
+  const passing=(a,b)=>{ const lo=Math.min(a,b), hi=Math.max(a,b), mids=[]; for(let m=lo+1;m<hi;m++) if(inScale(m)) mids.push(m);
+    if(mids.length) return mids.sort((p,q)=>Math.abs(p-(a+b)/2)-Math.abs(q-(a+b)/2))[0];
+    const c=ctPitches.filter(m=>m!==a&&Math.abs(m-a)<=5); return c.length?c[Math.floor(Math.random()*c.length)]:a+dir*2; };
+  // 次のコードへの入り方：半音（多め）／5度（サークル）／スケールの隣の音
+  const approach=(from)=>{ const side=from<target?-1:1, ch=Math.random(); let o;
+    if(ch<.55) o=target+side;                                                   // 半音
+    else if(ch<.78){ o=target+(side<0?-5:7); if(o>HIGH||o<LOW) o=target+(side<0?7:-5); }   // 5度から（ドミナントの動き）
+    else { o=target+side*2; for(let d=1;d<=2;d++){ const m=target+side*d; if(nScale.includes(((m%12)+12)%12)){ o=m; break; } } }   // スケールの隣
+    if(o===from) o=target-side; if(Math.abs(o-from)>7) o=target+side; return o; };
+  let line;
+  if(len===1) line=[r];
+  else if(len===2) line=Math.random()<.3?[r,r+(fifth<=(target-r)*dir?fifth*dir:-dir*(12-fifth))]:[r,approach(r)];
+  else if(len===3){ const s3=pickStrong(r); line=[r,s3,approach(s3)]; }
+  else { const s3=pickStrong(r), s2=passing(r,s3); line=[r,s2,s3,approach(s3)];
+    for(let i=4;i<len;i++) line.splice(i-1,0,passing(line[i-2],line[i-1])); }
   const out=line.map(m=>m<LOW?m+12:m>HIGH?m-12:m);
   P.walkLast=out[out.length-1];
   return out;
@@ -2637,33 +2695,56 @@ tickHooks.push((t,info)=>{
   if(pb<0) return;
   if(!$('#progLoop').checked&&pb>=bars.length){ if(info.beat===0) setTimeout(()=>{if(M.owner==='prog')transportStop();},Math.max(0,(t-ctx.currentTime)*1000)); return; }
   const bar=bars[pb%bars.length], ci=Math.floor(info.beat*bar.length/info.beats), chordStart=Math.floor(ci*info.beats/bar.length)===info.beat;
-  const x=chordAt(bar[ci]), v=voicingOf(x), half=60/M.bpm/2;
+  const x=chordAt(bar[ci]), v=voicingOf(x);
   if(!v) return;
-  if(isBass()&&walkOn()){   // ジャズ：ウォーキングベース（1拍に1音、次のコードへ半音でつなぐ）
+  const beat=60/M.bpm, half=beat/2, q=beat/4, tu=tun(), kd=ins().kind, n=info.beat;
+  const hum=()=>(Math.random()-.5)*.010;   // 人の手のような、ほんの少しのずれ
+  if(isBass()&&walkOn()){   // ジャズ：ウォーキングベース（1拍に1音）
     const ib=Math.floor(ci*info.beats/bar.length), len=Math.max(1,Math.floor((ci+1)*info.beats/bar.length)-ib);
     if(chordStart){ const ni=ci+1<bar.length?bar[ci+1]:bars[(pb+1)%bars.length][0]; P.walk=walkLine(x,chordAt(ni),len); }
-    const m=P.walk&&P.walk[info.beat-ib]; if(m!=null) pluck(m,Math.max(0,t-ctx.currentTime),info.beat%2?.62:.72,{kind:'bass',str:'b'});
+    const k=info.beat-ib, m=P.walk&&P.walk[k]; if(m==null) return;
+    const g=[.74,.66,.71,.64][info.beat%4]*(.95+Math.random()*.1);
+    bassNote(m,t+hum()+(info.beat%2?.006:0),g);                               // 2・4拍はほんの少し後ろに
+    if(k===len-1&&len>=2&&Math.random()<.14) bassNote(m,t+beat*2/3,.2,{dur:.05});   // ときどき3連の「スキップ」（ゴースト音）
     return;
   }
-  if(isBass()){   // ベース：ルート中心のライン（伴奏の型に合わせて）
-    const rt=bassRoot(x.free&&x.free.bass!=null?x.free.bass:x.root), at=Math.max(0,t-ctx.currentTime), pl=(m,d,g)=>pluck(m,at+d,g,{kind:'bass',str:'b'});
-    const five=rt+7, oct=rt+12;
+  if(isBass()){   // ベース：伴奏の型に合わせたライン
+    const rt=bassRoot(x.free&&x.free.bass!=null?x.free.bass:x.root), five=rt+7, oct=rt+12, ten=rt+(chordIvs(x).third)+12;
+    const pl=(m,d,g,o)=>bassNote(m,t+d+hum(),g,o);
     switch(P.acc){
       case 'whole': if(chordStart) pl(rt,0,.75); break;
-      case 'strum': pl(info.beat===2&&info.beats===4?five:rt,0,info.beat===0?.75:.6); break;
-      case 'eighth': pl(rt,0,.7); pl(rt,half,.5); break;
-      case 'arp': pl([rt,five,oct,five][info.beat%4],0,.7); break;
+      case 'strum': pl(n===2&&info.beats===4?five:rt,0,n===0?.75:.6); break;
+      case 'eighth': pl(rt,0,.7); pl(rt,half,.45); break;
+      case '8beat': pl(rt,0,.72); pl(n%2?oct:rt,half,.5); break;
+      case '16beat': [[0,rt,.74],[3*q,oct,.42]].concat(n%2?[[2*q,five,.5]]:[]).forEach(([d,m,g])=>pl(m,d,g)); break;
+      case 'arp': pl([rt,five,oct,five][n%4],0,.7); break;
+      case 'arp2': pl(n%2?five:rt,0,.72); pl(oct,half,.48); break;
+      case 'arp3': pl([rt,five,oct,ten][(n*2)%4],0,.66); pl([rt,five,oct,ten][(n*2+1)%4],half,.5); break;
     }
     return;
   }
+  const strs=v.frets.map((f,i)=>f===null?null:i).filter(i=>i!==null);
+  const pl=(st,d,g)=>{ const at=t+d+hum(); pluck(tu[st]+v.frets[st],Math.max(0,at-ctx.currentTime),g*(.94+Math.random()*.12),{kind:kd,str:st}); boardPing(st,v.frets[st],at); };
   switch(P.acc){
     case 'whole': if(chordStart) strumAt(t,v.frets,{gain:.36,spread:.03}); break;
-    case 'strum': strumAt(t,v.frets,{gain:info.beat===0?.32:.22}); break;
-    case 'eighth': strumAt(t,v.frets,{gain:info.beat===0?.3:.22,spread:.012}); strumAt(t+half,v.frets,{up:true,gain:.22,spread:.012}); break;
-    case 'arp': {
-      const strs=v.frets.map((f,i)=>f===null?null:i).filter(i=>i!==null), order=[strs[0],...strs.slice(1),...strs.slice(1,-1).reverse()];
-      const n=info.beat*2, tu=tun(); [0,1].forEach(k=>{const s=order[(n+k)%order.length];pluck(tu[s]+v.frets[s],Math.max(0,t-ctx.currentTime)+k*half,.42,{kind:ins().kind,str:s});});
-      break;}
+    case 'strum': strumAt(t,v.frets,{gain:n===0?.32:.22}); break;
+    case 'eighth': strumAt(t,v.frets,{gain:n===0?.3:.22,spread:.012}); strumAt(t+half,v.frets,{up:true,gain:.22,spread:.012}); break;
+    case '8beat': {   // 8ビート：ダウン・(休)・ダウン・アップ・(休)・アップ・ダウン・アップ
+      const pat='D-DU-UDU'; [0,1].forEach(k=>{ const c=pat[(n*2+k)%8], acc=(n%2===1&&k===0); if(c==='D') strumAt(t+k*half,v.frets,{gain:acc?.32:.25,spread:.014}); if(c==='U') strumAt(t+k*half,v.frets,{up:true,gain:.2,spread:.012,only:'high'}); }); break; }
+    case '16beat': {  // 16ビート：2・4拍はミュートの「チャッ」、16分のアップを細かく
+      const pat='D.uUX.uUD.udX.uU'; [0,1,2,3].forEach(k=>{ const c=pat[(n*4+k)%16], d=k*q;
+        if(c==='D') strumAt(t+d,v.frets,{gain:.28,spread:.01}); else if(c==='d') strumAt(t+d,v.frets,{gain:.17,spread:.008,only:'high'});
+        else if(c==='U') strumAt(t+d,v.frets,{up:true,gain:.19,spread:.008,only:'high'}); else if(c==='u') strumAt(t+d,v.frets,{up:true,gain:.11,spread:.007,only:'high'});
+        else if(c==='X') strumAt(t+d,v.frets,{gain:.26,spread:.006,dur:.04}); }); break; }
+    case 'arp': {   // アルペジオ1：8分で上がって下がる
+      const order=[strs[0],...strs.slice(1),...strs.slice(1,-1).reverse()];
+      [0,1].forEach(k=>pl(order[(n*2+k)%order.length],k*half,k?.36:.42)); break; }
+    case 'arp2': {  // アルペジオ2：親指が低音弦を交互に、人さし指・中指が高音弦（トラヴィス風）
+      const lo=strs[0], alt=strs[Math.min(2,strs.length-2)]??lo, hi=strs[strs.length-1], hi2=strs[strs.length-2]??hi;
+      pl(n%2?alt:lo,0,.44); if(n===0) pl(hi,0,.3); pl(n%2?hi:hi2,half,.32); break; }
+    case 'arp3': {  // アルペジオ3：16分で流れるように上下
+      const order=[strs[0],...strs.slice(1),...strs.slice(1,-1).reverse()];
+      [0,1,2,3].forEach(k=>pl(order[(n*4+k)%order.length],k*q,k?.26:.34)); break; }
   }
 });
 drawHooks.push(cur=>{
