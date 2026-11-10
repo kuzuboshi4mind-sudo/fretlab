@@ -1,5 +1,10 @@
 <title>Fretlab ギター練習帳</title>
-<script>try{const t=JSON.parse(localStorage.getItem('fretlab.theme'));const D=['dark','navy','bordeaux','walnut'],A=['light','sage','sakura','sky'].concat(D);if(A.includes(t)){document.documentElement.dataset.theme=t;document.documentElement.dataset.scheme=D.includes(t)?'dark':'light';}}catch(e){}</script>
+<script>(function(){// 最後に選んだカラーと振り子の色を、開いた瞬間から使う（端末の保存領域とクッキーの両方に覚えておく）
+var t=null,pc=null;try{t=JSON.parse(localStorage.getItem('fretlab.theme'));pc=JSON.parse(localStorage.getItem('fretlab.pendColor'));}catch(e){}
+try{var m=document.cookie.match(/(?:^|; )fretlab_theme=([a-z]+)/);if(!t&&m)t=m[1];var n=document.cookie.match(/(?:^|; )fretlab_pend=(%23[0-9a-fA-F]{6})/);if(!pc&&n)pc=decodeURIComponent(n[1]);}catch(e){}
+var BG={light:'#f7f7f3',sage:'#f1f4ee',sakura:'#faf3f3',sky:'#f1f5f9',dark:'#121412',navy:'#0f1522',bordeaux:'#1a0f12',walnut:'#18130f'},D=['dark','navy','bordeaux','walnut'],r=document.documentElement;
+if(BG[t]){r.dataset.theme=t;r.dataset.scheme=D.indexOf(t)>=0?'dark':'light';var mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.content=BG[t];}
+if(pc&&/^#[0-9a-fA-F]{6}$/.test(pc))r.style.setProperty('--pend',pc);else pc=null;window.__fretPrefs={theme:BG[t]?t:null,pend:pc};})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -119,6 +124,10 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .pend-rod{stroke:var(--pend);stroke-width:7;stroke-linecap:round}
 .pend-w{fill:#fff;stroke:color-mix(in srgb,var(--fg) 14%,transparent);stroke-width:1;filter:drop-shadow(0 3px 4px rgba(0,0,0,.28))}
 .pend-pivot{fill:var(--fg)}
+.pendcolors{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pendcolors button{width:34px;height:34px;border-radius:50%;border:1px solid rgba(0,0,0,.15);cursor:pointer;padding:0;box-shadow:inset 0 0 0 3px var(--surface)}
+.pendcolors button[aria-checked="true"]{outline:2.5px solid var(--fg);outline-offset:2px}
+.pendcolors .auto{width:auto;height:34px;padding:0 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);box-shadow:none;font-size:12.5px;color:var(--fg)}
 .term{font-family:var(--display);font-style:italic;font-size:15px;color:var(--muted);font-weight:400;text-align:center}
 .bpm{display:flex;align-items:center;justify-content:center;gap:clamp(16px,6vw,48px);width:100%}
 .bpm-c{display:flex;flex-direction:column;align-items:center}
@@ -720,6 +729,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
         <label class="check"><input type="checkbox" id="accentChk"> 1拍目にアクセント</label>
         </div>
         <div><span class="label">音量</span><input type="range" id="volRange" min="0" max="100" value="70" aria-label="音量"></div>
+        <div><span class="label">振り子の色</span><div class="pendcolors" id="pendColors" role="radiogroup" aria-label="振り子の色"></div></div>
       </div>
     </div>
   </section>
@@ -1345,7 +1355,19 @@ function paintTheme(){
   document.querySelectorAll('.theme-opt').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.v===t.id)));
   const m=document.querySelector('meta[name="theme-color"]'); if(m) m.content=t.bg;
 }
-function setTheme(id){ const t=THEMES.find(x=>x.id===id); if(!t) return; const r=document.documentElement; r.dataset.theme=id; r.dataset.scheme=t.dark?'dark':'light'; store.set('theme',id); paintTheme(); }
+function setTheme(id){ const t=THEMES.find(x=>x.id===id); if(!t) return; const r=document.documentElement; r.dataset.theme=id; r.dataset.scheme=t.dark?'dark':'light'; store.set('theme',id);
+  try{ document.cookie='fretlab_theme='+id+';max-age=315360000;path=/;SameSite=Lax'; }catch(e){} paintTheme(); }
+// 振り子の色：8色から選ぶ（選ぶまではカラーに合わせた色）
+const PEND_COLORS=[['キャラメル','#c08547'],['テラコッタ','#c8643c'],['ルビー','#b8323f'],['ローズ','#d97a93'],['オリーブ','#8a9a3a'],['エメラルド','#2f8f6a'],['サファイア','#2f6db0'],['ゴールド','#c9a227']];
+function setPendColor(c){ const r=document.documentElement; if(c) r.style.setProperty('--pend',c); else r.style.removeProperty('--pend'); store.set('pendColor',c||null);
+  try{ document.cookie='fretlab_pend='+(c?encodeURIComponent(c):'')+';max-age='+(c?315360000:0)+';path=/;SameSite=Lax'; }catch(e){}
+  document.querySelectorAll('#pendColors button').forEach(b=>b.setAttribute('aria-checked',String((b.dataset.c||null)===(c||null)))); }
+(function initPendColors(){
+  const el=$('#pendColors'); if(!el) return;
+  const a=document.createElement('button'); a.type='button'; a.className='auto'; a.textContent='カラーに合わせる'; a.setAttribute('role','radio'); a.addEventListener('click',()=>setPendColor(null)); el.appendChild(a);
+  PEND_COLORS.forEach(([n,c])=>{ const b=document.createElement('button'); b.type='button'; b.dataset.c=c; b.title=n; b.setAttribute('aria-label',n); b.setAttribute('role','radio'); b.style.background=c; b.addEventListener('click',()=>setPendColor(c)); el.appendChild(b); });
+  setPendColor(store.get('pendColor',null)||(window.__fretPrefs&&window.__fretPrefs.pend)||null);
+})();
 (function initThemes(){
   const pop=$('#themePop'), btn=$('#themeBtn');
   THEMES.forEach(t=>{ const b=document.createElement('button'); b.type='button'; b.className='theme-opt'; b.dataset.v=t.id; b.setAttribute('role','radio');
@@ -1355,6 +1377,7 @@ function setTheme(id){ const t=THEMES.find(x=>x.id===id); if(!t) return; const r
   document.addEventListener('click',e=>{ if(!pop.hidden&&!pop.contains(e.target)) open(false); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!pop.hidden){ open(false); btn.focus(); } });
 })();
+{ const pt=window.__fretPrefs&&window.__fretPrefs.theme; if(pt&&!store.get('theme',null)) setTheme(pt); }   // クッキーからだけ戻せたときは、保存し直す
 darkMQ.addEventListener('change',paintTheme); paintTheme();
 
 const TABS=['metronome','tuner','chords','progressions','fretboard','scales','songs','tab','log','ai','tips'];
@@ -1478,11 +1501,11 @@ const DRUMS=[
   {id:'funk',name:'ファンク／ソウル',kit:'room',fill:1,beats:4,steps:16,swing:{unit:4,amt:.57},rows:{h:'XoxoXoxoXoxoXo-o',O:'--------------x-',s:'---oX--o-o-oX--o',k:'x-x----x--x-x---'},note:'16分を少し跳ねさせ、スネアをわずかに遅らせたブラックミュージックのグルーヴ。ゴーストノートが命。',feel:{jit:4,lay:{s:12,h:3}}},
   {id:'pop',name:'アコースティック・ポップ',kit:'room',beats:4,steps:16,rows:{z:'xoxoxoxoxoxoxoxo',R:'----x-------x---',k:'x-----x-x-------'},feel:{lay:{R:6}}},
   {id:'ballad',name:'バラード',kit:'room',fill:1,beats:4,steps:16,rows:{h:'x-o-x-o-x-o-x-o-',R:'----x-------x---',k:'x-------x-x-----'},feel:{lay:{R:10,h:4}}},
-  {id:'four',name:'4つ打ち（ダンス）',kit:'elec',beats:4,steps:16,rows:{O:'--x---x---x---x-',h:'x-o-x-o-x-o-x-o-',c:'----x-------x---',k:'X---X---X---X---'},feel:{jit:1}},
+  {id:'four',name:'4つ打ち（ダンス）',kit:'elec',beats:4,steps:16,rows:{O:'--x---x---x---x-',h:'x--ox--ox--ox-oo',c:'----x-------x---',k:'X---X---X---X---'},feel:{jit:1}},
   {id:'hardrock',name:'ハードロック',kit:'power',fill:1,beats:4,steps:16,rows:{h:'X-x-X-x-X-x-X-x-',s:'----X-------X---',k:'x-----x-x-x-----'},note:'太いキックと力強いスネアの、ストレートなロック。ハイハットは8分でしっかり。',feel:{jit:4,lay:{s:-2}}},
   {id:'shuffle',name:'ブルース・シャッフル',kit:'room',fill:1,beats:4,steps:12,rows:{r:'X-xx-xX-xx-x',p:'---x-----x--',s:'---X-----X--',k:'x--o--x--o--'},note:'ライドで「タッ・タ」と跳ねる、ブルースの定番。'},
-  {id:'swing',name:'ジャズ・スウィング',kit:'jazz',comp:1,beats:4,steps:12,rows:{r:'x--X-xx--X-x',p:'---x-----x--',k:'o--o--o--o--'},note:'ライドの「チーン・チキ」と2・4拍のハイハット。スネアは自由にコンピング。',feel:{lay:{r:-3,p:2}}},
-  {id:'reggae',name:'レゲエ',kit:'std',beats:4,steps:16,rows:{h:'x-o-x-o-x-o-x-o-',R:'--------X-------',k:'--------X-------'},note:'3拍目だけにキックとリム。ギターは裏拍でカッティング。',feel:{lay:{R:8,k:8}}},
+  {id:'swing',name:'ジャズ・スウィング',kit:'jazz',comp:1,beats:4,steps:12,rows:{r:'x--X-xx--X-x',p:'---x-----x--'},note:'ライドの「チーン・チキ」と2・4拍のハイハット。スネアとバスドラムは自由に合いの手（コンピング）。',feel:{lay:{r:-3,p:2}}},
+  {id:'reggae',name:'レゲエ',kit:'std',beats:4,steps:16,rows:{h:'o-X-o-X-o-X-o-X-',R:'--------X-------',k:'--------X-------'},note:'ハイハットは裏拍にアクセント（ンチャ・ンチャ）。3拍目にキックとリム。ギターも裏拍でカッティング。',feel:{lay:{R:8,k:8}}},
   {id:'bossa',name:'ボサノヴァ',kit:'brush',beats:4,steps:16,rows:{z:'xoxoxoxoxoxoxoxo',R:'x--x--x---x--x--',k:'x--xo--xx--xo--x'},note:'リムがボサノヴァ・クラーベ。テンポは120〜150が目安。'},
   {id:'waltz',name:'ワルツ（3/4）',kit:'brush',beats:3,steps:6,rows:{h:'x-o-o-',s:'--x-x-',k:'X-----'}},
   {id:'six8',name:'6/8 バラード',kit:'room',fill:1,ts:[6,8],beats:2,steps:6,rows:{h:'xoxxox',s:'---X--',k:'x-----'},note:'BPMは付点4分音符（1小節に2拍）で数えます。',feel:{lay:{s:8}}},
