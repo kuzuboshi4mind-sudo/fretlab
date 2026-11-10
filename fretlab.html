@@ -2509,6 +2509,40 @@ function strumAt(t,frets,{up=false,gain=.3,spread=.022}={}){
   const tu=tun(), k=ins().kind; idx.forEach((s,j)=>pluck(tu[s]+frets[s],Math.max(0,t-c.currentTime)+j*spread,gain*(up?.7:1),{kind:k,str:s}));
 }
 const countBars=()=>$('#progCount').checked?1:0;
+// ウォーキングベース：ジャズの進行（またはジャズ・スウィングのリズム）をベースで弾くとき
+const walkOn=()=>(P.src==='list'&&PROGS[P.idx]&&PROGS[P.idx].c==='ジャズ')||M.rhythm==='swing';
+function chordIvs(x){   // 3度・5度・7度（または6度）の半音
+  const iv=(x.free?x.free.iv:(CHORDS.find(c=>c.id===x.type)||CHORDS[0]).iv).map(i=>i%12);
+  const third=iv.find(i=>i===3||i===4)??iv.find(i=>i===5||i===2)??4, fifth=iv.find(i=>i===7||i===6||i===8)??7, sev=iv.find(i=>i===10||i===11||i===9);
+  return {third,fifth,sev};
+}
+const LOW=28, HIGH=50;   // E1〜D3
+const near=(pc,ref)=>{ let best=null; for(let m=LOW;m<=HIGH;m++) if(m%12===pc&&(best==null||Math.abs(m-ref)<Math.abs(best-ref))) best=m; return best; };
+function walkLine(x,nx,len){
+  const rootPc=x.free&&x.free.bass!=null?x.free.bass:x.root, nRoot=nx.free&&nx.free.bass!=null?nx.free.bass:nx.root;
+  const prev=P.walkLast??36, r=near(rootPc,prev), {third,fifth,sev}=chordIvs(x);
+  // 高すぎたら下へ、低すぎたら上へ。真ん中なら次のコードの方へ
+  let target=near(nRoot,r);
+  const up=r>=43?false:r<=33?true:(target===r?Math.random()<.5:target>r);
+  const s7=sev??12;
+  const mids=up?[r+third,r+fifth,r+s7]:[r+s7-12,r+fifth-12,r+third-12];
+  if(up&&target<r) target+=12; if(!up&&target>r) target-=12;
+  if(target>HIGH) target-=12; if(target<LOW) target+=12;
+  let line;
+  if(len===1) line=[r];
+  else {
+    line=[r,...mids.slice(0,Math.max(0,len-2))];
+    while(line.length<len-1) line.push(line[line.length-1]);
+    const last=line[line.length-1], from=last<target?-1:1;
+    let app=Math.random()<.75?target+from:target+from*2;   // 半音（ときどき全音）で次のルートへ
+    if(app===last) app=target-from;                           // 同じ音が続くときは反対側の半音から
+    line.push(app);
+  }
+  line=line.map(m=>m<LOW?m+12:m>HIGH?m-12:m);
+  P.walkLast=line[line.length-1];
+  return line;
+}
+
 tickHooks.push((t,info)=>{
   if(M.owner!=='prog'||info.subI!==0) return;
   const bars=P.bars, pb=info.bar-countBars();
@@ -2517,6 +2551,12 @@ tickHooks.push((t,info)=>{
   const bar=bars[pb%bars.length], ci=Math.floor(info.beat*bar.length/info.beats), chordStart=Math.floor(ci*info.beats/bar.length)===info.beat;
   const x=chordAt(bar[ci]), v=voicingOf(x), half=60/M.bpm/2;
   if(!v) return;
+  if(isBass()&&walkOn()){   // ジャズ：ウォーキングベース（1拍に1音、次のコードへ半音でつなぐ）
+    const ib=Math.floor(ci*info.beats/bar.length), len=Math.max(1,Math.floor((ci+1)*info.beats/bar.length)-ib);
+    if(chordStart){ const ni=ci+1<bar.length?bar[ci+1]:bars[(pb+1)%bars.length][0]; P.walk=walkLine(x,chordAt(ni),len); }
+    const m=P.walk&&P.walk[info.beat-ib]; if(m!=null) pluck(m,Math.max(0,t-ctx.currentTime),info.beat%2?.62:.72,{kind:'bass',str:'b'});
+    return;
+  }
   if(isBass()){   // ベース：ルート中心のライン（伴奏の型に合わせて）
     const rt=bassRoot(x.free&&x.free.bass!=null?x.free.bass:x.root), at=Math.max(0,t-ctx.currentTime), pl=(m,d,g)=>pluck(m,at+d,g,{kind:'bass',str:'b'});
     const five=rt+7, oct=rt+12;
