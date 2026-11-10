@@ -1376,7 +1376,14 @@ function instVoicing(root,type){
 function playShape(v,{capo=0,when=0}={}){
   if(!v) return; const t=tun(), k=ins().kind;
   if(v.notes){ v.notes.forEach((x,i)=>pluck(t[x.s]+x.f+capo,when+i*0.2,0.6,{kind:k,str:'arp'+i})); return; }
-  v.frets.forEach((f,i)=>{ if(f!==null) pluck(t[i]+f+capo,when+i*0.035,0.4,{kind:k,str:i}); });
+  // ギター・ウクレレのコードは、高い音を丸めたやさしい音で、少しゆっくりかき鳴らす
+  const c=ac(), bus=c.createGain(), lp=c.createBiquadFilter(), warm=c.createBiquadFilter();
+  lp.type='lowpass'; lp.frequency.value=k==='nylon'?2300:1700; lp.Q.value=.4;
+  warm.type='lowshelf'; warm.frequency.value=260; warm.gain.value=2.5;
+  bus.gain.value=.85; bus.connect(lp); lp.connect(warm); warm.connect(outNode());
+  let j=0;
+  onBus(bus,()=>v.frets.forEach((f,i)=>{ if(f!==null){ pluck(t[i]+f+capo,when+j*0.052+Math.random()*.008,0.36,{kind:k,str:i}); j++; } }));
+  setTimeout(()=>{ try{bus.disconnect();warm.disconnect();}catch(e){} },(when+5)*1000);
 }
 const shapeStr=v=>v.notes?v.notes.map(x=>`${strNo(x.s)}弦${x.f}`).join(' → '):v.frets.map(x=>x===null?'x':x).join('-');
 // 楽器の切り替えボタン（各ページの見出しの右に置き、どこで切り替えても全ページに反映）
@@ -1504,7 +1511,7 @@ function colorPicker({btn,pop,key,cssVar,cookie,init,colors=PEND_COLORS,autoLabe
 }
 colorPicker({btn:'#pendColorBtn',pop:'#pendColors',key:'pendColor',cssVar:'--pend',cookie:'fretlab_pend',init:window.__fretPrefs&&window.__fretPrefs.pend});
 // チューナーの背景：深い色4つと、明るい色・パステル4つ（明るい色のときは文字を黒くする）
-const TUNER_BG=[['チャコール','#24272d'],['ネイビー','#0f1a33'],['フォレスト','#10261b'],['ボルドー','#2c0f18'],['クリーム','#f6efdd'],['ミント','#dcefe3'],['スカイ','#dbe9f6'],['ピーチ','#fbe1d4']];
+const TUNER_BG=[['クリーム','#f6efdd'],['ミント','#dcefe3'],['スカイ','#dbe9f6'],['ピーチ','#fbe1d4'],['チャコール','#24272d'],['ネイビー','#0f1a33'],['フォレスト','#10261b'],['ボルドー','#2c0f18']];
 const isLightHex=c=>{ if(!c) return false; const n=parseInt(c.slice(1),16), r=n>>16, g=n>>8&255, b=n&255; return (.299*r+.587*g+.114*b)/255>.6; };
 colorPicker({btn:'#needleColorBtn',pop:'#needleColors',key:'tunerBg',cssVar:'--tbg',cookie:'fretlab_tbg',init:window.__fretPrefs&&window.__fretPrefs.tbg,colors:TUNER_BG,autoLabel:'標準（黒）',onSet:c=>{ if(isLightHex(c)) document.documentElement.dataset.tbg='light'; else delete document.documentElement.dataset.tbg; }});
 (function initThemes(){
