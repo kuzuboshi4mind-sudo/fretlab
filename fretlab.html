@@ -285,9 +285,10 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .board .fnum{fill:var(--muted);font-family:var(--mono);font-size:11px;text-anchor:middle}
 .board .hit{fill:transparent;cursor:pointer}
 .staff-card{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:14px}
-.staff-svg{display:flex;align-items:center;gap:4px}
-.staff-svg svg{display:block;width:210px;height:auto}
-.staff-svg svg.tabsvg{width:118px}
+.staff-card{flex-direction:column;align-items:stretch}
+.staff-svg{display:grid;grid-template-columns:1fr 1fr;align-items:center;width:100%;max-width:560px;margin-inline:auto;position:relative}
+.staff-svg:not(:empty)::after{content:"";position:absolute;left:50%;top:12%;bottom:12%;width:1px;background:var(--line)}
+.staff-svg svg{display:block;width:100%;height:auto}
 .tabsvg .tl{stroke:var(--fg);stroke-width:1;opacity:.75}
 .tabsvg .tabw{font:700 11px var(--body);fill:var(--fg);letter-spacing:.02em}
 .tabsvg .fr{font:700 15px var(--mono);fill:var(--fg)}
@@ -3422,10 +3423,15 @@ const NAT=new Set([0,2,4,5,7,9,11]);
 const LETTERS=['C','D','E','F','G','A','B'], DOREMI=['ド','レ','ミ','ファ','ソ','ラ','シ'];
 function spell(m,flat){ const pc=((m%12)+12)%12, sharp={0:[0,''],1:[0,'#'],2:[1,''],3:[1,'#'],4:[2,''],5:[3,''],6:[3,'#'],7:[4,''],8:[4,'#'],9:[5,''],10:[5,'#'],11:[6,'']}, fl={1:[1,'b'],3:[2,'b'],6:[4,'b'],8:[5,'b'],10:[6,'b']};
   const [li,acc]=flat&&fl[pc]?fl[pc]:sharp[pc]; const oct=Math.floor(m/12)-1+(flat&&pc===11&&false?1:0); return {li,acc,oct}; }
-function staffSVG(m,{clef='treble',flat=false,write=0}={}){
+// 音符の縦の位置（五線は y=40〜80）
+function noteY(m,{clef='treble',flat=false,write=0}={}){ const sp=spell(m+write,flat), d=sp.oct*7+sp.li; return 80-(d-(clef==='bass'?18:30))*5; }
+// 五線譜とTABの縦の表示範囲：高い音・低い音でも見切れないように広げる（左右で同じにする）
+function staffRange(y){ const top=Math.min(0,y-44), bot=Math.max(130,y+44); return [top,bot-top]; }
+function staffSVG(m,{clef='treble',flat=false,write=0,range}={}){
   const w=m+write, sp=spell(w,flat), d=sp.oct*7+sp.li;           // 音の高さ（ドから数えた白鍵の段）
-  const base=clef==='bass'?18:30, y=80-(d-base)*5, x=128;           // ト音記号：下の線＝ミ4、ヘ音記号：下の線＝ソ2
-  let s=`<svg viewBox="0 0 210 130" role="img" aria-label="五線譜">`;
+  const base=clef==='bass'?18:30, y=80-(d-base)*5, x=140;           // ト音記号：下の線＝ミ4、ヘ音記号：下の線＝ソ2
+  const [vy,vh]=range||staffRange(y);
+  let s=`<svg viewBox="0 ${vy} 210 ${vh}" role="img" aria-label="五線譜">`;
   for(let i=0;i<5;i++) s+=`<line class="sl" x1="8" y1="${40+i*10}" x2="202" y2="${40+i*10}"/>`;
   s+=clef==='bass'?`<text class="clef" x="12" y="62" font-size="38">𝄢</text>`:`<text class="clef" x="10" y="82" font-size="54">𝄞</text>`;
   if(write) s+=`<text class="oct" x="${clef==='bass'?22:24}" y="${clef==='bass'?92:108}">8</text>`;
@@ -3438,19 +3444,20 @@ function staffSVG(m,{clef='treble',flat=false,write=0}={}){
   return s+'</g></svg>';
 }
 // TAB：上の線が1弦。押さえる弦の線の上にフレット番号
-function tabSVG(s,f){
-  const n=tun().length, gap=n>4?11:13, top=65-gap*(n-1)/2, y=st=>top+(n-1-st)*gap, x=78, txt=String(f), w=txt.length*9+6;
-  let o=`<svg class="tabsvg" viewBox="0 0 118 130" role="img" aria-label="TAB ${strNo(s)}弦 ${f}フレット">`;
-  for(let i=0;i<n;i++) o+=`<line class="tl" x1="6" y1="${y(i)}" x2="114" y2="${y(i)}"/>`;
-  o+=`<line class="tl" x1="6" y1="${y(n-1)}" x2="6" y2="${y(0)}"/>`;
-  ['T','A','B'].forEach((c,i)=>o+=`<text class="tabw" x="13" y="${65-14+i*14+4}">${c}</text>`);
+function tabSVG(s,f,range=[0,130]){
+  const n=tun().length, gap=n>5?10:n>4?12:13, top=60-gap*(n-1)/2, y=st=>top+(n-1-st)*gap, x=120, txt=String(f), w=txt.length*10+8;   // 五線と同じ高さの真ん中に
+  let o=`<svg class="tabsvg" viewBox="0 ${range[0]} 210 ${range[1]}" role="img" aria-label="TAB ${strNo(s)}弦 ${f}フレット">`;
+  for(let i=0;i<n;i++) o+=`<line class="tl" x1="8" y1="${y(i)}" x2="202" y2="${y(i)}"/>`;
+  o+=`<line class="tl" x1="8" y1="${y(n-1)}" x2="8" y2="${y(0)}"/>`;
+  ['T','A','B'].forEach((c,i)=>o+=`<text class="tabw" x="16" y="${60-12+i*12+4}" style="font-size:12px">${c}</text>`);
   o+=`<g class="pop"><rect class="frbg" x="${x-w/2}" y="${y(s)-8}" width="${w}" height="16"/><text class="fr" x="${x}" y="${y(s)+5}" text-anchor="middle">${txt}</text></g>`;
   return o+'</svg>';
 }
 function showStaff(s,f,{pre='fb',key=F.key,extra=''}={}){
   const m=tun()[s]+f, kind=ins().kind, bass=kind==='bass', flat=FLAT_ROOTS.has(key);
   const write=INS==='uke'?0:12, sp=spell(m,flat), name=LETTERS[sp.li]+(sp.acc==='#'?'♯':sp.acc==='b'?'♭':''), dr=DOREMI[sp.li]+(sp.acc==='#'?'♯':sp.acc==='b'?'♭':'');
-  $('#'+pre+'StaffSvg').innerHTML=staffSVG(m,{clef:bass?'bass':'treble',flat,write})+tabSVG(s,f);
+  const opt={clef:bass?'bass':'treble',flat,write}, range=staffRange(noteY(m,opt));
+  $('#'+pre+'StaffSvg').innerHTML=staffSVG(m,{...opt,range})+tabSVG(s,f,range);
   $('#'+pre+'StaffInfo').innerHTML=`<b>${name}<sub style="font-size:.45em">${sp.oct}</sub></b><span class="doremi">${dr}</span>${extra}
     <span class="msg">${strNo(s)}弦 ${f===0?'開放':f+'フレット'}・${mfreq(m).toFixed(1)} Hz</span>
     <span class="msg">${bass?'ヘ音記号':'ト音記号'}${write?'（ギター・ベースの楽譜は、実際の音より1オクターブ高く書きます）':''}</span>`;
