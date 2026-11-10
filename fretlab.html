@@ -1358,8 +1358,8 @@ const darkMQ=matchMedia('(prefers-color-scheme: dark)');
 const THEMES=[
   {id:'light',name:'ライト',bg:'#f7f7f3',c2:'#161816'},{id:'dark',name:'ダーク',bg:'#121412',c2:'#e9ebe6',dark:1},
   {id:'sage',name:'セージ',bg:'#f1f4ee',c2:'#2f5a3c'},{id:'sakura',name:'サクラ',bg:'#faf3f3',c2:'#a94f66'},
-  {id:'sky',name:'スカイ',bg:'#f1f5f9',c2:'#2f6db0'},{id:'navy',name:'ネイビー',bg:'#0f1522',c2:'#8fb3ff',dark:1},
-  {id:'bordeaux',name:'ボルドー',bg:'#1a0f12',c2:'#e39aa8',dark:1},{id:'wood',name:'ライトウッド',bg:'#f6eee2',c2:'#8a5a2b'},
+  {id:'sky',name:'スカイ',bg:'#f1f5f9',c2:'#2f6db0'},{id:'wood',name:'ライトウッド',bg:'#f6eee2',c2:'#8a5a2b'},
+  {id:'bordeaux',name:'ボルドー',bg:'#1a0f12',c2:'#e39aa8',dark:1},{id:'navy',name:'ネイビー',bg:'#0f1522',c2:'#8fb3ff',dark:1},
 ];
 function curTheme(){return document.documentElement.dataset.theme||(darkMQ.matches?'dark':'light');}
 function paintTheme(){
