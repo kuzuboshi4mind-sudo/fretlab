@@ -525,6 +525,10 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .prog-title{font-size:22px}
 .prog-controls > div{display:flex;flex-direction:column}
 .bpm-mini{display:flex;align-items:center;gap:6px}
+.prog-src{display:flex;margin-bottom:12px}.prog-src button{flex:1}
+.my-prog{width:100%;font-family:var(--mono);font-size:15px;line-height:1.6;resize:vertical;min-height:120px}
+#myProgMsg:empty{display:none} #myProgMsg.err{color:var(--bad)}
+.prog-item .del{float:right;border:0;background:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0 4px}
 .bpm-mini output,.bpm-in{font-family:var(--display);font-weight:500;font-size:34px;min-width:2.4ch;text-align:center;font-variant-numeric:tabular-nums}
 .bpm-in{width:4.2ch;min-width:84px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);padding:0 4px;line-height:1.2;touch-action:none;cursor:ns-resize}
 .bpm-in:focus{cursor:text;outline:2px solid var(--accent);outline-offset:1px}
@@ -874,12 +878,22 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
 
   <!-- PROGRESSIONS -->
   <section data-panel="progressions" hidden>
-    <div class="panel-head"><div><h2>コード進行</h2><p>定番100パターンを伴奏つきで。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
+    <div class="panel-head"><div><h2>コード進行</h2><p>定番の進行や自分で書いた進行を、伴奏つきで。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
     <div class="prog">
       <div class="card prog-list-card">
+        <div class="seg prog-src" id="progSrc"><button data-v="list">定番進行</button><button data-v="mine">自分の進行</button></div>
+        <div id="progListBox">
         <input type="search" id="progSearch" class="search" placeholder="名前・進行で検索（例：カノン、IIm7）" aria-label="コード進行を検索">
         <div class="chips" id="progCats" style="margin-block:10px"></div>
         <div class="prog-list" id="progList"></div>
+        </div>
+        <div id="progMineBox" class="stack" hidden>
+          <label class="label" for="myProgText">コードを並べて書く（小節は「|」か改行、1小節に2つ以上はスペースで区切る。「%」で前の小節をくり返し）</label>
+          <textarea id="myProgText" class="search my-prog" rows="5" spellcheck="false" autocapitalize="off" placeholder="例：&#10;C | G/B | Am7 | Fmaj7&#10;Dm7 G7 | C | % | G13"></textarea>
+          <div class="msg" id="myProgMsg"></div>
+          <div class="row"><input id="myProgName" class="search" type="text" placeholder="名前（保存するとき）" style="flex:1;min-width:0"><button class="btn primary" id="myProgShow" type="button">表示する</button><button class="btn" id="myProgSave" type="button">保存</button></div>
+          <div><span class="label">保存した進行</span><div class="prog-list" id="myProgList"></div></div>
+        </div>
       </div>
       <div class="stack" style="min-width:0">
         <div class="card stack">
@@ -892,7 +906,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
             <div><label class="label" for="progKey">キー</label><select id="progKey"></select></div>
             <div><label class="label" for="progRhythm">リズム</label><select id="progRhythm"></select></div>
             <div><label class="label" for="progAcc">伴奏</label><select id="progAcc">
-              <option value="none">なし</option><option value="whole">ジャーン（1拍目）</option><option value="strum">4分ストローク</option><option value="eighth">8分ストローク</option><option value="arp">アルペジオ</option></select></div>
+              <option value="arp">アルペジオ</option><option value="whole">ジャーン（1拍目）</option><option value="strum">4分ストローク</option><option value="eighth">8分ストローク</option><option value="none">なし</option></select></div>
             <div><span class="label">表示</span><div class="seg" id="progView"><button data-v="chord">コード</button><button data-v="roman">度数</button></div></div>
           </div>
           <div class="row">
@@ -2413,14 +2427,24 @@ function parseRoman(tok){
   return {semi:(DEG_SEMI[m[2]]+(m[1]==='b'?-1:m[1]==='#'?1:0)+12)%12,type,acc:m[1],num:m[2],q:m[3]};
 }
 function parseProg(p){return p.split('|').map(bar=>bar.trim().split(/\s+/).map(parseRoman));}
-const P={idx:store.get('pIdx',0),key:store.get('pKey',0),view:'chord',acc:store.get('pAcc','strum'),cat:'すべて',q:'',bars:null,lastChord:null};
+const P={src:store.get('pSrc','list'),mine:store.get('myProg','C | G/B | Am7 | Fmaj7\nDm7 G7 | C | % | G13'),idx:store.get('pIdx',0),key:store.get('pKey',0),view:'chord',acc:store.get('pAcc','arp'),cat:'すべて',q:'',bars:null,lastChord:null};
 const prettyQ=q=>q.replace('m7b5','m7(♭5)');
 function chordAt(c){
+  if(c.free) return {root:c.free.root,type:'free',name:c.free.name,roman:c.free.name,free:c.free};   // 自分の進行：書いたコード名のまま
   const root=(P.key+c.semi)%12, names=c.acc==='b'?NOTES_F:c.acc==='#'?NOTES_S:(FLAT_ROOTS.has(P.key)?NOTES_F:NOTES_S);
   const ch=CHORDS.find(x=>x.id===c.type);
   return {root,type:c.type,name:names[root]+ch.sym,roman:(c.acc==='b'?'♭':c.acc==='#'?'♯':'')+c.num+prettyQ(c.q)};
 }
 const vCache=new Map();
+// 自由入力のコード（自分の進行）は、そのコードを一時的に「custom」として押さえ方を探す
+function withCustom(ch,fn){ const keep=CUSTOM; CUSTOM=ch; try{ return fn(); } finally{ CUSTOM=keep; } }
+function freeVoicing(ch){
+  const k=INS+':free:'+ch.name; if(vCache.has(k)) return vCache.get(k);
+  const v=ch.known&&ch.bass==null?instVoicing(ch.root,ch.known):withCustom(ch,()=>INS==='guitar'?searchVoicings(ch.root,ch).std:(isBass()?bassShapes:stringedVoicings)(ch.root,'custom').std);
+  vCache.set(k,v); return v;
+}
+const voicingOf=x=>x.free?freeVoicing(x.free):bestVoicing(x.root,x.type);
+const diagramOf=(v,x)=>x.free?withCustom(x.free,()=>diagram(v,x.root,'custom')):diagram(v,x.root,x.type);
 function bestVoicing(root,type){
   const k=INS+':'+root+':'+type; if(vCache.has(k)) return vCache.get(k);
   const v=instVoicing(root,type); vCache.set(k,v); return v;
@@ -2441,9 +2465,28 @@ function renderProgList(){
   });
   if(!list.children.length) list.innerHTML='<p class="msg" style="padding:8px">該当する進行がありません。</p>';
 }
+// 自分の進行：「C | G/B | Am7 F」のように書いたものを小節に分ける（読めないコードは知らせる）
+function parseMine(txt){
+  const bad=[], bars=[];
+  String(txt||'').normalize('NFKC').replace(/｜/g,'|').split(/\n|\|/).map(b=>b.trim()).filter(Boolean).forEach(b=>{
+    if(b==='%'){ if(bars.length) bars.push(bars[bars.length-1]); return; }
+    const cs=b.split(/\s+/).map(t=>{ const c=parseChordName(t); if(!c){ bad.push(t); return null; } return {free:c}; }).filter(Boolean);
+    if(cs.length) bars.push(cs.slice(0,4));
+  });
+  return {bars,bad};
+}
 function renderProg(){
+  const mine=P.src==='mine';
+  $('#progKey').parentElement.hidden=mine; $('#progView').parentElement.hidden=mine;
+  if(mine){
+    const r=parseMine(P.mine), msg=$('#myProgMsg');
+    msg.className='msg'+(r.bad.length?' err':''); msg.textContent=r.bad.length?`読み取れないコード：${r.bad.join('、')}`:'';
+    P.bars=r.bars.length?r.bars:[[{free:parseChordName('C')}]];
+    $('#progCat').textContent='自分の進行'; $('#progTitle').textContent=P.mineName||'自分で書いた進行'; $('#progDesc').textContent=`${P.bars.length}小節。リズム・伴奏・テンポを選んで ▶ 再生。`;
+  } else {
   const p=PROGS[P.idx]; P.bars=parseProg(p.p);
   $('#progCat').textContent=`No.${P.idx+1}　${p.c}`; $('#progTitle').textContent=p.n; $('#progDesc').textContent=p.d;
+  }
   const el=$('#progBars'); el.innerHTML='';
   P.bars.forEach((bar,bi)=>{
     const d=document.createElement('div');d.className='bar';d.dataset.b=bi;
@@ -2456,9 +2499,9 @@ function showNowNext(bi,ci){
   const bars=P.bars, cur=bars[bi][ci];
   const nb=ci+1<bars[bi].length?bi:(bi+1)%bars.length, nc=ci+1<bars[bi].length?ci+1:0, nx=bars[nb][nc];
   const key=bi+':'+ci; if(P.lastChord===key) return; P.lastChord=key;
-  const a=chordAt(cur), b=chordAt(nx), va=bestVoicing(a.root,a.type), vb=bestVoicing(b.root,b.type);
+  const a=chordAt(cur), b=chordAt(nx), va=voicingOf(a), vb=voicingOf(b);
   $('#nowName').textContent=a.name; $('#nextName').textContent=b.name;
-  $('#nowDia').innerHTML=va?diagram(va,a.root,a.type):''; $('#nextDia').innerHTML=vb?diagram(vb,b.root,b.type):'';
+  $('#nowDia').innerHTML=va?diagramOf(va,a):''; $('#nextDia').innerHTML=vb?diagramOf(vb,b):'';
 }
 function progToggle(){ if(M.playing&&M.owner==='prog') transportStop(); else {P.lastChord=null;transportStart('prog');} }
 function strumAt(t,frets,{up=false,gain=.3,spread=.022}={}){
@@ -2472,10 +2515,10 @@ tickHooks.push((t,info)=>{
   if(pb<0) return;
   if(!$('#progLoop').checked&&pb>=bars.length){ if(info.beat===0) setTimeout(()=>{if(M.owner==='prog')transportStop();},Math.max(0,(t-ctx.currentTime)*1000)); return; }
   const bar=bars[pb%bars.length], ci=Math.floor(info.beat*bar.length/info.beats), chordStart=Math.floor(ci*info.beats/bar.length)===info.beat;
-  const x=chordAt(bar[ci]), v=bestVoicing(x.root,x.type), half=60/M.bpm/2;
+  const x=chordAt(bar[ci]), v=voicingOf(x), half=60/M.bpm/2;
   if(!v) return;
   if(isBass()){   // ベース：ルート中心のライン（伴奏の型に合わせて）
-    const rt=bassRoot(x.root), at=Math.max(0,t-ctx.currentTime), pl=(m,d,g)=>pluck(m,at+d,g,{kind:'bass',str:'b'});
+    const rt=bassRoot(x.free&&x.free.bass!=null?x.free.bass:x.root), at=Math.max(0,t-ctx.currentTime), pl=(m,d,g)=>pluck(m,at+d,g,{kind:'bass',str:'b'});
     const five=rt+7, oct=rt+12;
     switch(P.acc){
       case 'whole': if(chordStart) pl(rt,0,.75); break;
@@ -2533,6 +2576,25 @@ drawHooks.push(cur=>{
     el.addEventListener('pointerup',up); el.addEventListener('pointercancel',()=>{ y0=null; });
     el.addEventListener('wheel',e=>{ e.preventDefault(); setBpm(M.bpm+(e.deltaY<0?1:-1)); el.value=M.bpm; },{passive:false}); }
   if(P.idx>=PROGS.length) P.idx=0;
+  // 定番進行／自分の進行の切り替え
+  const showSrc=()=>{ $('#progListBox').hidden=P.src==='mine'; $('#progMineBox').hidden=P.src!=='mine'; };
+  segInit($('#progSrc'),P.src,v=>{ P.src=v; store.set('pSrc',v); if(M.playing&&M.owner==='prog') transportStop(); showSrc(); renderProg(); });
+  const tx=$('#myProgText'); tx.value=P.mine;
+  const applyMine=()=>{ P.mine=tx.value; P.mineName=$('#myProgName').value.trim()||null; store.set('myProg',P.mine); if(M.playing&&M.owner==='prog') transportStop(); renderProg(); };
+  $('#myProgShow').addEventListener('click',applyMine);
+  tx.addEventListener('keydown',e=>{ if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){ e.preventDefault(); applyMine(); } });
+  const saved=()=>store.get('myProgs',[]);
+  const renderSaved=()=>{ const el=$('#myProgList'); el.innerHTML=''; const list=saved();
+    if(!list.length){ el.innerHTML='<p class="msg" style="padding:4px 2px">まだありません。書いた進行に名前をつけて「保存」できます。</p>'; return; }
+    list.forEach((x,i)=>{ const b=document.createElement('div'); b.className='prog-item'; b.setAttribute('role','button'); b.tabIndex=0;
+      b.innerHTML=`<b></b><small></small>`; b.querySelector('b').textContent=x.name; b.querySelector('small').textContent=x.text.replace(/\n/g,' | ');
+      const d=document.createElement('button'); d.className='del'; d.type='button'; d.textContent='×'; d.setAttribute('aria-label',x.name+'を削除');
+      d.addEventListener('click',e=>{ e.stopPropagation(); const l=saved(); l.splice(i,1); store.set('myProgs',l); renderSaved(); }); b.querySelector('b').appendChild(d);
+      const open=()=>{ tx.value=x.text; $('#myProgName').value=x.name; P.mineName=x.name; applyMine(); };
+      b.addEventListener('click',open); b.addEventListener('keydown',e=>{ if(e.key==='Enter') open(); }); el.appendChild(b); }); };
+  $('#myProgSave').addEventListener('click',()=>{ const text=tx.value.trim(); if(!text) return; const name=$('#myProgName').value.trim()||text.split(/\n|\|/)[0].trim()+' …';
+    const l=saved().filter(x=>x.name!==name); l.unshift({name,text}); store.set('myProgs',l.slice(0,50)); P.mineName=name; applyMine(); renderSaved(); });
+  showSrc(); renderSaved();
   renderProgList(); renderProg(); instHooks.push(()=>{P.lastChord=null;renderProg();});
 })();
 
