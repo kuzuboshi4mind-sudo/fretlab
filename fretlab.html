@@ -4,7 +4,7 @@ var t=null,pc=null,nc=null;try{t=JSON.parse(localStorage.getItem('fretlab.theme'
 try{var m=document.cookie.match(/(?:^|; )fretlab_theme=([a-z]+)/);if(!t&&m)t=m[1];var n=document.cookie.match(/(?:^|; )fretlab_pend=(%23[0-9a-fA-F]{6})/);if(!pc&&n)pc=decodeURIComponent(n[1]);var q=document.cookie.match(/(?:^|; )fretlab_tbg=(%23[0-9a-fA-F]{6})/);if(!nc&&q)nc=decodeURIComponent(q[1]);}catch(e){}
 var BG={light:'#f7f7f3',sage:'#f1f4ee',sakura:'#faf3f3',sky:'#f1f5f9',wood:'#f6eee2',dark:'#121412',navy:'#0f1522',bordeaux:'#1a0f12'},D=['dark','navy','bordeaux'],r=document.documentElement;if(t==='walnut')t='wood';
 if(BG[t]){r.dataset.theme=t;r.dataset.scheme=D.indexOf(t)>=0?'dark':'light';var mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.content=BG[t];}
-if(pc&&/^#[0-9a-fA-F]{6}$/.test(pc))r.style.setProperty('--pend',pc);else pc=null;if(nc&&/^#[0-9a-fA-F]{6}$/.test(nc))r.style.setProperty('--tbg',nc);else nc=null;window.__fretPrefs={theme:BG[t]?t:null,pend:pc,tbg:nc};})();</script>
+if(pc&&/^#[0-9a-fA-F]{6}$/.test(pc))r.style.setProperty('--pend',pc);else pc=null;if(nc&&/^#[0-9a-fA-F]{6}$/.test(nc)){r.style.setProperty('--tbg',nc);var v=parseInt(nc.slice(1),16);if((.299*(v>>16)+.587*(v>>8&255)+.114*(v&255))/255>.6)r.dataset.tbg='light';}else nc=null;window.__fretPrefs={theme:BG[t]?t:null,pend:pc,tbg:nc};})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -177,6 +177,10 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
   --good:#7fd69a; --warn:#f0b35a; --root:#d9b56c;
   color-scheme:dark; color:var(--fg); background:var(--bg); border-radius:22px; padding:20px 16px 22px; margin-inline:-4px}
 [data-panel="tuner"] .panel-head p{color:var(--muted)}
+/* チューナーの背景が明るい色のとき：文字と線を黒っぽく */
+:root[data-tbg="light"] [data-panel="tuner"]{--surface:color-mix(in srgb,var(--bg) 55%,#fff);--panel:color-mix(in srgb,var(--bg) 85%,#000);--line:color-mix(in srgb,var(--bg) 82%,#000);
+  --fg:#1d201e;--muted:#5f6660;--accent:#1d201e;--accent-ink:#fff;--accent-soft:color-mix(in srgb,var(--bg) 88%,#000);--good:#2f8f55;--warn:#c9751a;color-scheme:light}
+:root[data-tbg="light"] .gauge-wrap .pendcolors button{border-color:rgba(0,0,0,.18)}
 [data-panel="tuner"] .card{background:var(--surface)}
 /* tuner */
 .tuner{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px;align-items:start}
@@ -244,7 +248,7 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .gauge .zone{fill:var(--good);opacity:.2;transition:opacity .3s}
 .gauge text{fill:var(--muted);font-family:var(--mono);font-size:10px;text-anchor:middle}
 .gauge text.side{font-family:var(--body);font-size:10.5px;letter-spacing:.15em}
-#needle{transform-origin:150px 160px;transition:transform .45s cubic-bezier(.25,.6,.35,1)}
+#needle{transform-origin:150px 160px;transition:transform .8s cubic-bezier(.25,.6,.35,1)}
 #needle line{stroke:var(--warn);stroke-width:3;stroke-linecap:round;transition:stroke .2s}
 .gauge.idle #needle line{stroke:var(--muted);opacity:.5}
 .gauge.in #needle line{stroke:var(--good)}
@@ -1372,11 +1376,11 @@ function setTheme(id){ const t=THEMES.find(x=>x.id===id); if(!t) return; const r
   try{ document.cookie='fretlab_theme='+id+';max-age=315360000;path=/;SameSite=Lax'; }catch(e){} paintTheme(); }
 // 振り子・チューナーの針の色：8色から選ぶ（選ぶまではカラーに合わせた色）。右上のアイコンから開く
 const PEND_COLORS=[['キャラメル','#c08547'],['テラコッタ','#c8643c'],['ルビー','#b8323f'],['ローズ','#d97a93'],['オリーブ','#8a9a3a'],['エメラルド','#2f8f6a'],['サファイア','#2f6db0'],['ゴールド','#c9a227']];
-function colorPicker({btn,pop,key,cssVar,cookie,init,colors=PEND_COLORS,autoLabel='カラーに合わせる'}){
+function colorPicker({btn,pop,key,cssVar,cookie,init,colors=PEND_COLORS,autoLabel='カラーに合わせる',onSet}){
   btn=$(btn); pop=$(pop); if(!btn||!pop) return;
   const set=c=>{ const r=document.documentElement; if(c) r.style.setProperty(cssVar,c); else r.style.removeProperty(cssVar); store.set(key,c||null);
     try{ document.cookie=cookie+'='+(c?encodeURIComponent(c):'')+';max-age='+(c?315360000:0)+';path=/;SameSite=Lax'; }catch(e){}
-    pop.querySelectorAll('button').forEach(b=>b.setAttribute('aria-checked',String((b.dataset.c||null)===(c||null)))); };
+    pop.querySelectorAll('button').forEach(b=>b.setAttribute('aria-checked',String((b.dataset.c||null)===(c||null)))); onSet&&onSet(c); };
   colors.forEach(([n,c])=>{ const b=document.createElement('button'); b.type='button'; b.dataset.c=c; b.title=n; b.setAttribute('aria-label',n); b.setAttribute('role','radio'); b.style.background=c; b.addEventListener('click',()=>set(c)); pop.appendChild(b); });
   const a=document.createElement('button'); a.type='button'; a.className='auto'; a.textContent=autoLabel; a.setAttribute('role','radio'); a.addEventListener('click',()=>set(null)); pop.appendChild(a);
   set(store.get(key,null)||init||null);
@@ -1387,9 +1391,10 @@ function colorPicker({btn,pop,key,cssVar,cookie,init,colors=PEND_COLORS,autoLabe
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!pop.hidden){ open(false); btn.focus(); } });
 }
 colorPicker({btn:'#pendColorBtn',pop:'#pendColors',key:'pendColor',cssVar:'--pend',cookie:'fretlab_pend',init:window.__fretPrefs&&window.__fretPrefs.pend});
-// チューナーの背景：白い文字が読みやすい、深い色の8種類
-const TUNER_BG=[['チャコール','#24272d'],['ネイビー','#0f1a33'],['ディープブルー','#0b2440'],['ティール','#0b2a2a'],['フォレスト','#10261b'],['ボルドー','#2c0f18'],['パープル','#211433'],['ブラウン','#2b1d13']];
-colorPicker({btn:'#needleColorBtn',pop:'#needleColors',key:'tunerBg',cssVar:'--tbg',cookie:'fretlab_tbg',init:window.__fretPrefs&&window.__fretPrefs.tbg,colors:TUNER_BG,autoLabel:'標準（黒）'});
+// チューナーの背景：深い色4つと、明るい色・パステル4つ（明るい色のときは文字を黒くする）
+const TUNER_BG=[['チャコール','#24272d'],['ネイビー','#0f1a33'],['フォレスト','#10261b'],['ボルドー','#2c0f18'],['クリーム','#f6efdd'],['ミント','#dcefe3'],['スカイ','#dbe9f6'],['ピーチ','#fbe1d4']];
+const isLightHex=c=>{ if(!c) return false; const n=parseInt(c.slice(1),16), r=n>>16, g=n>>8&255, b=n&255; return (.299*r+.587*g+.114*b)/255>.6; };
+colorPicker({btn:'#needleColorBtn',pop:'#needleColors',key:'tunerBg',cssVar:'--tbg',cookie:'fretlab_tbg',init:window.__fretPrefs&&window.__fretPrefs.tbg,colors:TUNER_BG,autoLabel:'標準（黒）',onSet:c=>{ if(isLightHex(c)) document.documentElement.dataset.tbg='light'; else delete document.documentElement.dataset.tbg; }});
 (function initThemes(){
   const pop=$('#themePop'), btn=$('#themeBtn');
   THEMES.forEach(t=>{ const b=document.createElement('button'); b.type='button'; b.className='theme-opt'; b.dataset.v=t.id; b.setAttribute('role','radio');
@@ -1939,7 +1944,7 @@ function tunerLoop(){
   const tm=chrom?T.target:ms[T.target??0], raw=(mf-tm)*100;
   // メーターはゆっくり追従させる（大きくずれたときだけ素早く寄せる）
   const dev=T.ema==null?0:Math.abs(raw-T.ema);
-  T.ema=T.ema==null?raw:T.ema+(raw-T.ema)*(dev>35?.18:.035);   // 針はゆっくり（大きくずれたときだけ少し速く）
+  T.ema=T.ema==null?raw:T.ema+(raw-T.ema)*(dev>35?.09:.018);   // 針はゆっくり（大きくずれたときだけ少し速く）
   const cents=Math.round(T.ema), n=ms.length, now=performance.now();
   // ±4セント以内が0.45秒続いたら「合った」（少し甘め）
   const near=Math.abs(T.ema)<=4;
