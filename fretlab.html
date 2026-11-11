@@ -763,6 +763,17 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 @keyframes navPulse{50%{background:color-mix(in srgb,var(--root) 18%,transparent)}}
 .follow-pill{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;border:1px solid var(--root);background:var(--surface);color:var(--root);font:600 14px/1 var(--sans,system-ui);padding:11px 18px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
 .follow-pill[hidden]{display:none}
+.gear-btn{padding:4px;width:38px;justify-content:center}
+.gear-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round}
+.set-pop{width:min(340px,calc(100vw - 32px));display:flex;flex-direction:column;gap:12px}
+.set-pop h3{margin:0;font-size:15px}.set-head{display:flex;justify-content:space-between;align-items:center}.set-x{border:0;background:none;font-size:22px;line-height:1;color:var(--muted);cursor:pointer;padding:2px 6px}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;cursor:pointer}
+.set-row>span{display:flex;flex-direction:column;font-size:14px;min-width:0}
+.set-row small{font-size:11px;color:var(--muted)}
+.set-row .seg button{padding:6px 9px;font-size:12px}
+.set-pop input.sw-in{margin:0;border:0;appearance:none;-webkit-appearance:none;width:42px;height:24px;border-radius:999px;background:var(--line);position:relative;flex:none;cursor:pointer;transition:background .2s}
+.set-pop input.sw-in::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.set-pop input.sw-in:checked{background:var(--root)}.set-pop input.sw-in:checked::after{transform:translateX(18px)}
 </style>
 
 <div class="intro" id="intro" role="dialog" aria-label="Fretlab ギター練習帳">
@@ -796,6 +807,17 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
       <div class="theme-wrap">
         <button class="theme-btn" id="themeBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="themePop" aria-label="カラーを選ぶ"><span class="ti" aria-hidden="true"></span><span class="tl"></span></button>
         <div class="theme-pop" id="themePop" role="radiogroup" aria-label="カラー" hidden></div>
+      </div>
+      <div class="theme-wrap">
+        <button class="theme-btn gear-btn" id="setBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="setPop" aria-label="設定"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 2.8h3.4l.5 2.4a7.5 7.5 0 0 1 1.9 1.1l2.3-.8 1.7 2.9-1.8 1.6a7.6 7.6 0 0 1 0 2.2l1.8 1.6-1.7 2.9-2.3-.8a7.5 7.5 0 0 1-1.9 1.1l-.5 2.4h-3.4l-.5-2.4a7.5 7.5 0 0 1-1.9-1.1l-2.3.8-1.7-2.9 1.8-1.6a7.6 7.6 0 0 1 0-2.2L3.9 8.4l1.7-2.9 2.3.8a7.5 7.5 0 0 1 1.9-1.1z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        <div class="theme-pop set-pop" id="setPop" role="dialog" aria-label="設定" hidden>
+          <div class="set-head"><h3>設定</h3><button class="set-x" id="setClose" type="button" aria-label="閉じる">×</button></div>
+          <div class="set-row"><span>はじめの速さ<small>弾語り練習・TAB練習で曲を開いたとき</small></span><div class="seg" id="setSpeed"><button data-v="75">75%</button><button data-v="100">100%</button><button data-v="125">125%</button><button data-v="150">150%</button></div></div>
+          <label class="set-row"><span>再生中に自動でスクロール<small>手で動かすとその再生中は止まります</small></span><input type="checkbox" class="sw-in" id="setFollow"></label>
+          <label class="set-row"><span>曲の最後で次の曲へ進む<small>ループ・リピートがオフのとき</small></span><input type="checkbox" class="sw-in" id="setNext"></label>
+          <label class="set-row"><span>再生中は画面を消さない<small>対応している端末だけ</small></span><input type="checkbox" class="sw-in" id="setWake"></label>
+          <button class="btn" id="setReset" type="button">この設定を元に戻す</button>
+        </div>
       </div>
     </div>
   </header>
@@ -1681,6 +1703,24 @@ colorPicker({btn:'#pendColorBtn',pop:'#pendColors',key:'pendColor',cssVar:'--pen
 const TUNER_BG=[['クリーム','#f6efdd'],['ミント','#dcefe3'],['スカイ','#dbe9f6'],['ピーチ','#fbe1d4'],['チャコール','#24272d'],['ネイビー','#0f1a33'],['フォレスト','#10261b'],['ボルドー','#2c0f18']];
 const isLightHex=c=>{ if(!c) return false; const n=parseInt(c.slice(1),16), r=n>>16, g=n>>8&255, b=n&255; return (.299*r+.587*g+.114*b)/255>.6; };
 colorPicker({btn:'#needleColorBtn',pop:'#needleColors',key:'tunerBg',cssVar:'--tbg',cookie:'fretlab_tbg',init:window.__fretPrefs&&window.__fretPrefs.tbg,colors:TUNER_BG,autoLabel:'標準（黒）',onSet:c=>{ if(isLightHex(c)) document.documentElement.dataset.tbg='light'; else delete document.documentElement.dataset.tbg; }});
+(function initSettings(){
+  const pop=$('#setPop'), btn=$('#setBtn');
+  const open=v=>{ pop.hidden=!v; btn.setAttribute('aria-expanded',String(v)); };
+  btn.addEventListener('click',e=>{ e.stopPropagation(); open(pop.hidden); });
+  $('#setClose').addEventListener('click',()=>open(false));
+  document.addEventListener('click',e=>{ if(!pop.hidden&&!pop.contains(e.target)&&e.target!==btn) open(false); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!pop.hidden){ open(false); btn.focus(); } });
+  const applySpeed=v=>{ store.set('defSpeed',v); if(typeof SG!=='undefined'&&!SP.playing){ SG.speed=v; $('#songSpeed').value=v; $('#songSpeedOut').textContent=v; renderSong(); }
+    if(typeof TB!=='undefined'&&!TB.playing){ TB.speed=v; $('#tabSpeed').value=v; $('#tabSpeedOut').textContent=v; const p=TABS_DATA[TB.idx]; if(p) $('#tabBpm').textContent=Math.round(p.bpm*v/100); } };
+  segInit($('#setSpeed'),String(store.get('defSpeed',125)),v=>applySpeed(+v));
+  const fill=()=>{ $('#setSpeed').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.v===store.get('defSpeed',125))));
+    $('#setFollow').checked=store.get('autoFollow',true); $('#setNext').checked=store.get('autoNext',false); $('#setWake').checked=store.get('wakeLock',true); };
+  setTimeout(()=>{ fill(); const v=store.get('defSpeed',125); if(v!==125) applySpeed(v); },0);
+  $('#setFollow').addEventListener('change',e=>{ store.set('autoFollow',e.target.checked); if(e.target.checked&&FOLLOW.active){ FOLLOW.on=true; followPill(false); } });
+  $('#setNext').addEventListener('change',e=>store.set('autoNext',e.target.checked));
+  $('#setWake').addEventListener('change',e=>{ store.set('wakeLock',e.target.checked); if(!e.target.checked) wake(false); });
+  $('#setReset').addEventListener('click',()=>{ ['autoFollow','autoNext','wakeLock'].forEach(k=>{ try{localStorage.removeItem('fretlab.'+k);}catch(e){} }); applySpeed(125); fill(); });
+})();
 (function initThemes(){
   const pop=$('#themePop'), btn=$('#themeBtn');
   THEMES.forEach(t=>{ const b=document.createElement('button'); b.type='button'; b.className='theme-opt'; b.dataset.v=t.id; b.setAttribute('role','radio');
@@ -3079,7 +3119,7 @@ const QUAL_MAP={'':'maj',m:'m','7':'7',M7:'M7',maj7:'M7',m7:'m7',mM7:'mM7','6':'
 const NAME_PC={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
 function parseChord(ch){const m=/^([A-G])([#b♯♭]?)(.*)$/.exec(ch);if(!m) return null;let pc=NAME_PC[m[1]]+(m[2]==='#'||m[2]==='♯'?1:m[2]==='b'||m[2]==='♭'?-1:0);return {pc:(pc+12)%12,q:m[3]};}
 const keyRoot=k=>parseChord(k).pc, keyMinor=k=>/m$/.test(k);
-const SG={idx:store.get('sIdx',0),lang:'all',shift:0,mode:'real',speed:125,lv:store.get('songLv',0)};
+const SG={idx:store.get('sIdx',0),lang:'all',shift:0,mode:'real',speed:store.get('defSpeed',125),lv:store.get('songLv',0)};
 /* 難易度：易＝元のコード、中＝セブンス、難＝テンション（9th・13th・♭9・♯11 など）。キーの中での役割（度数）で決める */
 function arrangeSym(song,marks,k,lv){
   const m=marks[k]; if(!lv) return m.q;
@@ -3148,7 +3188,7 @@ function renderSongList(){
   SONGS.forEach((s,i)=>{ if(SG.lang!=='all'&&s.lang!==SG.lang) return;
     const b=document.createElement('button'); b.className='prog-item'; b.setAttribute('aria-current',String(i===SG.idx));
     b.innerHTML=`<b></b><small></small>`; b.querySelector('b').textContent=s.t; b.querySelector('small').textContent=`${s.key} ・ ${s.ts||s.time+'拍子'} ・ ${s.mel?'メロディ＋伴奏':'伴奏のみ'}`;
-    b.addEventListener('click',()=>{songStop();SG.idx=i;SG.shift=0;SG.speed=125;$('#songSpeed').value=125;$('#songSpeedOut').textContent=125;store.set('sIdx',i);renderSongList();renderSong();if(innerWidth<860) $('#songTitle').scrollIntoView({behavior:'smooth'});});
+    b.addEventListener('click',()=>{songStop();SG.idx=i;SG.shift=0;SG.speed=store.get('defSpeed',125);$('#songSpeed').value=SG.speed;$('#songSpeedOut').textContent=SG.speed;store.set('sIdx',i);renderSongList();renderSong();if(innerWidth<860) $('#songTitle').scrollIntoView({behavior:'smooth'});});
     el.appendChild(b); });
 }
 function renderSong(){
@@ -3242,8 +3282,9 @@ function songSchedulePassRaw(){
 }
 /* 再生中の自動スクロール：手でスクロールしたら止める（下の「自動スクロールに戻す」で再開）。次の再生でまたオン */
 const FOLLOW={on:true,active:null,last:null};
-function followStart(kind){ FOLLOW.on=true; FOLLOW.active=kind; FOLLOW.last=null; followPill(false); }
-function followStop(kind){ if(FOLLOW.active===kind){ FOLLOW.active=null; followPill(false); } }
+function followStart(kind){ FOLLOW.on=store.get('autoFollow',true); FOLLOW.active=kind; FOLLOW.last=null; followPill(false); wake(true); }
+let WAKE=null; async function wake(on){ try{ if(on&&store.get('wakeLock',true)&&'wakeLock' in navigator&&!WAKE){ WAKE=await navigator.wakeLock.request('screen'); WAKE.addEventListener('release',()=>{WAKE=null;}); } else if(!on&&WAKE){ await WAKE.release(); WAKE=null; } }catch(e){} }
+function followStop(kind){ if(FOLLOW.active===kind){ FOLLOW.active=null; followPill(false); wake(false); } }
 function followPill(show){ let b=$('#followPill');
   if(!b){ b=document.createElement('button'); b.id='followPill'; b.type='button'; b.className='follow-pill'; b.textContent='↻ 自動スクロールに戻す'; b.hidden=true;
     b.addEventListener('click',()=>{ FOLLOW.on=true; followPill(false); if(FOLLOW.last) followTo(FOLLOW.last,true); }); document.body.appendChild(b); }
@@ -3283,14 +3324,15 @@ function songStop(){
   document.querySelectorAll('#songSheet .now').forEach(x=>x.classList.remove('now')); $('#songPlay').textContent='▶ 再生';
 }
 // 前の曲・次の曲（今の絞り込みの中で移動）。再生が最後まで行くと「次の曲」を光らせる
-function songGo(i){ songStop(); SG.idx=i; SG.shift=0; SG.speed=125; $('#songSpeed').value=125; $('#songSpeedOut').textContent=125; store.set('sIdx',i); renderSongList(); renderSong(); $('#songTitle').scrollIntoView({behavior:'smooth',block:'start'}); }
+function songGo(i){ songStop(); SG.idx=i; SG.shift=0; SG.speed=store.get('defSpeed',125); $('#songSpeed').value=SG.speed; $('#songSpeedOut').textContent=SG.speed; store.set('sIdx',i); renderSongList(); renderSong(); $('#songTitle').scrollIntoView({behavior:'smooth',block:'start'}); }
 function renderNav(kind){
   const vis=kind==='song'?SONGS.map((s,i)=>i).filter(i=>SG.lang==='all'||SONGS[i].lang===SG.lang):TABS_DATA.map((p,i)=>i).filter(i=>TB.cat==='all'||TABS_DATA[i].cat===TB.cat);
   const cur=kind==='song'?SG.idx:TB.idx, k=vis.indexOf(cur), list=kind==='song'?SONGS:TABS_DATA;
   [['Prev',vis[k-1]],['Next',vis[k+1]]].forEach(([w,i])=>{ const b=$('#'+kind+w); if(!b) return; b.disabled=i==null; b.querySelector('b').textContent=i==null?(w==='Prev'?'最初の曲です':'最後の曲です'):list[i].t; b.dataset.i=i==null?'':i; });
   const nav=$('#'+kind+'Nav'); if(nav) nav.classList.remove('pulse');
 }
-function navPulse(kind){ const nav=$('#'+kind+'Nav'); if(!nav) return; nav.classList.remove('pulse'); void nav.offsetWidth; nav.classList.add('pulse'); const r=nav.getBoundingClientRect(); if(r.top>innerHeight||r.bottom<0) nav.scrollIntoView({behavior:'smooth',block:'center'}); }
+function navPulse(kind){ const nav=$('#'+kind+'Nav'); if(!nav) return;
+  if(store.get('autoNext',false)){ const nb=$('#'+kind+'Next'); if(nb&&!nb.disabled){ setTimeout(()=>{ nb.click(); setTimeout(()=>{ kind==='song'?songPlay():tabPlay(); },350); },1200); } } nav.classList.remove('pulse'); void nav.offsetWidth; nav.classList.add('pulse'); const r=nav.getBoundingClientRect(); if(r.top>innerHeight||r.bottom<0) nav.scrollIntoView({behavior:'smooth',block:'center'}); }
 setTimeout(()=>{ ['Prev','Next'].forEach(w=>{ const a=$('#song'+w), b=$('#tab'+w);
   if(a) a.addEventListener('click',()=>{ if(a.dataset.i!=='') songGo(+a.dataset.i); });
   if(b) b.addEventListener('click',()=>{ if(b.dataset.i===''||b.dataset.i==null) return; tabStop(); TB.idx=+b.dataset.i; store.set('tbIdx',TB.idx); renderTabList(); renderTab(); $('#tabTitle').scrollIntoView({behavior:'smooth',block:'start'}); }); }); },0);
@@ -3502,7 +3544,7 @@ function tabHarm(p,data){
   if(p.cat==='melody'||p.cat==='classic'||p.cat==='jazz') return autoHarm(p,data.ev,data.len);
   return [];
 }
-const TB={idx:store.get('tbIdx',0),cat:'all',speed:125,playing:false,srcs:[],timer:null,raf:0,cur:null,data:null,t0:0,bd:0,passes:0};
+const TB={idx:store.get('tbIdx',0),cat:'all',speed:store.get('defSpeed',125),playing:false,srcs:[],timer:null,raf:0,cur:null,data:null,t0:0,bd:0,passes:0};
 function renderTabList(){
   const el=$('#tabList'); el.innerHTML='';
   TABS_DATA.forEach((p,i)=>{ if(TB.cat!=='all'&&p.cat!==TB.cat) return;
