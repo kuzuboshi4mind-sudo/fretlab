@@ -3434,7 +3434,7 @@ function staffSVG(m,{clef='treble',flat=false,write=0,range}={}){
   const [vy,vh]=range||staffRange(y);
   let s=`<svg viewBox="0 ${vy} 210 ${vh}" role="img" aria-label="五線譜">`;
   for(let i=0;i<5;i++) s+=`<line class="sl" x1="8" y1="${40+i*10}" x2="202" y2="${40+i*10}"/>`;
-  s+=clef==='bass'?`<text class="clef" x="12" y="62" font-size="38">𝄢</text>`:`<text class="clef" x="10" y="82" font-size="54">𝄞</text>`;
+  s+=clef==='bass'?`<text class="clef" x="12" y="77.6" font-size="42">𝄢</text>`:`<text class="clef" x="10" y="82" font-size="54">𝄞</text>`;
   if(write) s+=`<text class="oct" x="${clef==='bass'?22:24}" y="${clef==='bass'?92:108}">8</text>`;
   for(let ly=90;ly<=y;ly+=10) s+=`<line class="sl" x1="${x-11}" y1="${ly}" x2="${x+11}" y2="${ly}"/>`;   // 加線
   for(let ly=30;ly>=y;ly-=10) s+=`<line class="sl" x1="${x-11}" y1="${ly}" x2="${x+11}" y2="${ly}"/>`;
