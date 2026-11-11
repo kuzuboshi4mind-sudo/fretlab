@@ -285,7 +285,7 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .board .fnum{fill:var(--fg);font-family:var(--mono);font-size:17px;font-weight:700;text-anchor:middle;opacity:.8}
 .board.long .fnum{font-size:21px}
 .board .hit{fill:transparent;cursor:pointer}
-.sheet .ch{display:inline-flex;align-items:center;gap:10px}.sheet .ch .chu{display:inline-flex;align-items:center;gap:3px;cursor:pointer}
+.sheet .ch{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px 10px;max-width:100%}.sheet .ch .chu{display:inline-flex;align-items:center;gap:3px;cursor:pointer}
 .sheet .ch .mini{width:60px;height:auto;flex:none}
 .mini line{stroke:var(--muted);stroke-width:.6}.mini line.nut{stroke:var(--fg);stroke-width:1.6}
 .mini circle{fill:var(--fg)}.mini circle.o{fill:none;stroke:var(--fg);stroke-width:.7}
@@ -447,7 +447,7 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .sheet{padding:22px 20px;display:flex;flex-direction:column;gap:18px}
 .sheet .sec{font-size:11px;letter-spacing:.24em;color:var(--muted)}
 .sline{display:flex;flex-wrap:wrap;align-items:flex-end;row-gap:6px}
-.seg-c{display:inline-flex;flex-direction:column;white-space:pre}
+.seg-c{display:inline-flex;flex-direction:column;white-space:pre-wrap;max-width:100%;min-width:0}
 .seg-c .ch{font-family:var(--display);font-weight:600;font-size:19px;color:var(--cobalt-b);line-height:1.1;min-height:1.1em;padding-right:.6em;cursor:pointer}
 .seg-c .ch:hover{color:var(--root)}
 .seg-c .ly{font-size:17px;line-height:1.5}
