@@ -712,7 +712,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
   body.pr-on{background:#fff!important}
   body.pr-on #printArea{display:block;color:#1b1a17;font-family:"Noto Sans JP","Hiragino Sans",system-ui,sans-serif}
 }
-.pr-page{width:190mm;height:277mm;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden;break-after:page;page-break-after:always;color:#1b1a17;background:#fff}
+.pr-page{width:100%;height:262mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden;break-after:page;page-break-after:always;color:#1b1a17;background:#fff}
 .pr-page:last-child{break-after:auto;page-break-after:auto}
 .pr-head{display:flex;justify-content:space-between;align-items:flex-end;gap:6mm;border-bottom:.6mm solid #8a5a2b;padding-bottom:2.5mm;margin-bottom:3mm}
 .pr-head h1{font-size:20pt;margin:0;line-height:1.15;font-weight:700}
@@ -3587,7 +3587,7 @@ function printTabHTML(){
   const nb=Math.ceil(len/B-1e-9);
   let mg=1; ev.forEach((e,i)=>{ const n=ev[i+1]; if(n&&n.t-e.t>1e-6) mg=Math.min(mg,n.t-e.t); }); mg=Math.max(mg,1/6);
   const clef=26, pad=9, need=(B/mg)*15+pad*2;
-  const pageH=1047, headH=118, gapMin=10, gapMax=22, extra=66;
+  const pageH=990, headH=118, gapMin=10, gapMax=22, extra=66;
   // 1行の小節数：音の細かさで決まる上限の中で、1枚がちょうど埋まるいちばん広い小節幅を選ぶ（どの小節も同じ幅）
   const bprMax=Math.max(1,Math.min(B===3?5:4,Math.floor((PR.W-clef)/need)));
   let bpr=bprMax; for(let c=Math.min(2,bprMax);c<=bprMax;c++){ const rw=Math.ceil(nb/c), gg=((pageH-headH)/rw-extra-14)/(ns-1); if(gg>=12){ bpr=c; break; } }
@@ -3628,7 +3628,7 @@ function openPrint(kind){
 }
 window.openPrint=openPrint;
 // 印刷ダイアログを開く（「PDFに保存」を選ぶとPDFになる）。終わったら印刷用の表示を片づける
-function printNow(kind){ if(kind==='song') songStop(); else if(TB.playing) tabStop(); openPrint(kind); setTimeout(()=>window.print(),80); }
+function printNow(kind){ if(kind==='song') songStop(); else if(TB.playing) tabStop(); openPrint(kind); window.print(); }   // タップの中で直接呼ぶ（Safariの「自動的に印刷」の確認を出さない）
 window.addEventListener('afterprint',()=>document.body.classList.remove('pr-on'));
 document.addEventListener('DOMContentLoaded',()=>{});
 setTimeout(()=>{ const a=$('#songPdf'), b=$('#tabPdf'); if(a) a.addEventListener('click',()=>printNow('song')); if(b) b.addEventListener('click',()=>printNow('tab')); },0);
