@@ -700,6 +700,56 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 @keyframes intro-ripple{0%{opacity:.7;transform:scale(.6)}100%{opacity:0;transform:scale(2.6)}}
 @keyframes intro-out{to{opacity:0;visibility:hidden;transform:scale(1.015)}}
 @media (prefers-reduced-motion:reduce){.intro *{animation-duration:0.01s!important;animation-delay:0s!important}.intro.leaving{animation:intro-out .3s ease forwards!important}}
+
+/* 印刷（A4）：画面には出さない */
+#printArea{display:none}
+@page{size:A4;margin:10mm}
+@media print{
+  body.pr-on>*:not(#printArea){display:none!important}
+  body.pr-on{background:#fff!important}
+  body.pr-on #printArea{display:block;color:#1b1a17;font-family:"Noto Sans JP","Hiragino Sans",system-ui,sans-serif}
+}
+.pr-page{width:190mm;height:277mm;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden;break-after:page;page-break-after:always;color:#1b1a17;background:#fff}
+.pr-page:last-child{break-after:auto;page-break-after:auto}
+.pr-head{display:flex;justify-content:space-between;align-items:flex-end;gap:6mm;border-bottom:.6mm solid #8a5a2b;padding-bottom:2.5mm;margin-bottom:3mm}
+.pr-head h1{font-size:20pt;margin:0;line-height:1.15;font-weight:700}
+.pr-head p{margin:1mm 0 0;font-size:8.5pt;color:#6b655c}
+.pr-head>div{flex:1;min-width:0}.pr-head ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:1.5mm;justify-content:flex-end;max-width:80mm}
+.pr-head li{font-size:8pt;border:.3mm solid #c9b9a3;border-radius:1.5mm;padding:.6mm 1.8mm;white-space:nowrap}
+.pr-head.small h1{font-size:13pt}
+.pr-page h2{font-size:10pt;margin:3mm 0 1.5mm;color:#8a5a2b;display:flex;gap:3mm;align-items:baseline}
+.pr-page h2 small{font-weight:400;color:#6b655c;font-size:7.5pt}
+.pr-dias{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:1.5mm 2mm}
+.pr-dias figure{margin:0;border:.3mm solid #e2d8ca;border-radius:2mm;padding:1mm 1mm .5mm;text-align:center}
+.pr-dias figcaption{font-weight:700;font-size:10pt}
+.pr-dias svg{width:100%;height:auto}
+.pr-dias .g{stroke:#9a9286;stroke-width:1}.pr-dias .gn{stroke:#1b1a17;stroke-width:4}.pr-dias text{font-size:11px;fill:#1b1a17}
+.pr-lyrics{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-evenly;min-height:0}
+.pr-line{display:flex;flex-wrap:wrap;align-items:flex-end;row-gap:1mm}
+.pr-seg{display:inline-flex;flex-direction:column;margin-right:1mm}
+.pr-seg b{font-size:calc(var(--ly,14pt)*.66);color:#8a5a2b;line-height:1.1;white-space:nowrap}
+.pr-seg b i{font-style:normal;color:#b9a68c;margin:0 .8mm}
+.pr-seg span{font-size:var(--ly,14pt);line-height:1.3;white-space:pre}
+.pr-bars{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-evenly;min-height:0}
+.pr-brow{display:grid;border-left:.4mm solid #1b1a17}
+.pr-bar{position:relative;height:12mm;border-right:.4mm solid #1b1a17;border-top:.2mm solid #d8cdbd;border-bottom:.2mm solid #d8cdbd}
+.pr-bar.empty{border-right:none;border-top:none;border-bottom:none}
+.pr-bar::before{content:attr(data-n);position:absolute;left:1mm;top:.4mm;font-size:6pt;color:#a2988a}
+.pr-bar span{position:absolute;top:3.2mm;font-size:var(--cf,12pt);font-weight:700;padding-left:1.6mm;white-space:nowrap}
+.pr-bar span.cont{color:#b9ad9c;font-weight:400;font-size:9pt;top:4mm}
+.pr-bar em u{position:absolute;bottom:0;height:1.6mm;border-left:.25mm solid #b9ad9c}
+.pr-rows{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-between;min-height:0}
+.pr-tabrow{width:100%;height:auto;display:block}
+.pr-tabrow .tl{stroke:#9a9286;stroke-width:.8}.pr-tabrow .bl{stroke:#1b1a17;stroke-width:1.2}
+.pr-tabrow .clef{font-size:9px;font-weight:700;fill:#6b655c}
+.pr-tabrow .bn{font-size:7px;fill:#a2988a}
+.pr-tabrow .cn{font-size:10.5px;font-weight:700;fill:#8a5a2b}
+.pr-tabrow .cnt{font-size:7px;fill:#a2988a;text-anchor:middle}
+.pr-tabrow .nb{fill:#fff}
+.pr-tabrow .tn{font-size:10.5px;font-weight:700;fill:#1b1a17;text-anchor:middle;dominant-baseline:middle;font-family:"Roboto Mono",ui-monospace,monospace}
+.pr-tabrow .stem,.pr-tabrow .flag{stroke:#4a463f;stroke-width:1;fill:none}.pr-tabrow .half{fill:none;stroke:#6b655c;stroke-width:.9}
+.pr-tip{font-size:8pt;color:#6b655c;margin:2mm 0 0}
+.pr-page footer{font-size:6.5pt;color:#a2988a;text-align:right;margin-top:1.5mm}
 </style>
 
 <div class="intro" id="intro" role="dialog" aria-label="Fretlab ギター練習帳">
@@ -1018,7 +1068,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           <div class="row">
             <button class="btn primary big" id="songPlay">▶ 再生</button>
             <button class="btn repeat-btn" id="songLoop" type="button" aria-pressed="false" title="くり返し再生"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11V9a3 3 0 0 1 3-3h11"/><path d="M15 3l3 3-3 3"/><path d="M20 13v2a3 3 0 0 1-3 3H6"/><path d="M9 21l-3-3 3-3"/></svg>リピート</button>
-            <div style="flex:1;min-width:180px"><span class="label">速さ <b id="songSpeedOut">100</b>%（♩=<span id="songBpm"></span>）</span><input type="range" id="songSpeed" min="50" max="200" step="5" value="100" aria-label="速さ"></div>
+            <div style="flex:1;min-width:180px"><span class="label">速さ <b id="songSpeedOut">125</b>%（♩=<span id="songBpm"></span>）</span><input type="range" id="songSpeed" min="50" max="200" step="5" value="125" aria-label="速さ"></div>
 
           </div>
           <div class="msg" id="songCapo"></div>
@@ -1044,7 +1094,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           <div class="row">
             <button class="btn primary big" id="tabPlay">▶ 再生</button>
             <button class="btn repeat-btn" id="tabKara" type="button" aria-pressed="false" title="主旋律を消して伴奏だけを流します"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M8.5 21h7"/></svg>カラオケ</button>
-            <div style="flex:1;min-width:180px"><span class="label">速さ <b id="tabSpeedOut">100</b>%（♩=<span id="tabBpm"></span>）</span><input type="range" id="tabSpeed" min="50" max="200" step="5" value="100" aria-label="速さ"></div>
+            <div style="flex:1;min-width:180px"><span class="label">速さ <b id="tabSpeedOut">125</b>%（♩=<span id="tabBpm"></span>）</span><input type="range" id="tabSpeed" min="50" max="200" step="5" value="125" aria-label="速さ"></div>
             <label class="check"><input type="checkbox" id="tabLoop" checked> ループ</label>
             <label class="check"><input type="checkbox" id="tabAcc" checked> 伴奏</label>
             <label class="check"><input type="checkbox" id="tabClick"> クリック</label>
@@ -3012,7 +3062,7 @@ const QUAL_MAP={'':'maj',m:'m','7':'7',M7:'M7',maj7:'M7',m7:'m7',mM7:'mM7','6':'
 const NAME_PC={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
 function parseChord(ch){const m=/^([A-G])([#b♯♭]?)(.*)$/.exec(ch);if(!m) return null;let pc=NAME_PC[m[1]]+(m[2]==='#'||m[2]==='♯'?1:m[2]==='b'||m[2]==='♭'?-1:0);return {pc:(pc+12)%12,q:m[3]};}
 const keyRoot=k=>parseChord(k).pc, keyMinor=k=>/m$/.test(k);
-const SG={idx:store.get('sIdx',0),lang:'all',shift:0,mode:'real',speed:100,lv:store.get('songLv',0)};
+const SG={idx:store.get('sIdx',0),lang:'all',shift:0,mode:'real',speed:125,lv:store.get('songLv',0)};
 /* 難易度：易＝元のコード、中＝セブンス、難＝テンション（9th・13th・♭9・♯11 など）。キーの中での役割（度数）で決める */
 function arrangeSym(song,marks,k,lv){
   const m=marks[k]; if(!lv) return m.q;
@@ -3081,7 +3131,7 @@ function renderSongList(){
   SONGS.forEach((s,i)=>{ if(SG.lang!=='all'&&s.lang!==SG.lang) return;
     const b=document.createElement('button'); b.className='prog-item'; b.setAttribute('aria-current',String(i===SG.idx));
     b.innerHTML=`<b></b><small></small>`; b.querySelector('b').textContent=s.t; b.querySelector('small').textContent=`${s.key} ・ ${s.ts||s.time+'拍子'} ・ ${s.mel?'メロディ＋伴奏':'伴奏のみ'}`;
-    b.addEventListener('click',()=>{songStop();SG.idx=i;SG.shift=0;SG.speed=100;$('#songSpeed').value=100;$('#songSpeedOut').textContent=100;store.set('sIdx',i);renderSongList();renderSong();if(innerWidth<860) $('#songTitle').scrollIntoView({behavior:'smooth'});});
+    b.addEventListener('click',()=>{songStop();SG.idx=i;SG.shift=0;SG.speed=125;$('#songSpeed').value=125;$('#songSpeedOut').textContent=125;store.set('sIdx',i);renderSongList();renderSong();if(innerWidth<860) $('#songTitle').scrollIntoView({behavior:'smooth'});});
     el.appendChild(b); });
 }
 function renderSong(){
@@ -3406,7 +3456,7 @@ function tabHarm(p,data){
   if(p.cat==='melody') return autoHarm(p,data.ev,data.len);
   return [];
 }
-const TB={idx:store.get('tbIdx',0),cat:'all',speed:100,playing:false,srcs:[],timer:null,raf:0,cur:null,data:null,t0:0,bd:0,passes:0};
+const TB={idx:store.get('tbIdx',0),cat:'all',speed:125,playing:false,srcs:[],timer:null,raf:0,cur:null,data:null,t0:0,bd:0,passes:0};
 function renderTabList(){
   const el=$('#tabList'); el.innerHTML='';
   TABS_DATA.forEach((p,i)=>{ if(TB.cat!=='all'&&p.cat!==TB.cat) return;
@@ -3445,6 +3495,93 @@ function drawTab(){
   });
   el.innerHTML=s+'</svg>';
 }
+/* ---------- 印刷・PDF（A4）：弾き語りシートとTAB譜。1〜2枚に収め、余白が出ないように行間を自動で広げる ---------- */
+const PR={W:718};   // 本文の幅（A4 − 余白10mm×2 ＝ 190mm ≒ 718px）
+function prEsc(x){ return String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function prHeader(title,sub,chips){
+  return `<header class="pr-head"><div><h1${String(title).length>14?' style="font-size:15pt"':''}>${prEsc(title)}</h1><p>${prEsc(sub)}</p></div><ul>${chips.filter(Boolean).map(c=>`<li>${prEsc(c)}</li>`).join('')}</ul></header>`;
+}
+const LV_NAME=['易','中','難'];
+function printSongHTML(){
+  const song=SONGS[SG.idx], capo=songCapo(), dispShift=SG.shift-capo, keyPc=(keyRoot(song.key)+dispShift+120)%12, marks=songMarks(song);
+  const per=marks.map((m,k)=>songChordsAt(song,marks,k,dispShift,keyPc));
+  const used=[]; per.flat().forEach(c=>{ if(c&&!used.some(u=>u.nm===c.nm)) used.push(c); });
+  // 歌詞とコード
+  let k=0;
+  const lyr=song.lines.map(line=>{ const parts=line.split(/(\[[^\]]+\])/).filter(x=>x!==''); let out='', pend=null;
+    const seg=(cs,txt)=>`<span class="pr-seg"><b>${cs?cs.map(c=>prEsc(c.nm)).join('<i>›</i>'):'&nbsp;'}</b><span>${prEsc(txt||' ')}</span></span>`;
+    parts.forEach(x=>{ if(x.startsWith('[')){ if(pend) out+=seg(pend,''); pend=per[k++]; } else { out+=seg(pend,x); pend=null; } });
+    if(pend) out+=seg(pend,'');
+    return `<div class="pr-line">${out}</div>`; }).join('');
+  // 小節ごとのコード表（どの小節も同じ幅）
+  const T=song.time, pre=+song.pre||0, ev=[]; let t=pre;
+  per.forEach(list=>list.forEach(c=>{ ev.push({t,d:c.d,nm:c.nm}); t+=c.d; }));
+  if(pre) ev.unshift({t:0,d:pre,nm:song.prech?chordName((parseChord(song.prech).pc+dispShift+120)%12,parseChord(song.prech).q,keyPc):ev[0].nm,pick:1});
+  const off=pre?(T-pre%T)%T:0, total=t+off, nb=Math.round(total/T);
+  const bars=[]; for(let b=0;b<nb;b++){ const b0=b*T-off, items=[];
+    ev.forEach(e=>{ const a=Math.max(e.t,b0), z=Math.min(e.t+e.d,b0+T); if(z-a>1e-6) items.push({x:(a-b0)/T,nm:e.nm,cont:e.t<b0-1e-6}); });
+    bars.push(items); }
+  const perRow=nb<=8?4:nb<=24?4:6;
+  const bcell=items=>`<div class="pr-bar" style="--cf:${items.length>=4?7.5:items.length===3?9.5:12}pt">${items.map(it=>`<span style="left:${(it.x*100).toFixed(1)}%"${it.cont?' class="cont"':''}>${prEsc(it.nm)}</span>`).join('')}<em>${Array.from({length:T},(_,i)=>`<u style="left:${(i/T*100).toFixed(1)}%"></u>`).join('')}</em></div>`;
+  let grid=''; for(let i=0;i<bars.length;i+=perRow){ const row=bars.slice(i,i+perRow); while(row.length<perRow) row.push(null); grid+=`<div class="pr-brow" style="grid-template-columns:repeat(${perRow},1fr)">${row.map((b,j)=>b?bcell(b).replace('class="pr-bar"',`class="pr-bar" data-n="${i+j+(pre?0:1)}"`):'<div class="pr-bar empty"></div>').join('')}</div>`; }
+  const dia=used.map(u=>`<figure><figcaption>${prEsc(u.nm)}</figcaption>${u.dia()}</figure>`).join('');
+  const bpm=Math.round(song.bpm*SG.speed/100);
+  const head=prHeader(song.t,song.c,[`キー ${songKeyName(song,SG.shift)}`,capo?`カポ ${capo}`:'',`難易度 ${LV_NAME[SG.lv]}`,song.ts||song.time+'拍子',`♩=${bpm}`,ins().name||'']);
+  const strum=SG.lv===2&&song.acc!=='arp'?'アルペジオ（ベース → 3弦 → 2弦 → 1弦 → 2弦 …）':song.strum;
+  return `<section class="pr-page pr-song">${head}
+    <div class="pr-dias" style="--cols:${Math.min(8,Math.max(5,used.length))}">${dia}</div>
+    <h2>歌詞とコード <small>${prEsc(strum)}</small></h2><div class="pr-lyrics" style="--ly:${song.lines.length<=4?21:song.lines.length<=6?18:15}pt">${lyr}</div>
+    <h2>コード進行 <small>1マス＝1小節${pre?'（最初のマスは弱起）':''}・縦線は拍</small></h2><div class="pr-bars">${grid}</div>
+    <footer>Fretlab ・ ${prEsc(song.t)}</footer></section>`;
+}
+function printTabHTML(){
+  const p=TABS_DATA[TB.idx], d=TB.data||buildTab(p), harm=(d.harm||tabHarm(p,d)), ev=d.ev, len=d.len, B=p.beats, ns=tun().length;
+  const nb=Math.ceil(len/B-1e-9);
+  let mg=1; ev.forEach((e,i)=>{ const n=ev[i+1]; if(n&&n.t-e.t>1e-6) mg=Math.min(mg,n.t-e.t); }); mg=Math.max(mg,1/6);
+  const clef=26, pad=9, need=(B/mg)*15+pad*2;
+  const pageH=1047, headH=118, gapMin=9, gapMax=21, extra=54;
+  // 1行の小節数：音の細かさで決まる上限の中で、1枚がちょうど埋まるいちばん広い小節幅を選ぶ（どの小節も同じ幅）
+  const bprMax=Math.max(1,Math.min(B===3?5:4,Math.floor((PR.W-clef)/need)));
+  let bpr=bprMax; for(let c=Math.min(2,bprMax);c<=bprMax;c++){ const rw=Math.ceil(nb/c), gg=((pageH-headH)/rw-extra-14)/(ns-1); if(gg>=12){ bpr=c; break; } }
+  if(nb<bpr) bpr=nb;
+  const bw=(PR.W-clef)/bpr, rows=Math.ceil(nb/bpr);
+  const fit=(g)=>rows*(extra+(ns-1)*g);
+  let pages=1, g=gapMax; if(fit(gapMin)>pageH-headH){ pages=2; }
+  const cap=pages===1?pageH-headH:2*pageH-headH-40;
+  g=Math.max(gapMin,Math.min(gapMax,((cap/rows)-extra-14)/(ns-1)));
+  const rowH=extra+(ns-1)*g;
+  const harmAt=b=>harm.filter(h=>h.t<(b+1)*B-1e-6&&h.t+h.d>b*B+1e-6);
+  const rowSVG=r=>{ const b0=r*bpr, n=Math.min(bpr,nb-b0), y0=22;
+    let s=`<svg viewBox="0 0 ${PR.W} ${rowH}" class="pr-tabrow">`;
+    for(let i=0;i<ns;i++) s+=`<line class="tl" x1="0" y1="${y0+i*g}" x2="${clef+n*bw}" y2="${y0+i*g}"/>`;
+    s+=`<text class="clef" x="4" y="${y0+(ns-1)*g*.22+4}">T</text><text class="clef" x="4" y="${y0+(ns-1)*g*.5+4}">A</text><text class="clef" x="4" y="${y0+(ns-1)*g*.78+4}">B</text>`;
+    for(let j=0;j<=n;j++) s+=`<line class="bl" x1="${clef+j*bw}" y1="${y0}" x2="${clef+j*bw}" y2="${y0+(ns-1)*g}"/>`;
+    for(let j=0;j<n;j++){ const b=b0+j, bx=clef+j*bw, X=tt=>bx+pad+(tt-b*B)/B*(bw-2*pad);
+      s+=`<text class="bn" x="${bx+2}" y="${y0-12}">${b+1}</text>`;
+      harmAt(b).forEach(h=>{ const tt=Math.max(h.t,b*B); s+=`<text class="cn" x="${X(tt)}" y="${y0-9}">${prEsc(h.name)}</text>`; });
+      for(let k=0;k<B;k++) s+=`<text class="cnt" x="${X(b*B+k)}" y="${y0+(ns-1)*g+42}">${k+1}</text>`;
+      ev.forEach(e=>{ if(e.t<b*B-1e-6||e.t>=(b+1)*B-1e-6) return; const x=X(e.t);
+        e.notes.forEach(nn=>{ const y=y0+(ns-1-nn.s)*g, w=String(nn.f).length>1?15:10; s+=`<rect x="${x-w/2}" y="${y-6}" width="${w}" height="12" class="nb"/><text class="tn" x="${x}" y="${y+.5}">${nn.f}</text>`; });
+        // 音の長さ（棒）：4分＝棒、8分＝旗1、16分＝旗2
+        if(e.notes.length){ const yb=y0+(ns-1)*g+21, sx=x, dd=e.d, L=13;   // 音の長さ：棒＝4分、旗1本＝8分、2本＝16分、白丸＝2分以上
+          s+=dd>=2-1e-6?`<circle class="half" cx="${sx}" cy="${yb+L-3}" r="2.6"/><line class="stem" x1="${sx+2.6}" y1="${yb}" x2="${sx+2.6}" y2="${yb+L-3}"/>`:`<line class="stem" x1="${sx}" y1="${yb}" x2="${sx}" y2="${yb+L}"/>`;
+          if(dd<1-1e-6) s+=`<path class="flag" d="M${sx} ${yb+L}q4 -2 6 -6"/>`; if(dd<.5-1e-6) s+=`<path class="flag" d="M${sx} ${yb+L-4}q4 -2 6 -6"/>`; }
+      }); }
+    return s+'</svg>'; };
+  const rowsHTML=Array.from({length:rows},(_,r)=>rowSVG(r));
+  const per1=pages===1?rows:Math.ceil((rows*(pageH-headH))/(2*pageH-headH));
+  const bpm=Math.round(p.bpm*TB.speed/100);
+  const head=prHeader(p.t,p.info,[TAB_CAT[p.cat],`キー ${p.key}`,(p.ts||p.beats+'拍子')+(p.swing?(p.cat==='jazz'?'（スウィング）':'（シャッフル）'):''),`♩=${bpm}`,d.shift===-12&&INS==='guitar'?'1オクターブ下':'' ,ins().name||'']);
+  const tip=`<p class="pr-tip">コツ ― ${prEsc(p.tip||'')}</p>`;
+  const pg=(html,first)=>`<section class="pr-page pr-tab">${first?head:`<header class="pr-head small"><h1>${prEsc(p.t)}</h1><p>つづき</p></header>`}<div class="pr-rows">${html}</div>${first&&pages===1?tip:''}${!first?tip:''}<footer>Fretlab ・ ${prEsc(p.t)}</footer></section>`;
+  return pages===1?pg(rowsHTML.join(''),true):pg(rowsHTML.slice(0,per1).join(''),true)+pg(rowsHTML.slice(per1).join(''),false);
+}
+function openPrint(kind){
+  let el=$('#printArea'); if(!el){ el=document.createElement('div'); el.id='printArea'; document.body.appendChild(el); }
+  el.innerHTML=kind==='tab'?printTabHTML():printSongHTML(); document.body.classList.add('pr-on');
+  return el;
+}
+window.openPrint=openPrint;
 function tabSchedule(){ onBus(TB.bus,tabScheduleRaw); }
 function tabScheduleRaw(){
   const p=TABS_DATA[TB.idx], c=ac(), bd=60/(p.bpm*TB.speed/100), {ev,len}=TB.data, start=TB.t0+TB.passes*len*bd;
