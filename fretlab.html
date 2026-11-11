@@ -1039,6 +1039,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           <div><div class="label" id="tabMeta"></div><h3 class="prog-title" id="tabTitle"></h3><p class="msg" id="tabDesc" style="margin:4px 0 0"></p></div>
           <div class="row">
             <button class="btn primary big" id="tabPlay">▶ 再生</button>
+            <button class="btn repeat-btn" id="tabKara" type="button" aria-pressed="false" title="主旋律を消して伴奏だけを流します"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M8.5 21h7"/></svg>カラオケ</button>
             <div style="flex:1;min-width:180px"><span class="label">速さ <b id="tabSpeedOut">100</b>%（♩=<span id="tabBpm"></span>）</span><input type="range" id="tabSpeed" min="50" max="120" step="5" value="100" aria-label="速さ"></div>
             <label class="check"><input type="checkbox" id="tabLoop" checked> ループ</label>
             <label class="check"><input type="checkbox" id="tabAcc" checked> 伴奏</label>
@@ -3289,7 +3290,7 @@ function renderTabList(){
 }
 function renderTab(){
   const p=TABS_DATA[TB.idx]; TB.data=buildTab(p); TB.data.harm=tabHarm(p,TB.data);
-  $('#tabMeta').textContent=`${TAB_CAT[p.cat]} ・ キー ${p.key} ・ ${p.ts||p.beats+'拍子'}${p.swing?'（シャッフル）':''}${TB.data.harm.length?' ・ 伴奏つき':''}`;
+  $('#tabMeta').textContent=`${TAB_CAT[p.cat]} ・ キー ${p.key} ・ ${p.ts||p.beats+'拍子'}${p.swing?'（シャッフル）':''}${TB.data.harm.length?' ・ 伴奏つき':''}${TB.kara?' ・ カラオケ（主旋律なし）':''}`;
   $('#tabTitle').textContent=p.t; $('#tabDesc').textContent=p.info;
   $('#tabTip').textContent='コツ ― '+p.tip+(INS==='guitar'||!TB.data.shift?'':`（${['','1','2','3'][Math.abs(TB.data.shift)/12]}オクターブ${TB.data.shift>0?'上':'下'}）`); $('#tabBpm').textContent=Math.round(p.bpm*TB.speed/100);
   drawTab();
@@ -3318,9 +3319,10 @@ function tabSchedule(){ onBus(TB.bus,tabScheduleRaw); }
 function tabScheduleRaw(){
   const p=TABS_DATA[TB.idx], c=ac(), bd=60/(p.bpm*TB.speed/100), {ev,len}=TB.data, start=TB.t0+TB.passes*len*bd;
   const sw=t=>{ if(!p.swing) return t; const b=Math.floor(t), fr=t-b; return b+(Math.abs(fr-.5)<1e-6?2/3:fr); };
-  const tu=tun(), kd=ins().kind; ev.forEach(e=>e.notes.forEach(n=>{const src=pluck(tu[n.s]+n.f,Math.max(0,start+sw(e.t)*bd-c.currentTime),e.notes.length>1?.4:.55,{kind:kd,str:n.s,dur:(sw(e.t+e.d)-sw(e.t))*bd*.92}); if(src) TB.srcs.push(src);}));
-  if($('#tabClick').checked) for(let k=0;k<Math.round(len);k++) metroHit(M.sound,start+k*bd,k%p.beats===0?0:1,M.vol*.55);
-  if($('#tabAcc').checked) tabAccomp(p,start,bd,sw);
+  const tu=tun(), kd=ins().kind, kara=TB.kara; if(!kara) ev.forEach(e=>e.notes.forEach(n=>{const src=pluck(tu[n.s]+n.f,Math.max(0,start+sw(e.t)*bd-c.currentTime),e.notes.length>1?.4:.55,{kind:kd,str:n.s,dur:(sw(e.t+e.d)-sw(e.t))*bd*.92}); if(src) TB.srcs.push(src);}));
+  const hasAcc=TB.data.harm.length||p.drum, accOn=$('#tabAcc').checked||kara;
+  if($('#tabClick').checked||(kara&&!hasAcc)) for(let k=0;k<Math.round(len);k++) metroHit(M.sound,start+k*bd,k%p.beats===0?0:1,M.vol*.55);
+  if(accOn) tabAccomp(p,start,bd,sw);
   TB.passes++;
 }
 // 伴奏を鳴らす：リフはドラムとベース、メロディや練習はギターのコード（やさしく）
@@ -3367,6 +3369,11 @@ function tabStop(){
   $('#tabSpeed').addEventListener('input',e=>{TB.speed=+e.target.value;$('#tabSpeedOut').textContent=TB.speed;$('#tabBpm').textContent=Math.round(TABS_DATA[TB.idx].bpm*TB.speed/100); if(TB.playing){tabStop();}});
   if(TB.idx>=TABS_DATA.length) TB.idx=0;
   renderTabList(); renderTab(); instHooks.push(renderTab);
+  // カラオケ：主旋律を鳴らさず伴奏だけ（光る音はそのまま。次のくり返しから反映）
+  TB.kara=store.get('tbKara',false);
+  const kb=$('#tabKara'), paintK=()=>{ kb.setAttribute('aria-pressed',String(TB.kara)); const m=$('#tabMeta'); if(m&&TABS_DATA[TB.idx]) m.textContent=m.textContent.replace(/ ・ カラオケ（主旋律なし）/,'')+(TB.kara?' ・ カラオケ（主旋律なし）':''); };
+  kb.addEventListener('click',()=>{ TB.kara=!TB.kara; store.set('tbKara',TB.kara); if(TB.kara) $('#tabAcc').checked=true; paintK(); if(TB.playing){ tabStop(); tabPlay(); } });
+  paintK();
   new ResizeObserver(()=>{ if(!$('[data-panel="tab"]').hidden) drawTab(); }).observe($('#tabSheet'));
 })();
 
