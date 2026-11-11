@@ -285,6 +285,8 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .board .fnum{fill:var(--fg);font-family:var(--mono);font-size:17px;font-weight:700;text-anchor:middle;opacity:.8}
 .board.long .fnum{font-size:21px}
 .board .hit{fill:transparent;cursor:pointer}
+.sc-desc-box{flex:1 1 100%;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.sc-desc-box p{margin:2px 0 0;font-size:14px;line-height:1.7}
 .staff-card{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:14px}
 .staff-card{flex-direction:column;align-items:stretch}
 .staff-svg{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-items:center;width:100%;margin-inline:auto;position:relative}
@@ -898,6 +900,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
     <div class="board-tools">
       <div><label class="label" for="scRoot">ルート</label><select id="scRoot"></select></div>
       <div><label class="label" for="scType">スケール</label><select id="scType"></select></div>
+      <div class="sc-desc-box"><span class="label">響きと使いどころ</span><p id="scDesc"></p></div>
       <div><span class="label">ラベル</span><div class="seg" id="scLabel"><button data-v="degree">度数</button><button data-v="name">音名</button></div></div>
       <div><span class="label">表示範囲</span><div class="seg" id="scRange"><button data-v="0-22">全体</button><button data-v="0-4">0–4</button><button data-v="3-8">3–8</button><button data-v="5-10">5–10</button><button data-v="8-13">8–13</button><button data-v="10-15">10–15</button><button data-v="12-17">12–17</button><button data-v="15-22">15–22</button></div></div>
       <div><button class="btn sc-play" id="scPlay">▶ スケールを再生</button></div>
@@ -916,7 +919,6 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
         <div><span class="label">構成音</span><div class="scale-notes" id="scNotes"></div></div>
         <div><span class="label">インターバル（全=全音, 半=半音）</span><div class="formula" id="scFormula"></div></div>
       </div>
-      <div class="card"><span class="label">響きと使いどころ</span><p id="scDesc" style="margin:0"></p></div>
     </div>
   </section>
 
@@ -2658,7 +2660,7 @@ function renderProgBoard(x){
   const lab=semi=>x.free?withCustom(x.free,()=>chordDeg(semi,'custom')):chordDeg(semi,x.type);
   renderBoard(el,(st,f,m)=>{ const pc=m%12; if(!chordPcs.has(pc)) return null; const semi=(pc-x.root+12)%12; return {kind:kindOf(semi),label:lab(semi)}; });
 }
-function boardPing(st,f,at,kind,sel='#progBoard',g=G){
+function boardPing(st,f,at,kind,sel='#progBoard',g=G,noScroll=false){
   const fire=()=>{
     const svg=$(sel+' svg'); if(svg&&f!=null){
       const n=tun().length, cx=fxc(f,g), cy=g.top+(n-1-st)*g.gap, NS='http://www.w3.org/2000/svg';
@@ -2667,7 +2669,7 @@ function boardPing(st,f,at,kind,sel='#progBoard',g=G){
       svg.appendChild(r); svg.appendChild(c); setTimeout(()=>{c.remove();r.remove();},750);
       // 光った場所が見えるように、指板を横にずらす
       const box=svg.parentElement, k=svg.clientWidth/g.W, px=cx*k;
-      if(px<box.scrollLeft+30||px>box.scrollLeft+box.clientWidth-30) box.scrollTo({left:Math.max(0,px-box.clientWidth/2),behavior:'smooth'});
+      if(!noScroll&&(px<box.scrollLeft+30||px>box.scrollLeft+box.clientWidth-30)) box.scrollTo({left:Math.max(0,px-box.clientWidth/2),behavior:'smooth'});
     }
     const d=sel==='#progBoard'&&document.querySelector(`#nowDia [data-s="${st}"][data-f="${f}"]`);
     if(d){ d.classList.remove('hit'); void d.getBBox(); d.classList.add('hit'); }
@@ -3522,8 +3524,11 @@ function scaleToggle(){
   stopAllPlayback(); const seq=scalePositions(); if(!seq.length) return;
   const path=[...seq,...seq.slice(0,-1).reverse()], step=Math.min(.32,60/(M.bpm||120)/2), c=ac(), t0=c.currentTime+.08;
   SCP.playing=true; document.querySelectorAll('.sc-play').forEach(b=>b.textContent='■ 停止');
+  // 指板は最初に1回だけ、弾くポジション全体が見える位置へ動かす（再生中は動かさない）
+  { const g=geo(22), svg=$('#scBoard svg'), box=$('#scBoard'); if(svg&&box){ const fs=seq.map(p=>p.f), k=svg.clientWidth/g.W, cx=(fxc(Math.min(...fs),g)+fxc(Math.max(...fs),g))/2*k;
+      if(box.scrollWidth>box.clientWidth) box.scrollTo({left:Math.max(0,cx-box.clientWidth/2),behavior:'smooth'}); } }
   path.forEach((p,i)=>{ const at=t0+i*step; pluck(p.m,at-c.currentTime,.55,{kind:ins().kind,str:'sc'+p.s});
-    boardPing(p.s,p.f,at,null,'#scBoard',geo(22));
+    boardPing(p.s,p.f,at,null,'#scBoard',geo(22),true);
     SCP.timers.push(setTimeout(()=>{ const semi=((p.m-S.root)%12+12)%12; showStaff(p.s,p.f,{pre:'sc',key:S.root,extra:`<span class="msg">スケールの ${semi===0?'ルート':scDeg(semi)}</span>`}); },Math.max(0,(at-c.currentTime)*1000))); });
   SCP.timers.push(setTimeout(scaleStop,(path.length*step+.6)*1000));
 }
