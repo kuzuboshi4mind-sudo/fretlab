@@ -282,11 +282,12 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .board .fw{stroke:var(--fretwire);stroke-width:2.5}
 .board .str{stroke:var(--string)}
 .board .inl{fill:var(--inlay);opacity:.55}
-.board .fnum{fill:var(--muted);font-family:var(--mono);font-size:11px;text-anchor:middle}
+.board .fnum{fill:var(--fg);font-family:var(--mono);font-size:17px;font-weight:700;text-anchor:middle;opacity:.8}
+.board.long .fnum{font-size:21px}
 .board .hit{fill:transparent;cursor:pointer}
 .staff-card{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:14px}
 .staff-card{flex-direction:column;align-items:stretch}
-.staff-svg{display:grid;grid-template-columns:1fr 1fr;align-items:center;width:100%;max-width:560px;margin-inline:auto;position:relative}
+.staff-svg{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-items:center;width:100%;margin-inline:auto;position:relative}
 .staff-svg:not(:empty)::after{content:"";position:absolute;left:50%;top:12%;bottom:12%;width:1px;background:var(--line)}
 .staff-svg svg{display:block;width:100%;height:auto}
 .tabsvg .tl{stroke:var(--fg);stroke-width:1;opacity:.75}
@@ -870,7 +871,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
     <div class="board-tools">
       <div><span class="label">表示</span><div class="seg" id="fbMode"><button data-v="name">音名</button><button data-v="degree">度数</button><button data-v="doremi">ドレミ</button></div></div>
       <div><label class="label" for="fbFind">この音だけ表示</label><select id="fbFind"></select></div>
-      <div><label class="check" style="min-height:40px"><input type="checkbox" id="fbNatural"> ♯♭を除く</label></div>
+      <div class="row" style="align-items:center;gap:14px"><label class="check" style="min-height:40px"><input type="checkbox" id="fbNatural"> ♯♭を除く</label><span class="msg tap-hint">指板をタップすると音が鳴ります</span></div>
     </div>
     <div class="board-scroll" id="fbBoard"></div>
     <div class="legend" id="fbLegend" style="margin-top:10px"></div>
@@ -899,7 +900,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
       <div><label class="label" for="scType">スケール</label><select id="scType"></select></div>
       <div><span class="label">ラベル</span><div class="seg" id="scLabel"><button data-v="degree">度数</button><button data-v="name">音名</button></div></div>
       <div><span class="label">表示範囲</span><div class="seg" id="scRange"><button data-v="0-22">全体</button><button data-v="0-4">0–4</button><button data-v="3-8">3–8</button><button data-v="5-10">5–10</button><button data-v="8-13">8–13</button><button data-v="10-15">10–15</button><button data-v="12-17">12–17</button><button data-v="15-22">15–22</button></div></div>
-      <div><button class="btn" id="scPlay">▶ 上行で鳴らす</button></div>
+      <div><button class="btn sc-play" id="scPlay">▶ スケールを再生</button></div>
     </div>
     <div class="board-scroll" id="scBoard"></div>
     <div class="legend" style="margin-top:10px">
@@ -909,6 +910,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
       <div class="staff-svg" id="scStaffSvg"></div>
       <div class="staff-info" id="scStaffInfo"><span class="msg">指板の音をタップすると、五線譜とTABでの書き方が出ます。</span></div>
     </div>
+    <div class="row" style="justify-content:center;margin-block:12px 4px"><button class="btn primary big sc-play" id="scPlay2">▶ スケールを再生</button></div>
     <div class="scale-info">
       <div class="card stack">
         <div><span class="label">構成音</span><div class="scale-notes" id="scNotes"></div></div>
@@ -1781,6 +1783,7 @@ function rhythmOptions(sel){
 
 /* ---------- 再生は常に1つだけ ---------- */
 function stopAllPlayback(){
+  if(typeof SCP!=='undefined'&&SCP.playing) scaleStop();
   if(M.playing) transportStop();
   if(typeof TB!=='undefined'&&TB.playing) tabStop();
   if(typeof SP!=='undefined'&&SP.playing) songStop();
@@ -2263,7 +2266,7 @@ const G=geo(FRETS);
 const fxc=(f,g=G)=>f===0?g.openW/2-4:(g.fx[f-1]+g.fx[f])/2;
 function renderBoard(el,dotFn,onPick,tuning=tun(),frets=FRETS){
   const g=geo(frets), FR=g.frets;
-  const n=tuning.length, sy=st=>g.top+(n-1-st)*g.gap, H=g.top+(n-1)*g.gap+44, bt=g.top-13, bb=sy(0)+13, mid=(sy(0)+sy(n-1))/2;
+  const n=tuning.length, sy=st=>g.top+(n-1-st)*g.gap, H=g.top+(n-1)*g.gap+50, bt=g.top-13, bb=sy(0)+13, mid=(sy(0)+sy(n-1))/2;
   const bass=ins().kind==='bass', w0=bass?3.4:INS==='uke'?2.1:2.6, w1=bass?1.6:INS==='uke'?1.5:1.0;
   let s=`<svg class="board${FR>15?' long':''}" viewBox="0 0 ${g.W} ${H}" role="img" aria-label="${ins().name}の指板">`;
   s+=`<rect class="wood" x="${g.openW}" y="${bt}" width="${g.fx[FR]-g.openW}" height="${bb-bt}" rx="3"/>`;
@@ -2272,7 +2275,7 @@ function renderBoard(el,dotFn,onPick,tuning=tun(),frets=FRETS){
   for(let f=1;f<=FR;f++) s+=`<line class="fw" x1="${g.fx[f]}" y1="${bt}" x2="${g.fx[f]}" y2="${bb}"/>`;
   s+=`<rect class="nut" x="${g.openW-5}" y="${bt}" width="7" height="${bb-bt}"/>`;
   for(let st=0;st<n;st++) s+=`<line class="str" x1="${g.openW-2}" y1="${sy(st)}" x2="${g.fx[FR]}" y2="${sy(st)}" stroke-width="${(w0-(w0-w1)*st/Math.max(1,n-1)).toFixed(2)}"/>`;
-  [0,1,3,5,7,9,12,15,17,19,21,22].filter(f=>f<=FR&&!(f===22&&FR!==22)).forEach(f=>s+=`<text class="fnum" x="${fxc(f,g)}" y="${bb+20}">${f===0?'開放':f}</text>`);
+  [0,1,3,5,7,9,12,15,17,19,21,22].filter(f=>f<=FR&&!(f===22&&FR!==22)).forEach(f=>s+=`<text class="fnum" x="${fxc(f,g)}" y="${bb+25}">${f===0?'開放':f}</text>`);
   for(let st=0;st<n;st++) for(let f=0;f<=FR;f++){
     const x0=f===0?0:g.fx[f-1], x1=f===0?g.openW-5:g.fx[f];
     s+=`<rect class="hit" data-s="${st}" data-f="${f}" x="${x0}" y="${sy(st)-15}" width="${x1-x0}" height="30"/>`;
@@ -2655,18 +2658,18 @@ function renderProgBoard(x){
   const lab=semi=>x.free?withCustom(x.free,()=>chordDeg(semi,'custom')):chordDeg(semi,x.type);
   renderBoard(el,(st,f,m)=>{ const pc=m%12; if(!chordPcs.has(pc)) return null; const semi=(pc-x.root+12)%12; return {kind:kindOf(semi),label:lab(semi)}; });
 }
-function boardPing(st,f,at,kind){
+function boardPing(st,f,at,kind,sel='#progBoard',g=G){
   const fire=()=>{
-    const svg=$('#progBoard svg'); if(svg&&f!=null){
-      const n=tun().length, cx=fxc(f), cy=G.top+(n-1-st)*G.gap, NS='http://www.w3.org/2000/svg';
+    const svg=$(sel+' svg'); if(svg&&f!=null){
+      const n=tun().length, cx=fxc(f,g), cy=g.top+(n-1-st)*g.gap, NS='http://www.w3.org/2000/svg';
       const c=document.createElementNS(NS,'circle'); c.setAttribute('class','ping'); c.setAttribute('cx',cx); c.setAttribute('cy',cy); c.setAttribute('r',kind==='mute'?7:10);
       const r=document.createElementNS(NS,'circle'); r.setAttribute('class','ping-ring'); r.setAttribute('cx',cx); r.setAttribute('cy',cy); r.setAttribute('r',11);
       svg.appendChild(r); svg.appendChild(c); setTimeout(()=>{c.remove();r.remove();},750);
       // 光った場所が見えるように、指板を横にずらす
-      const box=svg.parentElement, k=svg.clientWidth/G.W, px=cx*k;
+      const box=svg.parentElement, k=svg.clientWidth/g.W, px=cx*k;
       if(px<box.scrollLeft+30||px>box.scrollLeft+box.clientWidth-30) box.scrollTo({left:Math.max(0,px-box.clientWidth/2),behavior:'smooth'});
     }
-    const d=document.querySelector(`#nowDia [data-s="${st}"][data-f="${f}"]`);
+    const d=sel==='#progBoard'&&document.querySelector(`#nowDia [data-s="${st}"][data-f="${f}"]`);
     if(d){ d.classList.remove('hit'); void d.getBBox(); d.classList.add('hit'); }
   };
   const wait=Math.max(0,(at-ctx.currentTime)*1000); wait<5?fire():setTimeout(fire,wait);
@@ -3427,7 +3430,7 @@ function spell(m,flat){ const pc=((m%12)+12)%12, sharp={0:[0,''],1:[0,'#'],2:[1,
 // 音符の縦の位置（五線は y=40〜80）
 function noteY(m,{clef='treble',flat=false,write=0}={}){ const sp=spell(m+write,flat), d=sp.oct*7+sp.li; return 80-(d-(clef==='bass'?18:30))*5; }
 // 五線譜とTABの縦の表示範囲：高い音・低い音でも見切れないように広げる（左右で同じにする）
-function staffRange(y){ const top=Math.min(0,y-44), bot=Math.max(130,y+44); return [top,bot-top]; }
+function staffRange(y){ const top=Math.min(16,y-34), bot=Math.max(112,y+36); return [top,bot-top]; }   // 余白を減らして大きく見せる
 function staffSVG(m,{clef='treble',flat=false,write=0,range}={}){
   const w=m+write, sp=spell(w,flat), d=sp.oct*7+sp.li;           // 音の高さ（ドから数えた白鍵の段）
   const base=clef==='bass'?18:30, y=80-(d-base)*5, x=140;           // ト音記号：下の線＝ミ4、ヘ音記号：下の線＝ソ2
@@ -3500,6 +3503,30 @@ function newQuiz(){
 })();
 
 /* ---------- scales ---------- */
+// スケールの再生：表示範囲の中の1つのポジション（4〜5フレットの幅）で、上がって下がる。鳴っている場所が光る
+const SCP={timers:[],playing:false};
+function scalePositions(){
+  const sc=SCALES.find(x=>x.id===S.type), set=new Set(sc.iv), t=tun(), n=t.length, [lo,hi]=S.range;
+  let f0=null; for(let f=Math.max(lo,0);f<=hi&&f0==null;f++) if((t[0]+f)%12===S.root) f0=f;   // 低い弦のルートから
+  if(f0==null) f0=lo;
+  const a=Math.max(lo,f0-(f0>0?1:0)), b=Math.min(hi,a+4), out=[], used=new Set();
+  for(let s=0;s<n;s++) for(let f=a;f<=b;f++){ const m=t[s]+f; if(!set.has(((m-S.root)%12+12)%12)||used.has(m)) continue; used.add(m); out.push({s,f,m}); }
+  out.sort((x,y)=>x.m-y.m);
+  const i0=out.findIndex(x=>((x.m-S.root)%12+12)%12===0); let seq=i0>0?out.slice(i0):out;   // ルートから始めて
+  let iL=-1; seq.forEach((x,i)=>{ if(((x.m-S.root)%12+12)%12===0) iL=i; }); if(iL>0) seq=seq.slice(0,iL+1);   // ルートで終わる
+  return seq;
+}
+function scaleStop(){ SCP.timers.forEach(clearTimeout); SCP.timers=[]; SCP.playing=false; document.querySelectorAll('.sc-play').forEach(b=>b.textContent='▶ スケールを再生'); }
+function scaleToggle(){
+  if(SCP.playing){ scaleStop(); return; }
+  stopAllPlayback(); const seq=scalePositions(); if(!seq.length) return;
+  const path=[...seq,...seq.slice(0,-1).reverse()], step=Math.min(.32,60/(M.bpm||120)/2), c=ac(), t0=c.currentTime+.08;
+  SCP.playing=true; document.querySelectorAll('.sc-play').forEach(b=>b.textContent='■ 停止');
+  path.forEach((p,i)=>{ const at=t0+i*step; pluck(p.m,at-c.currentTime,.55,{kind:ins().kind,str:'sc'+p.s});
+    boardPing(p.s,p.f,at,null,'#scBoard',geo(22));
+    SCP.timers.push(setTimeout(()=>{ const semi=((p.m-S.root)%12+12)%12; showStaff(p.s,p.f,{pre:'sc',key:S.root,extra:`<span class="msg">スケールの ${semi===0?'ルート':scDeg(semi)}</span>`}); },Math.max(0,(at-c.currentTime)*1000))); });
+  SCP.timers.push(setTimeout(scaleStop,(path.length*step+.6)*1000));
+}
 const S={root:store.get('sRoot',9),type:store.get('sType','mpenta'),label:'degree',range:[0,22]};
 function scDeg(semi){return (semi===6&&S.type==='lydian')?'♯4':DEG[semi];}
 function renderScale(){
@@ -3523,10 +3550,7 @@ function renderScale(){
   t.addEventListener('change',()=>{S.type=t.value;renderScale();});
   segInit($('#scLabel'),'degree',v=>{S.label=v;renderScale();});
   segInit($('#scRange'),'0-22',v=>{S.range=v.split('-').map(Number);renderScale();});
-  $('#scPlay').addEventListener('click',()=>{
-    const sc=SCALES.find(x=>x.id===S.type), lo=Math.min(...tun()); const base=INS==='guitar'?48+S.root+(S.root>7?-12:0):INS==='uke'?60+S.root:lo+((S.root-lo)%12+12)%12;
-    [...sc.iv,12].forEach((iv,i)=>pluck(base+iv,i*0.28,0.55,{kind:ins().kind,str:'scale'}));
-  });
+  document.querySelectorAll('.sc-play').forEach(b=>b.addEventListener('click',scaleToggle));
   renderScale(); instHooks.push(renderScale);
 })();
 
