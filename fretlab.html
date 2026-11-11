@@ -285,6 +285,11 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .board .fnum{fill:var(--fg);font-family:var(--mono);font-size:17px;font-weight:700;text-anchor:middle;opacity:.8}
 .board.long .fnum{font-size:21px}
 .board .hit{fill:transparent;cursor:pointer}
+.sheet .ch{display:inline-flex;align-items:center;gap:3px}
+.sheet .ch .mini{width:60px;height:auto;flex:none}
+.mini line{stroke:var(--muted);stroke-width:.6}.mini line.nut{stroke:var(--fg);stroke-width:1.6}
+.mini circle{fill:var(--fg)}.mini circle.o{fill:none;stroke:var(--fg);stroke-width:.7}
+.mini text{font:6px var(--mono);fill:var(--muted);text-anchor:middle}.mini text.x{font-size:5px}
 .sc-desc-box{flex:1 1 100%;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
 .sc-desc-box p{margin:2px 0 0;font-size:14px;line-height:1.7}
 .sc-songs{margin:4px 0 0;padding-left:1.2em;font-size:14px;line-height:1.75}
@@ -736,7 +741,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
     <button class="tab" role="tab" data-tab="progressions">進行</button>
     <button class="tab" role="tab" data-tab="fretboard">指板</button>
     <button class="tab" role="tab" data-tab="scales">スケール</button>
-    <button class="tab" role="tab" data-tab="songs">練習曲</button>
+    <button class="tab" role="tab" data-tab="songs">弾語り練習</button>
     <button class="tab" role="tab" data-tab="tab">TAB</button>
     <button class="tab" role="tab" data-tab="log">マイ記録</button>
     <button class="tab" role="tab" data-tab="ai">レッスンコーチ</button>
@@ -989,7 +994,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
 
   <!-- SONGS -->
   <section data-panel="songs" hidden>
-    <div class="panel-head"><div><h2>練習曲</h2><p>名曲のコード譜。メロディと伴奏つき。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
+    <div class="panel-head"><div><h2>弾語り練習</h2><p>歌詞とコードを見ながら弾き語り。コードの横の図で押さえ方がわかります。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
     <div class="songs">
       <div class="card song-list-card">
         <div class="seg" id="songLang"><button data-v="all">すべて</button><button data-v="ja">日本の歌</button><button data-v="en">海外の歌</button></div>
@@ -1023,10 +1028,10 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
 
   <!-- TAB -->
   <section data-panel="tab" hidden>
-    <div class="panel-head"><div><h2>TAB練習</h2><p>名曲のメロディとリフ。上の線が1弦。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
+    <div class="panel-head"><div><h2>TAB練習</h2><p>メロディ・リフ・基礎練習。伴奏つきで弾けます。上の線が1弦。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
     <div class="songs">
       <div class="card song-list-card">
-        <div class="seg" id="tabCat"><button data-v="all">すべて</button><button data-v="melody">メロディ</button><button data-v="riff">リフ・練習</button></div>
+        <div class="seg" id="tabCat"><button data-v="all">すべて</button><button data-v="melody">メロディ</button><button data-v="riff">リフ</button><button data-v="basic">基礎練習</button></div>
         <div class="prog-list" id="tabList" style="margin-top:10px"></div>
       </div>
       <div class="stack" style="min-width:0">
@@ -1036,7 +1041,8 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
             <button class="btn primary big" id="tabPlay">▶ 再生</button>
             <div style="flex:1;min-width:180px"><span class="label">速さ <b id="tabSpeedOut">100</b>%（♩=<span id="tabBpm"></span>）</span><input type="range" id="tabSpeed" min="50" max="120" step="5" value="100" aria-label="速さ"></div>
             <label class="check"><input type="checkbox" id="tabLoop" checked> ループ</label>
-            <label class="check"><input type="checkbox" id="tabClick" checked> クリック</label>
+            <label class="check"><input type="checkbox" id="tabAcc" checked> 伴奏</label>
+            <label class="check"><input type="checkbox" id="tabClick"> クリック</label>
           </div>
         </div>
         <div class="card tabsheet" id="tabSheet"></div>
@@ -2957,6 +2963,37 @@ const SONGS=[
    lines:['[G]Swing low, sweet [C]chari[G]ot','Coming for to carry me [D7]home','[G]Swing low, sweet [C]chari[G]ot','Coming for to carry [D7]me [G]home'],
    seq:[4,2,6,4, 4,2,5,1,4],
     mel:'B4 G4:2 B4 G4:2 G4:.5 E4:.75 D4:.75 G4:.5 G4:.5 G4:.5 G4:.5 B4:.5 B4:.5 D5 D5:4 E5:.5 D5:.5 B4:2 D5 G4:2 G4:.5 E4:.75 D4:.75 G4:.5 G4:.5 G4:.5 G4:.5 B4:.5 B4:.5 A4 G4:3 r'},
+  // ---- 追加の30曲（2026年11月）
+  {id:"birthday",lang:"en",t:"Happy Birthday to You",c:"Mildred & Patty Hill（1893年のメロディ）",key:"C",time:3,bpm:100,part:"全体",strum:"3拍子：ベース → ジャン → ジャン",lines:["[C]Happy birthday to [G7]you,", "Happy birthday to [C]you,", "Happy [C7]birthday, dear [F]friend,", "Happy [C]birthday [G7]to [C]you."],seq:[3, 6, 3, 3, 3, 2, 1, 2],pre:1,mel:"G3:.75 G3:.25 A3 G3 C4 B3:2 G3:.75 G3:.25 A3 G3 D4 C4:2 G3:.75 G3:.25 G4 E4 C4 B3 A3 F4:.75 F4:.25 E4 C4 D4 C4:2"},
+  {id:"mary",lang:"en",t:"Mary Had a Little Lamb（メリーさんのひつじ）",c:"Sarah J. Hale（1830年）／アメリカ民謡",key:"C",time:4,bpm:110,part:"1番",strum:"4拍子：↓ ↓ ↓ ↓",lines:["[C]Mary had a little lamb,", "[G7]little lamb, [C]little lamb,", "[C]Mary had a little lamb, its", "[G7]fleece was white as [C]snow."],seq:[8, 4, 4, 8, 4, 4],mel:"E4 D4 C4 D4 E4 E4 E4:2 D4 D4 D4:2 E4 G4 G4:2 E4 D4 C4 D4 E4 E4 E4 E4 D4 D4 E4 D4 C4:4"},
+  {id:"london",lang:"en",t:"London Bridge（ロンドン橋）",c:"イギリス民謡",key:"C",time:4,bpm:110,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑",lines:["[C]London Bridge is falling down,", "[G7]falling down, [C]falling down,", "[C]London Bridge is falling down, my", "[G7]fair [C]lady."],seq:[8, 4, 4, 8, 4, 4],mel:"G4:1.5 A4:.5 G4 F4 E4 F4 G4:2 D4 E4 F4:2 E4 F4 G4:2 G4:1.5 A4:.5 G4 F4 E4 F4 G4:2 D4:2 G4:2 E4 C4:3"},
+  {id:"jacques",lang:"en",t:"Are You Sleeping?（フレール・ジャック）",c:"フランス民謡",key:"C",time:4,bpm:100,part:"全体",strum:"4拍子：↓ ↓ ↓ ↓（輪唱もできます）",lines:["[C]Are you sleeping, are you sleeping,", "Brother John, Brother John?", "Morning bells are ringing, morning bells are ringing,", "Ding, dang, dong. Ding, dang, dong."],seq:[32],mel:"C4 D4 E4 C4 C4 D4 E4 C4 E4 F4 G4:2 E4 F4 G4:2 G4:.5 A4:.5 G4:.5 F4:.5 E4 C4 G4:.5 A4:.5 G4:.5 F4:.5 E4 C4 C4 G3 C4:2 C4 G3 C4:2"},
+  {id:"yankee",lang:"en",t:"Yankee Doodle（アルプス一万尺）",c:"アメリカ民謡（18世紀）",key:"C",time:4,bpm:120,part:"1番",strum:"4拍子：↓↑ ↓↑ ↓↑ ↓↑（軽快に）",lines:["[C]Yankee Doodle [G7]went to town", "[C]a-riding on a [G7]pony,", "[C]stuck a feather [F]in his cap and", "[G7]called it maca[C]roni."],seq:[4, 4, 4, 4, 4, 4, 4, 4],mel:"C4 C4 D4 E4 C4 E4 D4 G3 C4 C4 D4 E4 C4:2 B3:2 C4 C4 D4 E4 F4 E4 D4 C4 B3 G3 A3 B3 C4:2 C4:2"},
+  {id:"deck",lang:"en",t:"Deck the Halls（ひいらぎかざろう）",c:"ウェールズ民謡",key:"C",time:4,bpm:110,part:"1番（前半）",strum:"4拍子：↓ ↓↑ ↓ ↓↑",lines:["[C]Deck the halls with boughs of holly,", "[G7]Fa la la la [C]la, la [G7]la la [C]la.", "[C]'Tis the season to be jolly,", "[G7]Fa la la la [C]la, la [G7]la la [C]la."],seq:[8, 2, 2, 2, 2, 8, 2, 2, 2, 2],mel:"G4:1.5 F4:.5 E4 D4 C4 D4 E4 C4 D4:.5 E4:.5 F4:.5 D4:.5 E4:1.5 D4:.5 C4 B3 C4:2 G4:1.5 F4:.5 E4 D4 C4 D4 E4 C4 D4:.5 E4:.5 F4:.5 D4:.5 E4:1.5 D4:.5 C4 B3 C4:2"},
+  {id:"wewish",lang:"en",t:"We Wish You a Merry Christmas",c:"イングランド民謡",key:"C",time:3,bpm:120,part:"1番",strum:"3拍子：ベース → ジャン → ジャン",lines:["[C]We wish you a merry [F]Christmas, we", "[D7]wish you a merry [G]Christmas, we", "[E7]wish you a merry [Am]Christmas and a", "[F]happy [G7]New [C]Year."],seq:[4, 3, 3, 3, 3, 3, 1, 2, 2],mel:"G3 C4 C4:.5 D4:.5 C4:.5 B3:.5 A3 A3 A3 D4 D4:.5 E4:.5 D4:.5 C4:.5 B3 G3 G3 E4 E4:.5 F4:.5 E4:.5 D4:.5 C4 A3 G3:.5 G3:.5 A3 D4 B3 C4:2"},
+  {id:"macdonald",lang:"en",t:"Old MacDonald Had a Farm（ゆかいな牧場）",c:"アメリカ民謡",key:"G",time:4,bpm:120,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑",lines:["[G]Old MacDonald [C]had a [G]farm,", "[D7]E-I-E-I-[G]O. And", "[G]on that farm he [C]had a [G]cow,", "[D7]E-I-E-I-[G]O."],seq:[4, 2, 2, 4, 4, 4, 2, 2, 4, 4],mel:"G3 G3 G3 D3 E3 E3 D3:2 B3 B3 A3 A3 G3:3 D3 G3 G3 G3 D3 E3 E3 D3:2 B3 B3 A3 A3 G3:4"},
+  {id:"oldman",lang:"en",t:"This Old Man",c:"イギリス民謡",key:"C",time:4,bpm:110,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑",lines:["[C]This old man, he played one,", "he [F]played knick-knack [G7]on my thumb; with a", "[C]knick-knack paddywhack, give the dog a bone,", "[G7]this old man came [C]rolling home."],seq:[8, 4, 4, 8, 4, 4],mel:"G4 E4 G4:2 G4 E4 G4:2 A4 G4 F4 E4 D4 E4 F4:2 E4:.5 F4:.5 G4 C4 C4:.5 C4:.5 C4:.5 D4:.5 E4:.5 F4:.5 G4:2 G4 D4 D4 F4 E4 D4 C4:2"},
+  {id:"clementine",lang:"en",t:"Oh My Darling, Clementine",c:"アメリカ民謡（1884年ごろ）",key:"C",time:3,bpm:100,part:"1番",strum:"3拍子：ベース → ジャン → ジャン",lines:["[C]In a cavern, in a canyon,", "[G7]excavating for a [C]mine,", "[C]dwelt a miner, forty-[G7]niner,", "[G7]and his daughter Clemen[C]tine."],seq:[12, 9, 3, 9, 3, 9, 3]},
+  {id:"redriver",lang:"en",t:"Red River Valley",c:"カナダ／アメリカ民謡",key:"C",time:4,bpm:96,part:"1番",strum:"4拍子：カントリー風（ベース↓ ↑ ベース↓ ↑）",lines:["[C]From this valley they say you are [G7]going,", "we will miss your bright eyes and sweet [C]smile,", "for they say you are taking the [F]sunshine", "that has [C]brightened our [G7]pathway a [C]while."],seq:[12, 12, 8, 12, 8, 4, 8]},
+  {id:"michael",lang:"en",t:"Michael, Row the Boat Ashore（漕げよマイケル）",c:"アメリカ黒人霊歌",key:"C",time:4,bpm:100,part:"全体",strum:"4拍子：↓ ↓↑ ↓ ↓↑",lines:["[C]Michael, row the boat a[F]shore, Halle[C]lujah!", "[C]Michael, row the boat a[Em]shore, Halle[Dm]lu[G7]jah[C]!"],seq:[6, 2, 8, 6, 2, 2, 2, 4]},
+  {id:"kumbaya",lang:"en",t:"Kum Ba Yah",c:"アメリカ黒人霊歌",key:"C",time:4,bpm:76,part:"全体",strum:"4拍子：ゆったりアルペジオ",lines:["[C]Kum ba yah, my [F]Lord, kum ba [C]yah.", "[C]Kum ba yah, my [Em]Lord, kum ba [Dm]yah.", "[C]Kum ba yah, my [F]Lord, kum ba [C]yah.", "O [F]Lord, [G7]kum ba [C]yah."],seq:[4, 2, 2, 4, 2, 2, 4, 2, 2, 4, 2, 2]},
+  {id:"bonnie",lang:"en",t:"My Bonnie Lies Over the Ocean",c:"スコットランド民謡",key:"C",time:3,bpm:110,part:"1番",strum:"3拍子：ベース → ジャン → ジャン",lines:["[C]My Bonnie lies [F]over the [C]ocean,", "my [C]Bonnie lies [D7]over the [G7]sea,", "[C]my Bonnie lies [F]over the [C]ocean,", "oh [F]bring back my [G7]Bonnie to [C]me."],seq:[3, 3, 6, 3, 3, 6, 3, 3, 6, 3, 3, 6]},
+  {id:"risingsun",lang:"en",t:"The House of the Rising Sun（朝日のあたる家）",c:"アメリカ民謡",key:"Am",time:3,bpm:110,part:"1番",strum:"3拍子のアルペジオ（Am–C–D–F の定番）",lines:["There [Am]is a [C]house in [D]New Or[F]leans", "they [Am]call the [C]Rising [E]Sun, [E]", "and it's [Am]been the [C]ruin of [D]many a poor [F]boy,", "and [Am]God, I [E]know I'm [Am]one. [E]"],seq:[3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]},
+  {id:"dannyboy",lang:"en",t:"Danny Boy（ロンドンデリーの歌）",c:"作詞 F. E. ウェザリー（1913年）／アイルランド民謡",key:"C",time:4,bpm:66,part:"1番（前半）",strum:"4拍子：ゆったりアルペジオ",lines:["Oh [C]Danny boy, the [C7]pipes, the [F]pipes are [C]calling,", "from [C]glen to [Am]glen, and [D7]down the mountain [G7]side.", "The [C]summer's gone, and [C7]all the [F]roses [Fm]falling,", "'tis [C]you, 'tis [G7]you must go and [F]I must [C]bide."],seq:[4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]},
+  {id:"homerange",lang:"en",t:"Home on the Range（峠の我が家）",c:"作詞 B. ハイリー（1872年）／作曲 D. ケリー",key:"C",time:3,bpm:100,part:"1番",strum:"3拍子：ベース → ジャン → ジャン",lines:["Oh [C]give me a home where the [F]buffalo roam,", "where the [C]deer and the antelope [G7]play,", "where [C]seldom is heard a dis[F]couraging word,", "and the [C]skies are not [G7]cloudy all [C]day."],seq:[6, 6, 6, 6, 6, 6, 6, 3, 3]},
+  {id:"auralee",lang:"en",t:"Aura Lea",c:"作詞 W. W. フォスディック／作曲 G. R. プールトン（1861年）",key:"C",time:4,bpm:76,part:"1番（前半）",strum:"4拍子：ゆったりアルペジオ",lines:["As [C]the blackbird [D7]in the spring,", "'neath [G7]the willow [C]tree,", "sat [C]and piped, I [D7]heard him sing,", "sing [G7]of Aura [C]Lea."],seq:[4, 4, 4, 4, 4, 4, 4, 4]},
+  {id:"shenandoah",lang:"en",t:"Shenandoah",c:"アメリカ民謡",key:"C",time:4,bpm:66,part:"全体",strum:"4拍子：ゆったりアルペジオ",lines:["Oh [C]Shenandoah, [F]I long to [C]hear you,", "[Am]away, you [F]rolling [C]river.", "Oh [C]Shenandoah, [F]I long to [C]hear you,", "[Am]away, I'm [G]bound a[C]way, across the [G7]wide Mis[C]souri."],seq:[4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 4, 4, 4]},
+  {id:"alohaoe",lang:"en",t:"Aloha 'Oe",c:"作詞・作曲 リリウオカラニ（1878年）",key:"C",time:4,bpm:72,part:"コーラス",strum:"4拍子：ゆったりアルペジオ（ハワイアン）",lines:["[C]Aloha 'oe, [C7]aloha '[F]oe,", "E ke [C]onaona noho i ka [G7]lipo,", "[C]One fond em[C7]brace, a [F]ho'i a'e au", "un[C]til we [G7]meet a[C]gain."],seq:[4, 2, 2, 4, 4, 4, 2, 2, 4, 2, 2]},
+  {id:"harunoogawa",lang:"ja",t:"春の小川（1912年の歌詞）",c:"作詞 高野辰之／作曲 岡野貞一・1912年",key:"C",time:4,bpm:96,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑",lines:["[C]はるのおがわは [G7]さらさらな[C]がる", "[C]きしのすみれや [G7]れんげのはな[C]に", "[F]においめでたく [C]いろうつくしく", "[G7]さいているねと ささやくごと[C]く"],seq:[4, 2, 2, 4, 2, 2, 4, 4, 6, 2]},
+  {id:"oborozukiyo",lang:"ja",t:"朧月夜",c:"作詞 高野辰之／作曲 岡野貞一・1914年",key:"C",time:3,bpm:80,part:"1番",strum:"3拍子：ベース → ジャン → ジャン（ゆったり）",lines:["[C]なのはなばたけに [F]いりひ[C]うすれ", "[C]みわたすやまのは [G7]かすみ[C]ふかし", "[F]はるかぜそよふく [C]そらを[Am]みれば", "[F]ゆうづき[C]かかりて [G7]におい[C]あわし"],seq:[6, 3, 3, 6, 3, 3, 6, 3, 3, 3, 3, 3, 3]},
+  {id:"momiji",lang:"ja",t:"紅葉（もみじ）",c:"作詞 高野辰之／作曲 岡野貞一・1911年",key:"C",time:4,bpm:96,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑",lines:["[C]あきのゆうひに [G7]てるやま[C]もみじ", "[C]こいもうすいも [G7]かずある[C]なかに", "[F]まつをいろどる [C]かえでやつたは", "[G7]やまのふもとの すそも[C]よう"],seq:[4, 2, 2, 4, 2, 2, 4, 4, 6, 2]},
+  {id:"yuki",lang:"ja",t:"雪",c:"文部省唱歌・1911年",key:"C",time:4,bpm:112,part:"1番",strum:"4拍子：↓ ↓ ↓ ↓（元気よく）",lines:["[C]ゆきやこんこ あられやこんこ", "[F]ふっては[C]ふっては [G7]ずんずん[C]つもる", "[C]やまものはらも [F]わたぼうし[C]かぶり", "[F]かれき[C]のこらず [G7]はながさ[C]く"],seq:[8, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2]},
+  {id:"chatsumi",lang:"ja",t:"茶摘",c:"文部省唱歌・1912年",key:"C",time:4,bpm:104,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑",lines:["[C]なつもちかづく [G7]はちじゅうはち[C]や", "[C]のにもやまにも [G7]わかばがし[C]げる", "[F]あれにみえるは [C]ちゃつみじゃないか", "[C]あかねだすきに [G7]すげの[C]かさ"],seq:[4, 2, 2, 4, 2, 2, 4, 4, 4, 2, 2]},
+  {id:"natsuwakinu",lang:"ja",t:"夏は来ぬ",c:"作詞 佐佐木信綱／作曲 小山作之助・1896年",key:"C",time:4,bpm:92,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑",lines:["[C]うのはなの [G7]におうか[C]きねに", "[C]ほととぎす [F]はやもき[C]なきて", "[Am]しのびね[Dm]もらす", "[G7]なつは[C]きぬ"],seq:[4, 2, 2, 4, 2, 2, 4, 4, 4, 4]},
+  {id:"hana",lang:"ja",t:"花",c:"作詞 武島羽衣／作曲 滝廉太郎・1900年",key:"C",time:4,bpm:88,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑（軽やかに）",lines:["[C]はるのうららの [G7]すみだ[C]がわ", "[C]のぼりくだりの [G7]ふなびと[C]が", "[F]かいのしずくも [C]はなと[Am]ちる", "[F]ながめをなにに [G7]たとう[C]べき"],seq:[4, 2, 2, 4, 2, 2, 4, 2, 2, 4, 2, 2]},
+  {id:"hamabe",lang:"ja",t:"浜辺の歌",c:"作詞 林古渓／作曲 成田為三・1918年",key:"C",time:2,ts:"6/8",bpm:56,part:"1番",strum:"6/8拍子：アルペジオ（1拍＝付点4分音符）",lines:["[C]あしたはまべを [G7]さまよえ[C]ば", "[C]むかしのことぞ [G7]しのばる[C]る", "[F]かぜのおとよ [C]くものさまよ", "[F]よするなみも [G7]かいのいろ[C]も"],seq:[4, 2, 2, 4, 2, 2, 4, 4, 4, 2, 2]},
+  {id:"donguri",lang:"ja",t:"どんぐりころころ",c:"作詞 青木存義／作曲 梁田貞・1921年",key:"C",time:4,bpm:112,part:"1番",strum:"4拍子：↓ ↓ ↓ ↓（元気よく）",lines:["[C]どんぐりころころ [G7]どんぶり[C]こ", "[C]おいけにはまって [G7]さあたい[C]へん", "[F]どじょうがでてきて [C]こんにち[Am]は", "[F]ぼっちゃんいっしょに [G7]あそびま[C]しょう"],seq:[4, 2, 2, 4, 2, 2, 4, 2, 2, 4, 2, 2]},
+  {id:"fujisan",lang:"ja",t:"富士山（ふじの山）",c:"作詞 巌谷小波・文部省唱歌・1910年",key:"C",time:4,bpm:100,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑（堂々と）",lines:["[C]あたまをくもの [G7]うえに[C]だし", "[C]しほうのやまを [G7]みおろし[C]て", "[F]かみなりさまを [C]したに[Am]きく", "[F]ふじは[C]にっぽん [G7]いちの[C]やま"],seq:[4, 2, 2, 4, 2, 2, 4, 2, 2, 2, 2, 2, 2]}
 ];
 
 const QUAL_MAP={'':'maj',m:'m','7':'7',M7:'M7',maj7:'M7',m7:'m7',mM7:'mM7','6':'6',m6:'m6',sus2:'sus2',sus4:'sus4','7sus4':'7sus4',add9:'add9','9':'9',dim:'dim',dim7:'dim7',m7b5:'m7b5',aug:'aug'};
@@ -3010,7 +3047,8 @@ function renderSong(){
     const parts=line.split(/(\[[^\]]+\])/).filter(x=>x!=='');
     let pend=null;
     const push=(ch,txt)=>{const sg=document.createElement('span');sg.className='seg-c';const c=document.createElement('span');c.className='ch';const l=document.createElement('span');l.className='ly';
-      if(ch){const p=parseChord(ch), pc=(p.pc+dispShift+120)%12, nm=chordName(pc,p.q,dispKeyPc); c.textContent=nm; c.dataset.k=k++; if(!used.some(u=>u.nm===nm)) used.push({nm,pc,q:p.q}); c.addEventListener('click',()=>songStrum(pc,p.q,capo));}
+      if(ch){const p=parseChord(ch), pc=(p.pc+dispShift+120)%12, nm=chordName(pc,p.q,dispKeyPc), mv=bestVoicing(pc,QUAL_MAP[p.q]??'maj');
+        c.innerHTML=`<b class="chn"></b>${mv?miniDiagram(mv):''}`; c.querySelector('.chn').textContent=nm; c.dataset.k=k++; if(!used.some(u=>u.nm===nm)) used.push({nm,pc,q:p.q}); c.addEventListener('click',()=>songStrum(pc,p.q,capo));}
       l.textContent=txt||' '; sg.append(c,l); row.appendChild(sg);};
     parts.forEach(x=>{ if(x.startsWith('[')){ if(pend!==null) push(pend,''); pend=x.slice(1,-1);} else { push(pend,x); pend=null; } });
     if(pend!==null) push(pend,'');
@@ -3019,6 +3057,19 @@ function renderSong(){
   const ce=$('#songChords'); ce.innerHTML='';
   used.forEach(u=>{ const type=QUAL_MAP[u.q]??'maj'; const v=bestVoicing(u.pc,type); const d=document.createElement('div'); d.className='card';
     d.innerHTML=`<div class="cn"></div>${v?diagram(v,u.pc,type):''}`; d.querySelector('.cn').textContent=u.nm; d.addEventListener('click',()=>songStrum(u.pc,u.q,capo)); ce.appendChild(d); });
+}
+// 小さな横向きのコード図（歌詞の横に置く）：上が1弦、左がナット
+function miniDiagram(v){
+  const t=tun(), n=t.length, frets=v.frets||null, notes=frets?frets.map((f,i)=>f===null?null:{s:i,f}).filter(Boolean):v.notes;
+  const pl=notes.map(x=>x.f).filter(f=>f>0), mn=pl.length?Math.min(...pl):1, mx=pl.length?Math.max(...pl):1, base=mx<=4?1:mn;
+  const W=58, gx=j=>9+j*12, sy=i=>4+(n-1-i)*5.2, H=sy(0)+5;
+  let o=`<svg class="mini" viewBox="0 0 ${W} ${H}" aria-hidden="true">`;
+  for(let i=0;i<n;i++) o+=`<line x1="${gx(0)}" y1="${sy(i)}" x2="${gx(4)}" y2="${sy(i)}"/>`;
+  for(let j=0;j<=4;j++) o+=`<line x1="${gx(j)}" y1="${sy(n-1)}" x2="${gx(j)}" y2="${sy(0)}"${j===0&&base===1?' class="nut"':''}/>`;
+  if(base>1) o+=`<text x="${(gx(0)+gx(1))/2}" y="${H+1.5}">${base}</text>`;
+  if(frets) frets.forEach((f,i)=>{ if(f===null) o+=`<text class="x" x="4" y="${sy(i)+1.6}">×</text>`; else if(f===0) o+=`<circle class="o" cx="4.5" cy="${sy(i)}" r="1.7"/>`; });
+  notes.forEach(x=>{ if(x.f>0) o+=`<circle cx="${(gx(x.f-base)+gx(x.f-base+1))/2}" cy="${sy(x.s)}" r="2.3"/>`; });
+  return o+'</svg>';
 }
 function songStrum(pc,q,capo){ stopAllPlayback(); const type=QUAL_MAP[q]??'maj', v=bestVoicing(pc,type); playShape(v,{capo}); }
 /* 再生：伴奏（コード）＋メロディ。キーを変えると両方移調される */
@@ -3136,15 +3187,37 @@ const TABS_DATA=[
    tip:'ドレミファソラシドを1オクターブ半。上りと下りで同じ指を使いましょう。',
    mel:'C3 D3 E3 F3 G3 A3 B3 C4 D4 E4 F4 G4 F4 E4 D4 C4 B3 A3 G3 F3 E3 D3 C3:2'},
 ];
+const TAB_PATCH={twinkle:{ch:"C:4 F:2 C:2 F:2 C:2 G:2 C:2 C:2 F:2 C:2 G:2 C:2 F:2 C:2 G:2 C:4 F:2 C:2 F:2 C:2 G:2 C:2"},joy:{ch:"C:4 G:4 C:4 G:4 C:4 G:4 C:4 G:2 C:2"},jingle:{ch:"C:4 C:4 C:4 C:4 F:4 C:4 D7:4 G7:4"},saints:{ch:"C:4 C:4 C:4 C:4 C:4 C:4 C:4 G:4 C:4 C7:4 C:4 F:4 C:4 C:4 G:4 C:4"},hotaru:{ch:"G:4 G:4 D:4 G:4 C:4 G:4 D:4 Em:2 D:2 G:4"},shuffle:{t:"ブルース・シャッフル（A・12小節）",bpm:88,drum:"shuffle",ch:"A7:4 D7:4 A7:8 D7:8 A7:8 E7:4 D7:4 A7:4 E7:4",tip:"12小節のブルース進行（A–D–E）で、5度→6度→♭7度→6度を往復する定番のシャッフル。右手の手のひらで軽くミュートして、「タッ・タ」と跳ねるリズムで。",riff:"5/0+4/2;5/0+4/2;5/0+4/4;5/0+4/4;5/0+4/5;5/0+4/5;5/0+4/4;5/0+4/4;4/0+3/2;4/0+3/2;4/0+3/4;4/0+3/4;4/0+3/5;4/0+3/5;4/0+3/4;4/0+3/4;5/0+4/2;5/0+4/2;5/0+4/4;5/0+4/4;5/0+4/5;5/0+4/5;5/0+4/4;5/0+4/4;5/0+4/2;5/0+4/2;5/0+4/4;5/0+4/4;5/0+4/5;5/0+4/5;5/0+4/4;5/0+4/4;4/0+3/2;4/0+3/2;4/0+3/4;4/0+3/4;4/0+3/5;4/0+3/5;4/0+3/4;4/0+3/4;4/0+3/2;4/0+3/2;4/0+3/4;4/0+3/4;4/0+3/5;4/0+3/5;4/0+3/4;4/0+3/4;5/0+4/2;5/0+4/2;5/0+4/4;5/0+4/4;5/0+4/5;5/0+4/5;5/0+4/4;5/0+4/4;5/0+4/2;5/0+4/2;5/0+4/4;5/0+4/4;5/0+4/5;5/0+4/5;5/0+4/4;5/0+4/4;6/0+5/2;6/0+5/2;6/0+5/4;6/0+5/4;6/0+5/5;6/0+5/5;6/0+5/4;6/0+5/4;4/0+3/2;4/0+3/2;4/0+3/4;4/0+3/4;4/0+3/5;4/0+3/5;4/0+3/4;4/0+3/4;5/0+4/2;5/0+4/2;5/0+4/4;5/0+4/4;5/0+4/5;5/0+4/5;5/0+4/4;5/0+4/4;6/0+5/2;6/0+5/2;6/0+5/4;6/0+5/4;6/0+5/5;6/0+5/5;6/0+5/4;6/0+5/4"},power:{drum:"hardrock",ch:"E5:8"},penta:{ch:"Am7:16"},chromatic:{cat:"basic"},cmajor:{cat:"basic",ch:"C:24"}};
+const TAB_NEW=[{id:"power2",cat:"riff",t:"パワーコードのロックリフ（E・8小節）",info:"オリジナル練習リフ",key:"E",beats:4,bpm:112,unit:0.5,drum:"hardrock",ch:"E5:16 A5:8 E5:8",tip:"E5（6弦開放＋5弦2フレット）の刻みを軸に、G5・A5・B5へ形を保ったまま移動。5〜6小節目は5弦ルートのA5に移ります。右手の手のひらで軽くミュートして刻みましょう。",riff:"6/0+5/2;6/0+5/2;6/0+5/2;6/0+5/2;6/0+5/2;6/0+5/2;6/3+5/5;6/5+5/7;6/0+5/2;6/0+5/2;6/0+5/2;6/0+5/2;6/7+5/9:1;6/5+5/7:1;6/0+5/2;6/0+5/2;6/0+5/2;6/0+5/2;6/0+5/2;6/0+5/2;6/3+5/5;6/5+5/7;6/0+5/2;6/0+5/2;6/0+5/2;6/0+5/2;6/3+5/5:1;6/2+5/4:1;5/0+4/2;5/0+4/2;5/0+4/2;5/0+4/2;5/0+4/2;5/0+4/2;5/3+4/5;5/5+4/7;5/0+4/2;5/0+4/2;5/0+4/2;5/0+4/2;5/5+4/7:1;5/3+4/5:1;6/0+5/2;6/0+5/2;6/0+5/2;6/0+5/2;6/0+5/2;6/0+5/2;6/3+5/5;6/5+5/7;6/0+5/2:1;6/0+5/2:1;6/0+5/2:2"},
+{id:"boogie",cat:"riff",t:"ロックンロール・ブギー（E・12小節）",info:"オリジナル練習リフ",key:"E",beats:4,bpm:140,unit:0.5,drum:"8beat",ch:"E7:16 A7:8 E7:8 B7:4 A7:4 E7:4 B7:4",tip:"12小節のブルース進行（E–A–B）。5度・6度・♭7度を行き来する、チャック・ベリー風の定番ブギー。小指（4〜5フレット先）をしっかり伸ばして。",riff:"6/0+5/2;6/0+5/2;6/0+5/4;6/0+5/4;6/0+5/5;6/0+5/5;6/0+5/4;6/0+5/4;6/0+5/2;6/0+5/2;6/0+5/4;6/0+5/4;6/0+5/5;6/0+5/5;6/0+5/4;6/0+5/4;6/0+5/2;6/0+5/2;6/0+5/4;6/0+5/4;6/0+5/5;6/0+5/5;6/0+5/4;6/0+5/4;6/0+5/2;6/0+5/2;6/0+5/4;6/0+5/4;6/0+5/5;6/0+5/5;6/0+5/4;6/0+5/4;5/0+4/2;5/0+4/2;5/0+4/4;5/0+4/4;5/0+4/5;5/0+4/5;5/0+4/4;5/0+4/4;5/0+4/2;5/0+4/2;5/0+4/4;5/0+4/4;5/0+4/5;5/0+4/5;5/0+4/4;5/0+4/4;6/0+5/2;6/0+5/2;6/0+5/4;6/0+5/4;6/0+5/5;6/0+5/5;6/0+5/4;6/0+5/4;6/0+5/2;6/0+5/2;6/0+5/4;6/0+5/4;6/0+5/5;6/0+5/5;6/0+5/4;6/0+5/4;5/2+4/4;5/2+4/4;5/2+4/6;5/2+4/6;5/2+4/7;5/2+4/7;5/2+4/6;5/2+4/6;5/0+4/2;5/0+4/2;5/0+4/4;5/0+4/4;5/0+4/5;5/0+4/5;5/0+4/4;5/0+4/4;6/0+5/2;6/0+5/2;6/0+5/4;6/0+5/4;6/0+5/5;6/0+5/5;6/0+5/4;6/0+5/4;5/2+4/4;5/2+4/4;5/2+4/6;5/2+4/6;5/2+4/7;5/2+4/7;5/2+4/6;5/2+4/6"},
+{id:"licks",cat:"riff",t:"マイナーペンタのリック（A・ブルース）",info:"オリジナル練習フレーズ・5フレット",key:"Am",beats:4,bpm:84,unit:0.5,swing:true,drum:"shuffle",ch:"A7:8",tip:"5フレットのボックスで、上から下へ流れるブルースらしいリック。2小節目の重音（3弦7＋2弦8）は、薬指と小指で同時に。",riff:"1/8;1/5;2/8;2/5;3/7;3/5;4/7;4/5;3/7+2/8:1;3/5;4/7;5/7;5/5:1;6/5"},
+{id:"chromatic2",cat:"basic",t:"クロマチック 往復（1234-4321）",info:"指慣らしの基本練習",key:"—",beats:4,bpm:72,unit:0.5,tip:"上の弦へ移るときは1→4、次の弦は4→1と折り返します。指を弦から離しすぎず、1本ずつ押さえを入れ替えましょう。",riff:"6/1;6/2;6/3;6/4;5/4;5/3;5/2;5/1;4/1;4/2;4/3;4/4;3/4;3/3;3/2;3/1;2/1;2/2;2/3;2/4;1/4;1/3;1/2;1/1"},
+{id:"spider",cat:"basic",t:"スパイダー（1-3・2-4）",info:"指の独立の練習",key:"—",beats:4,bpm:66,unit:0.5,tip:"人差し指と薬指、中指と小指を、となりの弦どうしで交互に押さえます。指がクモの足のように動くので「スパイダー」。ゆっくり正確に。",riff:"6/1;5/3;6/2;5/4;5/1;4/3;5/2;4/4;4/1;3/3;4/2;3/4;3/1;2/3;3/2;2/4;2/1;1/3;2/2;1/4;1/1;2/3;1/2;2/4"},
+{id:"gmajor",cat:"basic",t:"Gメジャースケール（開放ポジション）",info:"基本のスケール",key:"G",beats:4,bpm:80,pos:0,ch:"G:32",tip:"6弦3フレットのソから、2オクターブ上がって下がります。ファ♯（4弦4フレット、1弦2フレット）を忘れずに。",mel:"G2 A2 B2 C3 D3 E3 F#3 G3 A3 B3 C4 D4 E4 F#4 G4 F#4 E4 D4 C4 B3 A3 G3 F#3 E3 D3 C3 B2 A2 G2:4"},
+{id:"apenta5",cat:"basic",t:"Aマイナーペンタ（5フレット・上下）",info:"基本のスケール",key:"Am",beats:4,bpm:84,pos:5,ch:"Am7:24",tip:"人差し指は5フレットに置いたまま。各弦2音ずつ、ラ・ド・レ・ミ・ソを上がって下がります。ブルースやロックのソロの土台。",mel:"A2 C3 D3 E3 G3 A3 C4 D4 E4 G4 A4 C5 A4 G4 E4 D4 C4 A3 G3 E3 D3 C3 A2:2"},
+{id:"altpick",cat:"basic",t:"オルタネイト・ピッキング（開放弦）",info:"右手の基本練習",key:"Em",beats:4,bpm:90,unit:0.5,ch:"Em:24",tip:"ダウン・アップを必ず交互に。6弦から1弦まで、各弦8回ずつ。左手は使わず、右手の振りを一定に保つことだけに集中します。",riff:"6/0;6/0;6/0;6/0;6/0;6/0;6/0;6/0;5/0;5/0;5/0;5/0;5/0;5/0;5/0;5/0;4/0;4/0;4/0;4/0;4/0;4/0;4/0;4/0;3/0;3/0;3/0;3/0;3/0;3/0;3/0;3/0;2/0;2/0;2/0;2/0;2/0;2/0;2/0;2/0;1/0;1/0;1/0;1/0;1/0;1/0;1/0;1/0"},
+{id:"skip",cat:"basic",t:"弦飛び（Em の分散和音）",info:"右手の基本練習",key:"Em",beats:4,bpm:80,unit:0.5,ch:"Em:16",tip:"1本とばした弦を正確に弾きます。間の弦に当たらないよう、ピックの軌道を小さく。",riff:"6/0;4/2;5/2;3/0;4/2;2/0;3/0;1/0;1/0;3/0;2/0;4/2;3/0;5/2;4/2;6/0;6/0;4/2;5/2;3/0;4/2;2/0;3/0;1/0;1/0;3/0;2/0;4/2;3/0;5/2;4/2;6/0"},
+{id:"arpcamfg",cat:"basic",t:"アルペジオ（C–Am–F–G）",info:"コードの押さえ替えの練習",key:"C",beats:4,bpm:80,unit:0.5,ch:"C:4 Am:4 F:4 G:4",tip:"コードを押さえたまま1音ずつ弾き、小節の頭で次のコードへ。押さえ替えは1小節前から準備しておきましょう。",riff:"5/3;4/2;3/0;2/1;1/0;2/1;3/0;4/2;5/0;4/2;3/2;2/1;1/0;2/1;3/2;4/2;4/3;3/2;2/1;1/1;2/1;3/2;4/3;3/2;6/3;5/2;4/0;3/0;2/0;1/3;2/0;3/0"}];
+TABS_DATA.forEach(t=>{ if(TAB_PATCH[t.id]) Object.assign(t,TAB_PATCH[t.id]); });
+// 弾語り練習の歌のうち、メロディがある曲は TAB のメロディ練習にも（伴奏は歌のコード）
+{ const have=new Set(['joyful','jingle','twinkle','saints','hotaru','sakura']);
+  const fromSongs=SONGS.filter(sg=>sg.mel&&!sg.ts&&!have.has(sg.id)).map(sg=>({id:'song-'+sg.id,cat:'melody',t:sg.t,info:sg.c,key:sg.key,beats:sg.time,bpm:sg.bpm,pos:0,song:sg.id,...(()=>{const ld=sg.pre?(sg.time-sg.pre%sg.time)%sg.time:0; return {lead:ld,mel:(ld?'r:'+ld+' ':'')+sg.mel};})(),
+    tip:'歌のメロディを1音ずつ。伴奏のコードを聴きながら、歌うように弾きましょう。弦とフレットは開放ポジション中心に自動で選んでいます。'}));
+  const firstOther=TABS_DATA.findIndex(t=>t.cat!=='melody');
+  TABS_DATA.splice(firstOther<0?TABS_DATA.length:firstOther,0,...fromSongs);
+  TABS_DATA.push(...TAB_NEW.filter(t=>t.cat==='riff'),...TAB_NEW.filter(t=>t.cat==='basic'));
+  // 基礎練習を最後にまとめる
+  const basics=TABS_DATA.filter(t=>t.cat==='basic'); for(let i=TABS_DATA.length-1;i>=0;i--) if(TABS_DATA[i].cat==='basic') TABS_DATA.splice(i,1); TABS_DATA.push(...basics); }
 const PITCH={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
 function noteMidi(n){const m=/^([A-G])(#|b)?(-?\d)$/.exec(n);return (+m[3]+1)*12+PITCH[m[1]]+(m[2]==='#'?1:m[2]==='b'?-1:0);}
 // ポジションの中心に近い押さえ方を選ぶ（開放弦も可）。used：同時に鳴らす音で使用済みの弦
-function fingerNote(midi,pos,used){
+function fingerNote(midi,pos,used,maxF=15){
   const t=tun(); let best=null;
-  for(let s=0;s<t.length;s++){ if(used&&used.has(s)) continue; const f=midi-t[s]; if(f<0||f>15) continue;
+  for(let s=0;s<t.length;s++){ if(used&&used.has(s)) continue; const f=midi-t[s]; if(f<0||f>maxF) continue;
     const cost=Math.abs(f-(pos+1.5))+(f===0&&pos===0?-1.2:0)+(f>pos+4||(f<pos&&f!==0)?3:0);
     if(!best||cost<best.cost||(cost===best.cost&&s>best.s)) best={s,f,cost}; }
-  return best;
+  if(!best&&maxF<22) return fingerNote(midi,pos,used,22);
+  return best||{s:0,f:Math.max(0,midi-t[0]),cost:99};
 }
 // ほかの楽器で弾くとき、音域に収まるようにオクターブを選ぶ（ベースは1オクターブ下が基本）
 function octaveFit(ms){
@@ -3175,19 +3248,49 @@ function buildTab(p){
   });
   let tt=0; ev.forEach(e=>{e.t=tt;tt+=e.d;}); return {ev,len:tt,shift:k};
 }
+const TAB_CAT={melody:'メロディ',riff:'リフ',basic:'基礎練習'};
+/* TABの伴奏：歌から作ったものは歌のコード、ch があればそのコード、なければメロディから合うコードを選ぶ */
+function parseChordSeq(str){ let t=0; return str.trim().split(/\s+/).map(tok=>{ const i=tok.lastIndexOf(':'), nm=tok.slice(0,i), d=+tok.slice(i+1), c=parseChordName(nm); const e={t,d,name:nm,root:c?c.root:0,type:c&&c.known?c.known:/5$/.test(nm)?'power':'maj',iv:c?c.iv:[0,7]}; t+=d; return e; }); }
+function songHarm(song){
+  const marks=song.lines.join(' ').match(/\[[^\]]+\]/g).map(x=>x.slice(1,-1)); let t=song.pre||0; const out=[];
+  if(song.pre) out.push({t:0,d:song.pre,name:marks[0]});
+  marks.forEach((m,k)=>{ out.push({t,d:song.seq[k],name:m}); t+=song.seq[k]; });
+  return out.map(e=>{ const c=parseChordName(e.name); return {...e,root:c?c.root:0,type:c&&c.known?c.known:'maj',iv:c?c.iv:[0,4,7]}; });
+}
+function autoHarm(p,ev,len){
+  const km=/^([A-G][#b]?)(m?)$/.exec(p.key||''); if(!km) return [];
+  const kr=parseChordName(km[1]).root, minor=!!km[2];
+  const cand=(minor?[[0,'m'],[3,'maj'],[5,'m'],[7,'7'],[8,'maj'],[10,'maj']]:[[0,'maj'],[5,'maj'],[7,'7'],[9,'m'],[2,'m'],[4,'m']]).map(([d,ty],i)=>{ const r=(kr+d)%12; return {root:r,type:ty,pcs:new Set(CHORDS.find(c=>c.id===ty).iv.map(x=>(r+x)%12)),bonus:[.3,.12,.15,.05,.05,0][i]}; });
+  const seg=p.beats===4?2:p.beats, out=[]; let prev=null;
+  for(let t0=0;t0<len-1e-6;t0+=seg){
+    const notes=[]; ev.forEach(e=>{ const a=Math.max(e.t,t0), b=Math.min(e.t+e.d,t0+seg); if(b>a) e.notes.forEach(n=>notes.push({pc:(tun()[n.s]+n.f)%12,w:(b-a)*(Math.abs(e.t-t0)<1e-6?1.5:1)})); });
+    let best=prev;
+    if(notes.length){ let bs=-1e9; cand.forEach(c=>{ let sc=c.bonus+(prev&&c.root===prev.root&&c.type===prev.type?.25:0); notes.forEach(x=>sc+=c.pcs.has(x.pc)?x.w:-.45*x.w); if(sc>bs){bs=sc;best=c;} }); }
+    if(t0+seg>=len-1e-6) best=cand[0];   // 最後は主和音で終わる
+    if(best){ if(out.length&&out[out.length-1].c===best) out[out.length-1].d+=Math.min(seg,len-t0); else out.push({t:t0,d:Math.min(seg,len-t0),c:best}); }
+    prev=best;
+  }
+  return out.map(o=>({t:o.t,d:o.d,root:o.c.root,type:o.c.type,iv:[...o.c.pcs].map(pc=>(pc-o.c.root+12)%12)}));
+}
+function tabHarm(p,data){
+  if(p.song){ const sg=SONGS.find(x=>x.id===p.song); if(sg) return songHarm(sg).map(h=>({...h,t:h.t+(p.lead||0)})); }
+  if(p.ch) return parseChordSeq(p.ch);
+  if(p.cat==='melody') return autoHarm(p,data.ev,data.len);
+  return [];
+}
 const TB={idx:store.get('tbIdx',0),cat:'all',speed:100,playing:false,srcs:[],timer:null,raf:0,cur:null,data:null,t0:0,bd:0,passes:0};
 function renderTabList(){
   const el=$('#tabList'); el.innerHTML='';
   TABS_DATA.forEach((p,i)=>{ if(TB.cat!=='all'&&p.cat!==TB.cat) return;
     const b=document.createElement('button'); b.className='prog-item'; b.setAttribute('aria-current',String(i===TB.idx));
-    b.innerHTML='<b></b><small></small>'; b.querySelector('b').textContent=p.t; b.querySelector('small').textContent=`${p.cat==='melody'?'メロディ':'リフ・練習'} ・ ${p.info}`;
+    b.innerHTML='<b></b><small></small>'; b.querySelector('b').textContent=p.t; b.querySelector('small').textContent=`${TAB_CAT[p.cat]} ・ ${p.info}`;
     b.addEventListener('click',()=>{tabStop();TB.idx=i;store.set('tbIdx',i);renderTabList();renderTab();if(innerWidth<860) $('#tabTitle').scrollIntoView({behavior:'smooth'});});
     el.appendChild(b); });
 }
 function renderTab(){
-  const p=TABS_DATA[TB.idx]; TB.data=buildTab(p);
-  $('#tabMeta').textContent=`${p.cat==='melody'?'メロディ':'リフ・練習'} ・ キー ${p.key} ・ ${p.ts||p.beats+'拍子'}${p.swing?'（シャッフル）':''}`;
-  $('#tabTitle').textContent=p.t; $('#tabDesc').textContent=p.info+(p.cat==='melody'&&!/オリジナル/.test(p.info)?'（著作権の保護期間が終了した曲）':'');
+  const p=TABS_DATA[TB.idx]; TB.data=buildTab(p); TB.data.harm=tabHarm(p,TB.data);
+  $('#tabMeta').textContent=`${TAB_CAT[p.cat]} ・ キー ${p.key} ・ ${p.ts||p.beats+'拍子'}${p.swing?'（シャッフル）':''}${TB.data.harm.length?' ・ 伴奏つき':''}`;
+  $('#tabTitle').textContent=p.t; $('#tabDesc').textContent=p.info;
   $('#tabTip').textContent='コツ ― '+p.tip+(INS==='guitar'||!TB.data.shift?'':`（${['','1','2','3'][Math.abs(TB.data.shift)/12]}オクターブ${TB.data.shift>0?'上':'下'}）`); $('#tabBpm').textContent=Math.round(p.bpm*TB.speed/100);
   drawTab();
 }
@@ -3217,7 +3320,27 @@ function tabScheduleRaw(){
   const sw=t=>{ if(!p.swing) return t; const b=Math.floor(t), fr=t-b; return b+(Math.abs(fr-.5)<1e-6?2/3:fr); };
   const tu=tun(), kd=ins().kind; ev.forEach(e=>e.notes.forEach(n=>{const src=pluck(tu[n.s]+n.f,Math.max(0,start+sw(e.t)*bd-c.currentTime),e.notes.length>1?.4:.55,{kind:kd,str:n.s,dur:(sw(e.t+e.d)-sw(e.t))*bd*.92}); if(src) TB.srcs.push(src);}));
   if($('#tabClick').checked) for(let k=0;k<Math.round(len);k++) metroHit(M.sound,start+k*bd,k%p.beats===0?0:1,M.vol*.55);
+  if($('#tabAcc').checked) tabAccomp(p,start,bd,sw);
   TB.passes++;
+}
+// 伴奏を鳴らす：リフはドラムとベース、メロディや練習はギターのコード（やさしく）
+function tabAccomp(p,start,bd,sw){
+  const c=ac(), harm=TB.data.harm, len=TB.data.len, at=t=>Math.max(0,start+sw(t)*bd-c.currentTime);
+  if(p.drum){ const d=DRUMS.find(x=>x.id===p.drum); if(d){ const g={beats:d.beats,tpb:d.steps/d.beats}, keepB=M.bpm, keepBar=M.bar, keepV=M.vol;
+      M.bpm=p.bpm*TB.speed/100; M.vol=keepV*.75; loadKit(d.kit);
+      for(let bar=0;bar*d.beats<len-1e-6;bar++){ M.bar=bar+1; for(let i=0;i<d.steps;i++){ const tt=bar*d.beats+i/g.tpb; if(tt>=len-1e-6) break; drumBar(d,g,i).forEach(([k,ch])=>humanHit(d,k,ch,start+tt*bd,i,g)); } }
+      M.bpm=keepB; M.bar=keepBar; M.vol=keepV; } }
+  harm.forEach(h=>{
+    if(p.drum||h.type==='power'){   // ベース：ルートを8分（シャッフルは跳ねる）
+      if(isBass()) return; const rt=bassRoot(h.root);
+      for(let b=0;b<h.d-1e-6;b+=.5){ const tt=h.t+b; const src=pluck(rt+(Math.round(b*2)%4===3&&h.type!=='power'?7:0),at(tt),Math.round(b*2)%2?.42:.6,{kind:'bass',str:'acc-b',dur:(sw(tt+.5)-sw(tt))*bd*.85}); if(src) TB.srcs.push(src); }
+      return; }
+    const v=voicings(h.root,h.type)[0]; if(!v) return;
+    const strs=v.frets.map((f,i)=>f===null?null:i).filter(i=>i!==null), kd=INS==='uke'?'nylon':'guitar';
+    for(let b=0;b<h.d-1e-6;b+=1){ const tt=h.t+b, onBar=Math.abs(tt%p.beats)<1e-6||b===0;
+      if(onBar){ const s0=strs[0], src=pluck(STD[s0]+v.frets[s0],at(tt),.26,{kind:kd,str:'acc'+s0}); if(src) TB.srcs.push(src); }
+      else strs.slice(-3).forEach((s0,j)=>{ const src=pluck(STD[s0]+v.frets[s0],at(tt)+j*.014,.12,{kind:kd,str:'acc'+s0}); if(src) TB.srcs.push(src); }); }
+  });
 }
 function tabPlay(){
   if(TB.playing){tabStop();return;}
