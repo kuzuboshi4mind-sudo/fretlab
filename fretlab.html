@@ -753,6 +753,14 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 .pr-tabrow .stem,.pr-tabrow .flag,.pr-tabrow .rs{stroke:#2b2925;stroke-width:1;fill:none}.pr-tabrow .beam{stroke:#2b2925;stroke-width:2.8}.pr-tabrow .rr{fill:#2b2925}.pr-tabrow .hd{fill:none;stroke:#2b2925;stroke-width:1}.pr-tabrow .tup{font-size:8px;fill:#4a463f;text-anchor:middle}.pr-tabrow .half{fill:none;stroke:#6b655c;stroke-width:.9}
 .pr-tip{font-size:8pt;color:#6b655c;margin:2mm 0 0}
 .pr-page footer{font-size:6.5pt;color:#a2988a;text-align:right;margin-top:1.5mm}
+.song-nav{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.song-nav .btn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 14px;min-width:0;text-align:left;height:auto}
+.song-nav .btn+.btn{align-items:flex-end;text-align:right}
+.song-nav .btn span{font-size:12px;color:var(--muted);letter-spacing:.06em}
+.song-nav .btn b{font-size:15px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.song-nav .btn:disabled{opacity:.35}
+.song-nav.pulse .btn:not(:disabled):last-child{animation:navPulse 1.2s ease-in-out 3;border-color:var(--root)}
+@keyframes navPulse{50%{background:color-mix(in srgb,var(--root) 18%,transparent)}}
 </style>
 
 <div class="intro" id="intro" role="dialog" aria-label="Fretlab ギター練習帳">
@@ -1078,6 +1086,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           <div class="msg" id="songCapo"></div>
         </div>
         <div class="card sheet" id="songSheet"></div>
+        <nav class="song-nav" id="songNav" aria-label="曲の移動"><button class="btn" id="songPrev" type="button"><span>← 前の曲</span><b></b></button><button class="btn" id="songNext" type="button"><span>次の曲 →</span><b></b></button></nav>
         <div><span class="label">この曲で使うコード（タップで鳴る）</span><div class="song-chords" id="songChords"></div></div>
         <p class="msg" id="songStrum"></p>
       </div>
@@ -1106,6 +1115,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           </div>
         </div>
         <div class="card tabsheet" id="tabSheet"></div>
+        <nav class="song-nav" id="tabNav" aria-label="曲の移動"><button class="btn" id="tabPrev" type="button"><span>← 前の曲</span><b></b></button><button class="btn" id="tabNext" type="button"><span>次の曲 →</span><b></b></button></nav>
         <p class="msg" id="tabTip"></p>
       </div>
     </div>
@@ -3151,6 +3161,7 @@ function renderSong(){
   $('#songCapo').textContent= SG.mode==='capo' ? ''
     : (cap?`カポ${cap}なら ${songKeyName(song,SG.shift-cap)} の形で弾けます`:'');
   if(INS!=='guitar') $('#songCapo').textContent=isBass()?'ルート中心に弾きます':'High-G チューニング';
+  renderNav('song');
   $('#songStrum').textContent=SG.lv===2&&song.acc!=='arp'?'弾き方の目安 ― 難はアルペジオ（ベース → 3弦 → 2弦 → 1弦 → 2弦 …）。テンションの音を1音ずつ響かせます':'ストロークの目安 ― '+song.strum;
   const used=[]; const sheet=$('#songSheet'); sheet.innerHTML=''; sheet.className='card sheet'+(song.lang==='en'?' en':'');
   if(capo){ const cb=document.createElement('div'); cb.className='capo-badge';
@@ -3234,7 +3245,7 @@ function songPlay(){
   SP.playing=true; SP.passes=0; SP.srcs=[]; SP.cur=-2;
   SP.bus=openBus(); SP.t0=c.currentTime+0.12;   // カウントなしですぐに演奏を始める
   songSchedulePass(); $('#songPlay').textContent='■ 停止';
-  SP.timer=setInterval(()=>{ const len=SP.tl.len; if(c.currentTime>SP.t0+(SP.passes-1)*len*SP.bd-1){ if(SP.loop) songSchedulePass(); else if(c.currentTime>SP.t0+SP.passes*len*SP.bd+.3) songStop(); } },200);
+  SP.timer=setInterval(()=>{ const len=SP.tl.len; if(c.currentTime>SP.t0+(SP.passes-1)*len*SP.bd-1){ if(SP.loop) songSchedulePass(); else if(c.currentTime>SP.t0+SP.passes*len*SP.bd+.3){ songStop(); navPulse('song'); } } },200);
   const loop=()=>{ if(!SP.playing) return; SP.raf=requestAnimationFrame(loop);
     const el=(c.currentTime-SP.t0)/SP.bd; let k=-2, j=0, ni=-1;
     if(el>=0){ const pos=el%SP.tl.len; SP.tl.ev.forEach((e,i)=>{ if(e.t<=pos+1e-6){ k=e.k; j=e.j||0; ni=i+1; } }); }
@@ -3253,8 +3264,20 @@ function songStop(){
   const t=ctx?ctx.currentTime:0; SP.srcs.forEach(s=>{try{s.stop(t+0.05);}catch(e){}}); SP.srcs=[]; closeBus(SP.bus); SP.bus=null;
   document.querySelectorAll('#songSheet .now').forEach(x=>x.classList.remove('now')); $('#songPlay').textContent='▶ 再生';
 }
+// 前の曲・次の曲（今の絞り込みの中で移動）。再生が最後まで行くと「次の曲」を光らせる
+function songGo(i){ songStop(); SG.idx=i; SG.shift=0; SG.speed=125; $('#songSpeed').value=125; $('#songSpeedOut').textContent=125; store.set('sIdx',i); renderSongList(); renderSong(); $('#songTitle').scrollIntoView({behavior:'smooth',block:'start'}); }
+function renderNav(kind){
+  const vis=kind==='song'?SONGS.map((s,i)=>i).filter(i=>SG.lang==='all'||SONGS[i].lang===SG.lang):TABS_DATA.map((p,i)=>i).filter(i=>TB.cat==='all'||TABS_DATA[i].cat===TB.cat);
+  const cur=kind==='song'?SG.idx:TB.idx, k=vis.indexOf(cur), list=kind==='song'?SONGS:TABS_DATA;
+  [['Prev',vis[k-1]],['Next',vis[k+1]]].forEach(([w,i])=>{ const b=$('#'+kind+w); if(!b) return; b.disabled=i==null; b.querySelector('b').textContent=i==null?(w==='Prev'?'最初の曲です':'最後の曲です'):list[i].t; b.dataset.i=i==null?'':i; });
+  const nav=$('#'+kind+'Nav'); if(nav) nav.classList.remove('pulse');
+}
+function navPulse(kind){ const nav=$('#'+kind+'Nav'); if(!nav) return; nav.classList.remove('pulse'); void nav.offsetWidth; nav.classList.add('pulse'); const r=nav.getBoundingClientRect(); if(r.top>innerHeight||r.bottom<0) nav.scrollIntoView({behavior:'smooth',block:'center'}); }
+setTimeout(()=>{ ['Prev','Next'].forEach(w=>{ const a=$('#song'+w), b=$('#tab'+w);
+  if(a) a.addEventListener('click',()=>{ if(a.dataset.i!=='') songGo(+a.dataset.i); });
+  if(b) b.addEventListener('click',()=>{ if(b.dataset.i===''||b.dataset.i==null) return; tabStop(); TB.idx=+b.dataset.i; store.set('tbIdx',TB.idx); renderTabList(); renderTab(); $('#tabTitle').scrollIntoView({behavior:'smooth',block:'start'}); }); }); },0);
 (function initSongs(){
-  segInit($('#songLang'),'all',v=>{SG.lang=v;renderSongList();});
+  segInit($('#songLang'),'all',v=>{SG.lang=v;renderSongList();renderNav('song');});
   segInit($('#songMode'),'real',v=>{SG.mode=v;renderSong();});
   segInit($('#songLv'),String(SG.lv),v=>{songStop();SG.lv=+v;store.set('songLv',SG.lv);renderSong();});
   instHooks.push(renderSong);
@@ -3471,6 +3494,7 @@ function renderTabList(){
     el.appendChild(b); });
 }
 function renderTab(){
+  renderNav('tab');
   const p=TABS_DATA[TB.idx]; TB.data=buildTab(p); TB.data.harm=tabHarm(p,TB.data);
   $('#tabMeta').textContent=`${TAB_CAT[p.cat]} ・ キー ${p.key} ・ ${p.ts||p.beats+'拍子'}${p.swing?(p.cat==='jazz'?'（スウィング）':'（シャッフル）'):''}${TB.data.shift===-12&&INS==='guitar'?' ・ 1オクターブ下で表示':''}${TB.data.harm.length?' ・ 伴奏つき':''}${TB.kara?' ・ カラオケ（主旋律なし）':''}`;
   $('#tabTitle').textContent=p.t; $('#tabDesc').textContent=p.info;
@@ -3674,7 +3698,7 @@ function tabPlay(){
   TB.playing=true; TB.passes=0; TB.srcs=[]; TB.bd=bd; TB.t0=c.currentTime+0.12;   // カウントなしですぐに演奏を始める
   TB.bus=openBus();
   tabSchedule(); $('#tabPlay').textContent='■ 停止';
-  TB.timer=setInterval(()=>{ const len=TB.data.len; if(c.currentTime>TB.t0+(TB.passes-1)*len*bd-1){ if($('#tabLoop').checked) tabSchedule(); else if(c.currentTime>TB.t0+TB.passes*len*bd) tabStop(); } },200);
+  TB.timer=setInterval(()=>{ const len=TB.data.len; if(c.currentTime>TB.t0+(TB.passes-1)*len*bd-1){ if($('#tabLoop').checked) tabSchedule(); else if(c.currentTime>TB.t0+TB.passes*len*bd){ tabStop(); navPulse('tab'); } } },200);
   const loop=()=>{ if(!TB.playing) return; TB.raf=requestAnimationFrame(loop);
     const len=TB.data.len, el=(c.currentTime-TB.t0)/bd; let pos=el>=0?el%len:-1; let idx=-1;
     if(pos>=0) TB.data.ev.forEach((e,i)=>{ if(e.t<=pos+1e-6) idx=i; });
@@ -3687,7 +3711,7 @@ function tabStop(){
   document.querySelectorAll('#tabSheet .tev.on').forEach(g=>g.classList.remove('on')); $('#tabPlay').textContent='▶ 再生';
 }
 (function initTab(){
-  segInit($('#tabCat'),'all',v=>{TB.cat=v;renderTabList();});
+  segInit($('#tabCat'),'all',v=>{TB.cat=v;renderTabList();renderNav('tab');});
   $('#tabPlay').addEventListener('click',tabPlay);
   $('#tabSpeed').addEventListener('input',e=>{TB.speed=+e.target.value;$('#tabSpeedOut').textContent=TB.speed;$('#tabBpm').textContent=Math.round(TABS_DATA[TB.idx].bpm*TB.speed/100); if(TB.playing){tabStop();}});
   if(TB.idx>=TABS_DATA.length) TB.idx=0;
