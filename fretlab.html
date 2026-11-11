@@ -717,30 +717,30 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 .pr-page{width:100%;height:262mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden;break-after:page;page-break-after:always;color:#1b1a17;background:#fff}
 .pr-page:last-child{break-after:auto;page-break-after:auto}
 .pr-head{display:flex;justify-content:space-between;align-items:flex-end;gap:6mm;border-bottom:.6mm solid #8a5a2b;padding-bottom:2.5mm;margin-bottom:3mm}
-.pr-head h1{font-size:20pt;margin:0;line-height:1.15;font-weight:700}
+.pr-head h1{font-size:calc(20pt*var(--k,1));margin:0;line-height:1.15;font-weight:700}
 .pr-head p{margin:1mm 0 0;font-size:8.5pt;color:#6b655c}
 .pr-head>div{flex:1;min-width:0}.pr-head ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:1.5mm;justify-content:flex-end;max-width:80mm}
 .pr-head li{font-size:8pt;border:.3mm solid #c9b9a3;border-radius:1.5mm;padding:.6mm 1.8mm;white-space:nowrap}
 .pr-head.small h1{font-size:13pt}
-.pr-page h2{font-size:10pt;margin:3mm 0 1.5mm;color:#8a5a2b;display:flex;gap:3mm;align-items:baseline}
+.pr-page h2{font-size:calc(10pt*var(--k,1));margin:calc(3mm*var(--k,1)) 0 calc(1.5mm*var(--k,1));color:#8a5a2b;display:flex;gap:3mm;align-items:baseline}
 .pr-page h2 small{font-weight:400;color:#6b655c;font-size:7.5pt}
 .pr-dias{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:1.5mm 2mm}
 .pr-dias figure{margin:0;border:.3mm solid #e2d8ca;border-radius:2mm;padding:1mm 1mm .5mm;text-align:center}
-.pr-dias figcaption{font-weight:700;font-size:10pt}
+.pr-dias figcaption{font-weight:700;font-size:calc(10pt*var(--k,1))}
 .pr-dias svg{width:100%;height:auto}
 .pr-dias .g{stroke:#9a9286;stroke-width:1}.pr-dias .gn{stroke:#1b1a17;stroke-width:4}.pr-dias text{font-size:11px;fill:#1b1a17}
 .pr-lyrics{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-evenly;min-height:0}
 .pr-line{display:flex;flex-wrap:wrap;align-items:flex-end;row-gap:1mm}
 .pr-seg{display:inline-flex;flex-direction:column;margin-right:1mm}
-.pr-seg b{font-size:calc(var(--ly,14pt)*.66);color:#8a5a2b;line-height:1.1;white-space:nowrap}
+.pr-seg b{font-size:calc(var(--ly,14pt)*.66*var(--k,1));color:#8a5a2b;line-height:1.1;white-space:nowrap}
 .pr-seg b i{font-style:normal;color:#b9a68c;margin:0 .8mm}
-.pr-seg span{font-size:var(--ly,14pt);line-height:1.3;white-space:pre}
+.pr-seg span{font-size:calc(var(--ly,14pt)*var(--k,1));line-height:1.3;white-space:pre}
 .pr-bars{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-evenly;min-height:0}
 .pr-brow{display:grid;border-left:.4mm solid #1b1a17}
-.pr-bar{position:relative;height:12mm;border-right:.4mm solid #1b1a17;border-top:.2mm solid #d8cdbd;border-bottom:.2mm solid #d8cdbd}
+.pr-bar{position:relative;height:calc(12mm*var(--k,1));border-right:.4mm solid #1b1a17;border-top:.2mm solid #d8cdbd;border-bottom:.2mm solid #d8cdbd}
 .pr-bar.empty{border-right:none;border-top:none;border-bottom:none}
 .pr-bar::before{content:attr(data-n);position:absolute;left:1mm;top:.4mm;font-size:6pt;color:#a2988a}
-.pr-bar span{position:absolute;top:3.2mm;font-size:var(--cf,12pt);font-weight:700;padding-left:1.6mm;white-space:nowrap}
+.pr-bar span{position:absolute;top:calc(3.2mm*var(--k,1));font-size:calc(var(--cf,12pt)*var(--k,1));font-weight:700;padding-left:1.6mm;white-space:nowrap}
 .pr-bar span.cont{color:#b9ad9c;font-weight:400;font-size:9pt;top:4mm}
 .pr-bar em u{position:absolute;bottom:0;height:1.6mm;border-left:.25mm solid #b9ad9c}
 .pr-rows{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-between;min-height:0}
@@ -776,6 +776,16 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 .set-pop input.sw-in{margin:0;border:0;appearance:none;-webkit-appearance:none;width:42px;height:24px;border-radius:999px;background:var(--line);position:relative;flex:none;cursor:pointer;transition:background .2s}
 .set-pop input.sw-in::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
 .set-pop input.sw-in:checked{background:var(--root)}.set-pop input.sw-in:checked::after{transform:translateX(18px)}
+/* PDFの書き出し用：画面の外に A4（794×1123px）の紙を並べて画像にする */
+#pdfStage{position:fixed;left:-12000px;top:0;width:794px;pointer-events:none}
+#pdfStage .pr-sheet{width:794px;height:1123px;padding:37.8px;box-sizing:border-box;background:#fff;overflow:hidden;color:#1b1a17;font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif}
+#pdfStage .pr-page{height:1047px;width:718px}
+.pdf-modal{position:fixed;inset:0;z-index:80;background:rgba(20,18,14,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.pdf-modal[hidden]{display:none}
+.pdf-box{background:var(--surface);color:var(--fg);border-radius:18px;padding:18px;width:min(380px,100%);display:flex;flex-direction:column;gap:12px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.pdf-box h3{margin:0;font-size:16px}.pdf-box p{margin:0;font-size:13px;color:var(--muted)}
+.pdf-box img{width:100%;max-height:46vh;object-fit:contain;border:1px solid var(--line);border-radius:6px;background:#fff}
+.pdf-box .row{display:flex;gap:8px;flex-wrap:wrap}.pdf-box .row .btn{flex:1}
 </style>
 
 <div class="intro" id="intro" role="dialog" aria-label="Fretlab ギター練習帳">
@@ -3673,7 +3683,7 @@ function printTabHTML(){
   const nb=Math.ceil(len/B-1e-9);
   let mg=1; ev.forEach((e,i)=>{ const n=ev[i+1]; if(n&&n.t-e.t>1e-6) mg=Math.min(mg,n.t-e.t); }); mg=Math.max(mg,1/6);
   const clef=26, pad=9, need=(B/mg)*15+pad*2;
-  const pageH=990, headH=118, gapMin=10, gapMax=22, extra=66;
+  const pageH=PR.pageH||990, headH=118, gapMin=10, gapMax=22, extra=66;
   // 1行の小節数：音の細かさで決まる上限の中で、1枚がちょうど埋まるいちばん広い小節幅を選ぶ（どの小節も同じ幅）
   const bprMax=Math.max(1,Math.min(B===3?5:4,Math.floor((PR.W-clef)/need)));
   let bpr=bprMax; for(let c=Math.min(2,bprMax);c<=bprMax;c++){ const rw=Math.ceil(nb/c), gg=((pageH-headH)/rw-extra-14)/(ns-1); if(gg>=12){ bpr=c; break; } }
@@ -3713,11 +3723,80 @@ function openPrint(kind){
   return el;
 }
 window.openPrint=openPrint;
+/* PDFを作る：印刷画面を使わず、A4の画像をPDFにまとめて「共有・保存」（Safariの印刷の確認も出ない・必ず1枚に収める） */
+function loadH2C(){ return window.html2canvas?Promise.resolve():new Promise((ok,ng)=>{ const sc=document.createElement('script'); sc.src='vendor/html2canvas.min.js'; sc.onload=ok; sc.onerror=ng; document.head.appendChild(sc); }); }
+function overflowing(pg){ return pg.scrollHeight>pg.clientHeight+1||[...pg.querySelectorAll('.pr-lyrics,.pr-bars,.pr-rows,.pr-dias')].some(e=>e.scrollHeight>e.clientHeight+1); }
+function fixBarLabels(pg){   // 小節のマスからはみ出すコード名は右端にそろえ、重なるときは文字を小さく
+  pg.querySelectorAll('.pr-bar').forEach(bar=>{ const br=bar.getBoundingClientRect(), sp=[...bar.querySelectorAll('span')];
+    sp.forEach(x=>{ x.style.left=x.dataset.l||x.style.left; x.dataset.l=x.style.left; x.style.right=''; x.style.fontSize=''; });
+    for(let pass=0;pass<4;pass++){ let bad=false;
+      sp.forEach((x,i)=>{ const r=x.getBoundingClientRect(); if(r.right>br.right-2){ x.style.left='auto'; x.style.right='2px'; }
+        const nx=sp[i+1]; if(nx){ const r2=nx.getBoundingClientRect(), r1=x.getBoundingClientRect(); if(r1.right>r2.left-2) bad=true; } });
+      if(!bad) break; sp.forEach(x=>{ const f=parseFloat(getComputedStyle(x).fontSize); x.style.fontSize=(f*.88)+'px'; }); } });
+}
+function fitPage(pg){   // はみ出すときは文字・図・マスを少しずつ小さくして1枚に収める
+  const d=pg.querySelector('.pr-dias'), c0=d?+getComputedStyle(d).getPropertyValue('--cols')||8:0;
+  for(let k=1;k>=.6-1e-9;k-=.04){ pg.style.setProperty('--k',k.toFixed(2)); if(d) d.style.setProperty('--cols',Math.min(11,Math.round(c0/Math.max(k,.75)))); if(!overflowing(pg)){ fixBarLabels(pg); return k; } }
+  fixBarLabels(pg); return .6;
+}
+function pdfFromJpegs(imgs){   // imgs:[{bytes:Uint8Array,w,h}] → A4のPDF（Uint8Array）
+  const enc=new TextEncoder(), parts=[]; let len=0; const off=[];
+  const put=x=>{ const b=typeof x==='string'?enc.encode(x):x; parts.push(b); len+=b.length; };
+  const obj=(n,body,stream)=>{ off[n]=len; put(`${n} 0 obj\n`); put(body); if(stream){ put('\nstream\n'); put(stream); put('\nendstream'); } put('\nendobj\n'); };
+  put('%PDF-1.4\n'); put(new Uint8Array([37,226,227,207,211,10]));
+  const W=595.28, H=841.89, np=imgs.length, kids=imgs.map((_,i)=>`${3+i*3} 0 R`).join(' ');
+  obj(1,'<< /Type /Catalog /Pages 2 0 R >>'); obj(2,`<< /Type /Pages /Kids [${kids}] /Count ${np} >>`);
+  imgs.forEach((im,i)=>{ const pn=3+i*3, cn=pn+1, xn=pn+2, cs=enc.encode(`q ${W} 0 0 ${H} 0 0 cm /Im0 Do Q`);
+    obj(pn,`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /XObject << /Im0 ${xn} 0 R >> >> /Contents ${cn} 0 R >>`);
+    obj(cn,`<< /Length ${cs.length} >>`,cs);
+    obj(xn,`<< /Type /XObject /Subtype /Image /Width ${im.w} /Height ${im.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${im.bytes.length} >>`,im.bytes); });
+  const n=3+np*3, xref=len; put(`xref\n0 ${n}\n0000000000 65535 f \n`); for(let i=1;i<n;i++) put(String(off[i]).padStart(10,'0')+' 00000 n \n');
+  put(`trailer\n<< /Size ${n} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
+  const out=new Uint8Array(len); let o=0; parts.forEach(b=>{ out.set(b,o); o+=b.length; }); return out;
+}
+let PDF_BUSY=false;
+async function exportPDF(kind){
+  if(PDF_BUSY) return; PDF_BUSY=true;
+  if(kind==='song') songStop(); else if(TB.playing) tabStop();
+  const modal=pdfModal(); modal.show('PDFを作っています…','',null);
+  try{
+    await loadH2C();
+    let stage=$('#pdfStage'); if(!stage){ stage=document.createElement('div'); stage.id='pdfStage'; document.body.appendChild(stage); }
+    PR.pageH=1047; const html=kind==='tab'?printTabHTML():printSongHTML(); PR.pageH=990;
+    stage.innerHTML=html.replace(/<section class="pr-page/g,'<div class="pr-sheet"><section class="pr-page').replace(/<\/section>/g,'</section></div>');
+    if(document.fonts&&document.fonts.ready) await document.fonts.ready;
+    const sheets=[...stage.querySelectorAll('.pr-sheet')]; sheets.forEach(sh=>fitPage(sh.querySelector('.pr-page')));
+    const imgs=[]; let thumb='';
+    for(const sh of sheets){ const cv=await html2canvas(sh,{scale:2,backgroundColor:'#ffffff',logging:false,useCORS:true});
+      const url=cv.toDataURL('image/jpeg',.9); if(!thumb) thumb=url; const bin=atob(url.split(',')[1]), bytes=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+      imgs.push({bytes,w:cv.width,h:cv.height}); }
+    stage.innerHTML='';
+    const title=(kind==='tab'?TABS_DATA[TB.idx].t:SONGS[SG.idx].t).replace(/[\\/:*?"<>|]/g,'');
+    const file=new File([pdfFromJpegs(imgs)],`${title}${kind==='tab'?'_TAB':''}.pdf`,{type:'application/pdf'});
+    modal.show('PDFができました',`${file.name}（${imgs.length}ページ・A4）`,thumb,file);
+  }catch(e){ modal.show('PDFを作れませんでした','通信を確かめて、もう一度お試しください。',null); console.error(e); }
+  PDF_BUSY=false;
+}
+function pdfModal(){
+  let m=$('#pdfModal');
+  if(!m){ m=document.createElement('div'); m.id='pdfModal'; m.className='pdf-modal'; m.hidden=true;
+    m.innerHTML=`<div class="pdf-box" role="dialog" aria-modal="true"><h3></h3><p></p><img alt="" hidden><div class="row"><button class="btn primary" data-a="share" type="button">共有・保存・印刷</button><button class="btn" data-a="open" type="button">PDFを開く</button></div><button class="btn" data-a="close" type="button">閉じる</button></div>`;
+    m.addEventListener('click',async e=>{ const a=e.target.dataset&&e.target.dataset.a; const f=m._file;
+      if(e.target===m||a==='close'){ m.hidden=true; return; }
+      if(!f) return;
+      if(a==='share'){ try{ if(navigator.canShare&&navigator.canShare({files:[f]})) await navigator.share({files:[f],title:f.name}); else dl(f); }catch(err){ if(err&&err.name!=='AbortError') dl(f); } }
+      if(a==='open'){ const u=URL.createObjectURL(f); const w=window.open(u,'_blank'); if(!w) dl(f); setTimeout(()=>URL.revokeObjectURL(u),60000); } });
+    document.body.appendChild(m); }
+  const dl=f=>{ const u=URL.createObjectURL(f), a=document.createElement('a'); a.href=u; a.download=f.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),60000); };
+  m.show=(h,p,img,file)=>{ m.querySelector('h3').textContent=h; m.querySelector('p').textContent=p; const im=m.querySelector('img'); im.hidden=!img; if(img) im.src=img;
+    m._file=file||null; m.querySelector('.row').hidden=!file; m.hidden=false; };
+  return m;
+}
 // 印刷ダイアログを開く（「PDFに保存」を選ぶとPDFになる）。終わったら印刷用の表示を片づける
 function printNow(kind){ if(kind==='song') songStop(); else if(TB.playing) tabStop(); openPrint(kind); window.print(); }   // タップの中で直接呼ぶ（Safariの「自動的に印刷」の確認を出さない）
 window.addEventListener('afterprint',()=>document.body.classList.remove('pr-on'));
 document.addEventListener('DOMContentLoaded',()=>{});
-setTimeout(()=>{ const a=$('#songPdf'), b=$('#tabPdf'); if(a) a.addEventListener('click',()=>printNow('song')); if(b) b.addEventListener('click',()=>printNow('tab')); },0);
+setTimeout(()=>{ const a=$('#songPdf'), b=$('#tabPdf'); if(a) a.addEventListener('click',()=>exportPDF('song')); if(b) b.addEventListener('click',()=>exportPDF('tab')); },0);
 function tabSchedule(){ onBus(TB.bus,tabScheduleRaw); }
 function tabScheduleRaw(){
   const p=TABS_DATA[TB.idx], c=ac(), bd=60/(p.bpm*TB.speed/100), {ev,len}=TB.data, start=TB.t0+TB.passes*len*bd;
