@@ -761,6 +761,8 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 .song-nav .btn:disabled{opacity:.35}
 .song-nav.pulse .btn:not(:disabled):last-child{animation:navPulse 1.2s ease-in-out 3;border-color:var(--root)}
 @keyframes navPulse{50%{background:color-mix(in srgb,var(--root) 18%,transparent)}}
+.follow-pill{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;border:1px solid var(--root);background:var(--surface);color:var(--root);font:600 14px/1 var(--sans,system-ui);padding:11px 18px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.follow-pill[hidden]{display:none}
 </style>
 
 <div class="intro" id="intro" role="dialog" aria-label="Fretlab ギター練習帳">
@@ -3238,11 +3240,27 @@ function songSchedulePassRaw(){
     if(n!=='r') keep(pluck(noteMidi(n)+SG.shift-(SG.shift>6?12:0),at(t),.8,{kind:'nylon',str:'mel',dur:dur*bd*.97})); t+=dur; }); }
   SP.passes++;
 }
+/* 再生中の自動スクロール：手でスクロールしたら止める（下の「自動スクロールに戻す」で再開）。次の再生でまたオン */
+const FOLLOW={on:true,active:null,last:null};
+function followStart(kind){ FOLLOW.on=true; FOLLOW.active=kind; FOLLOW.last=null; followPill(false); }
+function followStop(kind){ if(FOLLOW.active===kind){ FOLLOW.active=null; followPill(false); } }
+function followPill(show){ let b=$('#followPill');
+  if(!b){ b=document.createElement('button'); b.id='followPill'; b.type='button'; b.className='follow-pill'; b.textContent='↻ 自動スクロールに戻す'; b.hidden=true;
+    b.addEventListener('click',()=>{ FOLLOW.on=true; followPill(false); if(FOLLOW.last) followTo(FOLLOW.last,true); }); document.body.appendChild(b); }
+  b.hidden=!show; }
+function userScrolled(){ if(FOLLOW.active&&FOLLOW.on){ FOLLOW.on=false; followPill(true); } }
+addEventListener('wheel',userScrolled,{passive:true});
+addEventListener('touchmove',userScrolled,{passive:true});
+addEventListener('keydown',e=>{ if(['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(e.key)&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) userScrolled(); });
+addEventListener('pointerdown',e=>{ if(e.target===document.documentElement||e.clientX>=document.documentElement.clientWidth) userScrolled(); });   // スクロールバーをつかんだ
+// 今の行が画面の見やすい範囲（上15%〜下70%）から外れたら、画面の真ん中あたりへ
+function followTo(el,force){ FOLLOW.last=el; if(!FOLLOW.on&&!force) return; const r=el.getBoundingClientRect(), top=Math.max(70,innerHeight*.15);
+  if(force||r.top<top||r.bottom>innerHeight*.7) scrollTo({top:scrollY+r.top-innerHeight*.35,behavior:'smooth'}); }
 function songPlay(){
   if(SP.playing){songStop();return;}
   stopAllPlayback();
   const song=SONGS[SG.idx], c=ac(); SP.bd=60/(song.bpm*SG.speed/100); SP.tl=songTimeline(song);
-  SP.playing=true; SP.passes=0; SP.srcs=[]; SP.cur=-2;
+  SP.playing=true; SP.passes=0; SP.srcs=[]; SP.cur=-2; followStart('song');
   SP.bus=openBus(); SP.t0=c.currentTime+0.12;   // カウントなしですぐに演奏を始める
   songSchedulePass(); $('#songPlay').textContent='■ 停止';
   SP.timer=setInterval(()=>{ const len=SP.tl.len; if(c.currentTime>SP.t0+(SP.passes-1)*len*SP.bd-1){ if(SP.loop) songSchedulePass(); else if(c.currentTime>SP.t0+SP.passes*len*SP.bd+.3){ songStop(); navPulse('song'); } } },200);
@@ -3254,13 +3272,13 @@ function songPlay(){
       // 今のコード：塗りつぶして強調。次のコード：枠だけ
       const ch=document.querySelector(`#songSheet .ch[data-k="${k}"]`);
       if(ch){ ch.classList.add('now'); const u=ch.querySelectorAll('.chu')[j]; if(u) u.classList.add('now'); const ln=ch.closest('.sline'); ln.classList.add('now');
-        const r=ln.getBoundingClientRect(); if(r.top<70||r.bottom>innerHeight-40) ln.scrollIntoView({block:'center',behavior:'smooth'}); }
+        followTo(ln); }
       const n=SP.tl.ev[ni<SP.tl.ev.length?ni:0];
       if(n&&n.k>=0){ const nc=document.querySelector(`#songSheet .ch[data-k="${n.k}"]`); const nu=nc&&nc.querySelectorAll('.chu')[n.j||0]; if(nu&&!nu.classList.contains('now')) nu.classList.add('next'); } } };
   loop();
 }
 function songStop(){
-  if(!SP.playing) return; SP.playing=false; clearInterval(SP.timer); cancelAnimationFrame(SP.raf);
+  if(!SP.playing) return; SP.playing=false; followStop('song'); clearInterval(SP.timer); cancelAnimationFrame(SP.raf);
   const t=ctx?ctx.currentTime:0; SP.srcs.forEach(s=>{try{s.stop(t+0.05);}catch(e){}}); SP.srcs=[]; closeBus(SP.bus); SP.bus=null;
   document.querySelectorAll('#songSheet .now').forEach(x=>x.classList.remove('now')); $('#songPlay').textContent='▶ 再生';
 }
@@ -3695,18 +3713,18 @@ function tabPlay(){
   if(TB.playing){tabStop();return;}
   stopAllPlayback();
   const p=TABS_DATA[TB.idx], c=ac(), bd=60/(p.bpm*TB.speed/100);
-  TB.playing=true; TB.passes=0; TB.srcs=[]; TB.bd=bd; TB.t0=c.currentTime+0.12;   // カウントなしですぐに演奏を始める
+  TB.playing=true; followStart('tab'); TB.passes=0; TB.srcs=[]; TB.bd=bd; TB.t0=c.currentTime+0.12;   // カウントなしですぐに演奏を始める
   TB.bus=openBus();
   tabSchedule(); $('#tabPlay').textContent='■ 停止';
   TB.timer=setInterval(()=>{ const len=TB.data.len; if(c.currentTime>TB.t0+(TB.passes-1)*len*bd-1){ if($('#tabLoop').checked) tabSchedule(); else if(c.currentTime>TB.t0+TB.passes*len*bd){ tabStop(); navPulse('tab'); } } },200);
   const loop=()=>{ if(!TB.playing) return; TB.raf=requestAnimationFrame(loop);
     const len=TB.data.len, el=(c.currentTime-TB.t0)/bd; let pos=el>=0?el%len:-1; let idx=-1;
     if(pos>=0) TB.data.ev.forEach((e,i)=>{ if(e.t<=pos+1e-6) idx=i; });
-    if(idx!==TB.cur){ document.querySelectorAll('#tabSheet .tev.on').forEach(g=>g.classList.remove('on')); const g=document.querySelector(`#tabSheet .tev[data-i="${idx}"]`); if(g){ g.classList.add('on'); const box=$('#tabSheet'); if(box.scrollWidth>box.clientWidth){ const r=g.getBoundingClientRect(), br=box.getBoundingClientRect(); if(r.left<br.left+24||r.right>br.right-24) box.scrollLeft+=r.left-br.left-br.width/3; } } TB.cur=idx; } };
+    if(idx!==TB.cur){ document.querySelectorAll('#tabSheet .tev.on').forEach(g=>g.classList.remove('on')); const g=document.querySelector(`#tabSheet .tev[data-i="${idx}"]`); if(g){ g.classList.add('on'); const box=$('#tabSheet'); FOLLOW.last=g; if(FOLLOW.on){ if(box.scrollWidth>box.clientWidth){ const r=g.getBoundingClientRect(), br=box.getBoundingClientRect(); if(r.left<br.left+24||r.right>br.right-24) box.scrollLeft+=r.left-br.left-br.width/3; } followTo(g); } } TB.cur=idx; } };
   loop();
 }
 function tabStop(){
-  if(!TB.playing) return; TB.playing=false; clearInterval(TB.timer); cancelAnimationFrame(TB.raf);
+  if(!TB.playing) return; TB.playing=false; followStop('tab'); clearInterval(TB.timer); cancelAnimationFrame(TB.raf);
   const t=ctx?ctx.currentTime:0; TB.srcs.forEach(s=>{try{s.stop(t+0.05);}catch(e){}}); TB.srcs=[]; TB.cur=null; closeBus(TB.bus); TB.bus=null;
   document.querySelectorAll('#tabSheet .tev.on').forEach(g=>g.classList.remove('on')); $('#tabPlay').textContent='▶ 再生';
 }
