@@ -285,7 +285,7 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .board .fnum{fill:var(--fg);font-family:var(--mono);font-size:17px;font-weight:700;text-anchor:middle;opacity:.8}
 .board.long .fnum{font-size:21px}
 .board .hit{fill:transparent;cursor:pointer}
-.sheet .ch{display:inline-flex;align-items:center;gap:3px}
+.sheet .ch{display:inline-flex;align-items:center;gap:10px}.sheet .ch .chu{display:inline-flex;align-items:center;gap:3px;cursor:pointer}
 .sheet .ch .mini{width:60px;height:auto;flex:none}
 .mini line{stroke:var(--muted);stroke-width:.6}.mini line.nut{stroke:var(--fg);stroke-width:1.6}
 .mini circle{fill:var(--fg)}.mini circle.o{fill:none;stroke:var(--fg);stroke-width:.7}
@@ -2895,7 +2895,7 @@ drawHooks.push(cur=>{
 const SONGS=[
   {id:'furusato',lang:'ja',t:'ふるさと（故郷）',c:'作詞 高野辰之（1947年没）／作曲 岡野貞一（1941年没）・1914年',key:'C',time:3,bpm:84,part:'1番',strum:'3拍子：ベース → ジャン → ジャン',
    lines:['[C]うさぎ[G]おいし [C]かのやま','[F]こぶな[C]つりし [G]かの[C]かわ','[G]ゆめは[C]いまも [F]めぐ[C]りて','[C]わすれがたき [G7]ふるさ[C]と'],
-   seq:[3,3,6, 3,3,3,3, 3,3,3,3, 6,3,3],
+   seq:[3,3,6, 3,3,3,3, 3,3,3,3, 6,3,3], arr:{2:['C6(9)','Dm9:2 G13:1','Em7:3 A7(b13):3', 'Dm9','Em7:2 A7(b9):1','Dm7:2 G7(b9):1','C6(9)', 'Dm7/G','CM7:2 C9:1','FM9','Fm6:2 Em7:1', 'A7(b13):3 Dm9:3','Dm7/G:2 G7(b9):1','C6(9)']},
     mel:'C4 C4 C4 D4:1.5 E4:.5 D4 E4 E4 F4 G4:2 r F4 G4 A4 E4:1.5 F4:.5 E4 D4 D4 B3 C4:2 r D4:.5 C4:.5 D4 G3 C4:.5 D4:.5 E4 E4 F4:.5 E4:.5 F4:1.5 A4:.5 G4:.5 F4:.5 E4 r G4 G4 G4 C4:1.5 D4:.5 E4 F4 F4 D4 C4:2 r'},
   {id:'akatombo',lang:'ja',t:'赤とんぼ',c:'作詞 三木露風（1964年没）／作曲 山田耕筰（1965年没）・1927年',key:'C',time:3,bpm:72,part:'1番',strum:'3拍子：ベース → ジャン → ジャン、またはアルペジオ',
    lines:['[C]ゆうやけこやけの [F]あかとん[C]ぼ','[Am]おわれて[C]みたのは いつの[G7]ひ[C]か'],
@@ -2993,7 +2993,7 @@ const SONGS=[
   {id:"chatsumi",lang:"ja",t:"茶摘",c:"文部省唱歌・1912年",key:"C",time:4,bpm:104,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑",lines:["[C]なつもちかづく [G7]はちじゅうはち[C]や", "[C]のにもやまにも [G7]わかばがし[C]げる", "[F]あれにみえるは [C]ちゃつみじゃないか", "[C]あかねだすきに [G7]すげの[C]かさ"],seq:[4, 2, 2, 4, 2, 2, 4, 4, 4, 2, 2]},
   {id:"natsuwakinu",lang:"ja",t:"夏は来ぬ",c:"作詞 佐佐木信綱／作曲 小山作之助・1896年",key:"C",time:4,bpm:92,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑",lines:["[C]うのはなの [G7]におうか[C]きねに", "[C]ほととぎす [F]はやもき[C]なきて", "[Am]しのびね[Dm]もらす", "[G7]なつは[C]きぬ"],seq:[4, 2, 2, 4, 2, 2, 4, 4, 4, 4]},
   {id:"hana",lang:"ja",t:"花",c:"作詞 武島羽衣／作曲 滝廉太郎・1900年",key:"C",time:4,bpm:88,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑（軽やかに）",lines:["[C]はるのうららの [G7]すみだ[C]がわ", "[C]のぼりくだりの [G7]ふなびと[C]が", "[F]かいのしずくも [C]はなと[Am]ちる", "[F]ながめをなにに [G7]たとう[C]べき"],seq:[4, 2, 2, 4, 2, 2, 4, 2, 2, 4, 2, 2]},
-  {id:"hamabe",lang:"ja",t:"浜辺の歌",c:"作詞 林古渓／作曲 成田為三・1918年",key:"C",time:2,ts:"6/8",bpm:40,acc:"arp",part:"1番",strum:"6/8拍子：アルペジオ（ベース → 3弦 → 2弦 → 1弦 → 2弦 → 3弦）",lines:["[C]あしたはまべを [G7]さまよえ[C]ば", "[C]むかしのことぞ [G7]しのばる[C]る", "[F]かぜのおとよ [C]くものさまよ", "[F]よするなみも [G7]かいのいろ[C]も"],seq:[4, 2, 2, 4, 2, 2, 4, 4, 4, 2, 2]},
+  {id:"hamabe",lang:"ja",t:"浜辺の歌",c:"作詞 林古渓／作曲 成田為三・1918年",key:"C",time:2,ts:"6/8",bpm:40,acc:"arp",part:"1番",strum:"6/8拍子：アルペジオ（ベース → 3弦 → 2弦 → 1弦 → 2弦 → 3弦）",lines:["[C]あしたはまべを [G7]さまよえ[C]ば", "[C]むかしのことぞ [G7]しのばる[C]る", "[F]かぜのおとよ [C]くものさまよ", "[F]よするなみも [G7]かいのいろ[C]も"],arr:{2:["CM9:2 Am9:2","Dm9:1 G13:1","C6(9)","CM9:2 Am9:2","Dm7/G:1 G7(b9):1","C6(9)","FM9:2 Dm9:2","Em7:2 A7(b13):2","Dm9:2 Fm6:2","Dm7/G:1 G7(b9):1","C6(9)"]},seq:[4, 2, 2, 4, 2, 2, 4, 4, 4, 2, 2]},
   {id:"donguri",lang:"ja",t:"どんぐりころころ",c:"作詞 青木存義／作曲 梁田貞・1921年",key:"C",time:4,bpm:112,part:"1番",strum:"4拍子：↓ ↓ ↓ ↓（元気よく）",lines:["[C]どんぐりころころ [G7]どんぶり[C]こ", "[C]おいけにはまって [G7]さあたい[C]へん", "[F]どじょうがでてきて [C]こんにち[Am]は", "[F]ぼっちゃんいっしょに [G7]あそびま[C]しょう"],seq:[4, 2, 2, 4, 2, 2, 4, 2, 2, 4, 2, 2]},
   {id:"fujisan",lang:"ja",t:"富士山（ふじの山）",c:"作詞 巌谷小波・文部省唱歌・1910年",key:"C",time:4,bpm:100,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑（堂々と）",lines:["[C]あたまをくもの [G7]うえに[C]だし", "[C]しほうのやまを [G7]みおろし[C]て", "[F]かみなりさまを [C]したに[Am]きく", "[F]ふじは[C]にっぽん [G7]いちの[C]やま"],seq:[4, 2, 2, 4, 2, 2, 4, 2, 2, 2, 2, 2, 2]}
 ];
@@ -3038,6 +3038,17 @@ function songVoice(pc,syms,keyPc){
 }
 function songMarks(song){ return song.lines.join(' ').match(/\[[^\]]+\]/g).map(x=>parseChord(x.slice(1,-1))); }
 function songSymsAt(song,marks,k){ const out=[]; for(let l=0;l<=SG.lv;l++) out.push(arrangeSym(song,marks,k,l)); return out; }
+// 手で編曲した曲（song.arr[難易度] ＝ 目印ごとのコード。'Dm9:2 G13:1' のように1か所を拍で分けられる）
+function transName(n,sh,keyPc){ const N=FLAT_ROOTS.has(keyPc)?NOTES_F:NOTES_S, f=(l,a)=>N[((({C:0,D:2,E:4,F:5,G:7,A:9,B:11})[l]+(a==='#'?1:a==='b'?-1:0)+sh)%12+24)%12];
+  return n.replace(/^([A-G])([#b]?)/,(_,l,a)=>f(l,a)).replace(/\/([A-G])([#b]?)$/,(_,l,a)=>'/'+f(l,a)); }
+function songChordsAt(song,marks,k,shift,keyPc){
+  const a=song.arr&&song.arr[SG.lv];
+  if(a&&a[k]){ const items=a[k].trim().split(/\s+/).map(x=>{const [n,d]=x.split(':');return {n,d:d?+d:0};});
+    const fixed=items.reduce((t,x)=>t+x.d,0), free=items.filter(x=>!x.d).length; items.forEach(x=>{ if(!x.d) x.d=(song.seq[k]-fixed)/free; });
+    const out=items.map(x=>{ const ch=parseChordName(transName(x.n,shift,keyPc)), v=ch&&freeVoicing(ch); return v?{d:x.d,pc:ch.bass??ch.root,nm:ch.name,v,dia:()=>withCustom(ch,()=>diagram(v,ch.root,'custom'))}:null; });
+    if(out.every(Boolean)) return out; }
+  const pc=(marks[k].pc+shift+120)%12; return [{d:song.seq[k],pc,...songVoice(pc,songSymsAt(song,marks,k),keyPc)}];
+}
 function songKeyName(song,shift){const r=(keyRoot(song.key)+shift+120)%12;return (FLAT_ROOTS.has(r)?NOTES_F:NOTES_S)[r]+(keyMinor(song.key)?'m':'');}
 const EASY_MAJ=[0,7,2,9,4], EASY_MIN=[9,4,2];
 function capoFor(song,shift){
@@ -3049,7 +3060,8 @@ const songCapo=()=>SG.mode==='capo'&&INS==='guitar'?capoFor(SONGS[SG.idx],SG.shi
 // コード進行のタイムライン（実際に鳴る音の高さ）
 function songTimeline(song){
   const marks=songMarks(song), kp=(keyRoot(song.key)+SG.shift+120)%12;
-  let t=song.pre||0; const ev=marks.map((m,k)=>{const pc=(m.pc+SG.shift+120)%12, e={k,t,d:song.seq[k],pc,q:m.q,v:songVoice(pc,songSymsAt(song,marks,k),kp).v};t+=song.seq[k];return e;});
+  let t=song.pre||0; const ev=[];
+  marks.forEach((m,k)=>{ songChordsAt(song,marks,k,SG.shift,kp).forEach(c=>{ ev.push({k,t,d:c.d,pc:c.pc,q:m.q,v:c.v}); t+=c.d; }); });
   if(song.pre&&ev.length) ev.unshift({k:-1,t:0,d:song.pre,pc:ev[0].pc,q:ev[0].q,v:ev[0].v});
   return {ev,len:t};
 }
@@ -3084,8 +3096,10 @@ function renderSong(){
     const parts=line.split(/(\[[^\]]+\])/).filter(x=>x!=='');
     let pend=null;
     const push=(ch,txt)=>{const sg=document.createElement('span');sg.className='seg-c';const c=document.createElement('span');c.className='ch';const l=document.createElement('span');l.className='ly';
-      if(ch){const p=parseChord(ch), pc=(p.pc+dispShift+120)%12, sv=songVoice(pc,songSymsAt(song,marks,k),dispKeyPc), nm=sv.nm, mv=sv.v;
-        c.innerHTML=`<b class="chn"></b>${mv?miniDiagram(mv):''}`; c.querySelector('.chn').textContent=nm; c.dataset.k=k++; if(!used.some(u=>u.nm===nm)) used.push(sv); c.addEventListener('click',()=>songStrum(mv,capo));}
+      if(ch){ const list=songChordsAt(song,marks,k,dispShift,dispKeyPc);
+        list.forEach((sv,j)=>{ const u=document.createElement('span'); u.className='chu'; u.innerHTML=`<b class="chn"></b>${sv.v?miniDiagram(sv.v):''}`; u.querySelector('.chn').textContent=sv.nm;
+          u.addEventListener('click',()=>songStrum(sv.v,capo)); c.appendChild(u); if(!used.some(x=>x.nm===sv.nm)) used.push(sv); });
+        c.dataset.k=k++; }
       l.textContent=txt||' '; sg.append(c,l); row.appendChild(sg);};
     parts.forEach(x=>{ if(x.startsWith('[')){ if(pend!==null) push(pend,''); pend=x.slice(1,-1);} else { push(pend,x); pend=null; } });
     if(pend!==null) push(pend,'');
