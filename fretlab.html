@@ -470,7 +470,7 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 @media (max-width:860px){.songs{grid-template-columns:minmax(0,1fr)}}
 
 /* tab */
-.tabsheet{padding:14px 10px;overflow:hidden}
+.tabsheet{padding:14px 10px;overflow-x:auto;overflow-y:hidden}
 .tabsheet svg{display:block;width:100%;height:auto}
 .tabsheet .tl{stroke:var(--line);stroke-width:1}
 .tabsheet .bl{stroke:var(--muted);stroke-width:1.2}
@@ -1035,7 +1035,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
     <div class="panel-head"><div><h2>TAB練習</h2><p>メロディ・リフ・基礎練習。伴奏つきで弾けます。上の線が1弦。</p></div><div class="seg inst-seg" role="group" aria-label="楽器"></div></div>
     <div class="songs">
       <div class="card song-list-card">
-        <div class="seg" id="tabCat"><button data-v="all">すべて</button><button data-v="melody">メロディ</button><button data-v="classic">クラシック</button><button data-v="jazz">ジャズ</button><button data-v="riff">リフ</button><button data-v="basic">基礎練習</button></div>
+        <div class="seg" id="tabCat"><button data-v="all">すべて</button><button data-v="melody">メロディ</button><button data-v="classic">クラシック</button><button data-v="jazz">トラディショナル</button><button data-v="riff">リフ</button><button data-v="basic">基礎練習</button></div>
         <div class="prog-list" id="tabList" style="margin-top:10px"></div>
       </div>
       <div class="stack" style="min-width:0">
@@ -3000,6 +3000,10 @@ const SONGS=[
   {id:"donguri",lang:"ja",t:"どんぐりころころ",c:"作詞 青木存義／作曲 梁田貞・1921年",key:"C",time:4,bpm:112,part:"1番",strum:"4拍子：↓ ↓ ↓ ↓（元気よく）",lines:["[C]どんぐりころころ どんぶり[G7]こ","[C]おいけに[F]はまって [C]さあたいへん","[C]どじょうがでてきて こんにち[G7]は","[C]ぼっちゃん[F]いっしょに [G7]あそび[C]ましょう"],seq:[6,2,2,2,4,6,2,2,2,2,2],mel:"G4 E4:0.5 E4:0.5 F4:0.5 E4:0.5 D4:0.5 C4:0.5 G4 E4:0.5 E4:0.5 D4:2 E4:0.5 E4:0.5 G4:0.5 G4:0.5 A4:0.5 A4 A4:0.5 C5 E4:0.5 E4:0.5 G4:2 G4:0.5 G4:0.5 E4:0.5 E4:0.5 F4:0.5 E4:0.5 D4:0.5 C4:0.5 G4 E4:0.5 E4:0.5 D4:2 G4 E4 A4 G4:0.5 G4:0.5 A4:0.5 A4:0.5 B4:0.5 B4:0.5 C5:2"},
   {id:"fujisan",lang:"ja",t:"富士山（ふじの山）",c:"作詞 巌谷小波・文部省唱歌・1910年",key:"C",time:4,bpm:100,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑（堂々と）",lines:["[C]あたまをくもの [G7]うえにだし","[C]しほうの[F]やまを [G7]みおろし[C]て","[G7]かみなり[C]さまを [F]したに[D7]き[G7]く","[C]ふじは[F]にっぽん [C]いちの[G7]や[C]ま"],seq:[8,8,4,4,4,4,4,4,2,2,4,2,2,4,4,4],mel:"G4:1.5 G4:0.5 A4 G4 E4 C4:0.5 D4:0.5 E4:2 D4:1.5 G4:0.5 G4 F4:0.5 E4:0.5 D4:4 G4:1.5 G4:0.5 E4 C4 A4:1.5 B4:0.5 C5 A4 G4:1.5 A4:0.5 G4:0.5 F4:0.5 E4:0.5 D4:0.5 C4:4 D4:1.5 D4:0.5 D4 D4 C4:0.5 D4:0.5 E4:0.5 F4:0.5 G4:2 A4:1.5 B4:0.5 C5 A4 G4:4 C5:2 A4 F4 E4:1.5 E4:0.5 A4 G4 F4:1.5 E4:0.5 D4:1.5 C4:0.5 C4:3 r"}
 ];
+// 「難」の手書きアレンジ（裏コード・代理コード・クリシェ・オンコード・ディミニッシュ・オーギュメントなど）
+const SONG_ARR={"furusato": ["C:1 Caug:1 C6:1", "D9:2 G13:1", "CM7/E:2 Dm7:1 A7(b13):3", "Dm9", "Em7:2 A7(b9):1", "Dm7:2 Db7:1", "C6(9)", "Dm7/G", "CM9:2 C7:1", "FM9:2 Dm7:1", "CM7/E:2 A7(b13):1", "Dm9:3 G9sus4:3", "Db9:2 G7(b9):1", "C6(9)"], "akatombo": ["CM9:3 Am7:3", "FM7:2 Fm6:1", "CM7/E:2 E7(b9):1", "Am9", "F6(9):2 Em7:1 A7(b9):1 Dm7:1", "G9sus4", "C6(9)"], "kojo": ["Em:2 EmM7:2 Em7:2 Em6:2", "Am7", "B7sus4:1 B:1 B7(b9):4", "Em:2 EmM7:2 Em7:2 Em6:2", "Am7", "F#m7(b5):1 B7(b9):1", "Em9:2 Em6:2", "Em7:2 E9:2", "CM9", "Am9:2 F#m7(b5):2", "B7sus4:2 B7(b9):2", "Em:2 EmM7:2 Em7:2 Em6:2", "Am7", "F#m7(b5):1 F7(#11):1", "Em9:2 Em6:2"], "shabondama": ["C6(9):2 Am7:2", "FM7:1 Dm7:1", "C6:1 A7(b13):1", "Dm9:1 G9sus4:1", "Dm7/G:1 G13:1", "FM7", "C/E:0.5 Ebdim7:0.5", "Dm9:0.5 G13:0.5", "C6(9)"], "nanatsunoko": ["CM9:2 Am7:2 Dm9:2 E7(b9):2", "Am9:2 FM7:2", "G7sus4:2 G7(b9):2", "CM7:2 C7:2 FM9:2 Em7:1 Ebdim7:1", "Dm9:2 G13:1 G7(b9):1", "C6(9)"], "harugakita": ["C6(9):4 Am7:2 C7:2", "FM9", "Em7", "Dm7/G:2 G13:2", "C6(9):2 C7:2", "FM9:2 Dm7:2", "Em7:1 A7:1", "D9:1 G13:1", "C6(9)"], "sakura": ["Am:2 Am/G:2 Am/F#:2 FM7:2", "Dm9:2 Dm7:2 Bm7(b5):2 FM7:2", "Am9:2 Dm9:2 Am/C:2", "E7sus4:1 E7(b9):1", "Dm9:2 Dm7:2 Bm7(b5):2 FM7:2", "Am9:2 Dm9:2 Am/C:2", "Bm7(b5):1 E7(b9):1", "Am:2 Am/G:2 Am/F#:2 FM7:2", "Dm9:1 BbM7:1", "E7sus4:1 E7(b9):1", "Am(add9)"], "hotaru": ["GM7:2 Em7:2", "Am7:2 D13:2", "G:2 G7/F:2", "C6(9):2 C#dim7:2", "G/D:2 Em7:2", "Am9:2 D13:2", "Em7:1 A9:1", "Am7/D:1 D7:1", "G6(9)"], "amazing": ["G6", "Dm9:2 G9:1", "CM9:2 C#dim7:1", "G/D:3 Em7:3 A9:3", "Am7/D:3 D13:3", "GM7", "Dm9:2 G9:1", "CM9:2 C#dim7:1", "G/D:2 Bm7:1", "Em7:2 Am7:1", "Am7/D:2 D7:1", "G6(9)"], "joyful": ["CM9:2 FM9:2", "Dm9:2 G13:2", "CM7:2 Am9:2", "Dm7:2 G7sus4:1 G7:1", "CM9:2 FM9:2", "Dm9:2 G13:2", "CM7:2 Em7:1 A7:1", "Dm9:1 G9sus4:1", "C6(9)"], "saints": ["G6(9):4 Am7/G:4 G6(9):4 Am7/G:4 Em7:6 A9:2", "Am7:4 D13:4", "G:2 Dm7:2", "G13:2 G7(b9):2", "C:4 Cm6:4", "G/D:2 Em7:2", "Am7:2 D9:2", "G6(9)"], "silent": ["CM7:3 Am7:3 Dm9:3 C/E:3", "Dm7/G:3 G7(b9):3", "CM9:3 C7:3", "FM7:3 Dm9:3", "CM7:3 Am9:3", "FM7:3 F#m7(b5):3", "C/G:3 A7:3", "Dm7:3 G7(b9):3", "C6(9)", "CM9:3 Am7:3", "Dm9:1.5 G7(b9):1.5", "C6(9)"], "jingle": ["GM7:4 Em7:4 Am7:2 D7sus4:2 G6(9):4", "CM9:2 Cm6:2", "Gsus4:1 G:1 E7(b9):2", "Em7:2 A9:2", "Am7:2 Ab7:2", "GM7:4 Em7:4 Am7:2 D7sus4:2 G6(9):4", "CM9:2 Cm6:2", "Gsus4:1 G:1 E7(b9):2", "Am7:2 D9:2", "G6(9)"], "twinkle": ["C6(9):2 Am7:2", "FM7", "Em7:1 A7(b9):1", "Dm9", "CM7/E", "Dm9:1 G13:1", "C6(9)", "CM7/E:1 C7:1", "FM7:1 Fm6:1", "Em7:1 A7:1", "Dm9:1 G13:1", "CM7/E:1 C7:1", "FM7:1 Fm6:1", "Em7:1 A7:1", "Dm7:1 G7:1", "C6(9):2 Am7:2", "FM9", "Em7:1 A7(b9):1", "Dm7:1 Fm6:1", "C/E:1 A7:1", "Dm7:1 G7(b9):1", "C6(9)"], "rowboat": ["CM9:2 Am7:2 Dm9:2 G7sus4:2 C6:2 Am7:2", "Dm9:1 G13:1", "C6(9)"], "susanna": ["FM7:4 Dm7:4", "C/G:2 Am7:2", "Dm9:2 G9sus4:2", "CM7:2 C6:2 A7:2 Dm7:2 Em7:1 A7:1", "Dm7:1 G7(b9):1", "C6(9)"], "scarborough": ["Am9:3 Am7/G:3", "Em7", "Am9", "CM7", "Am7", "Dadd9", "Am9:3 Am6:3", "Am7", "CM9:3 Am7:3", "Gadd9:3 Em7:3", "Am9", "Am7/G:3 Em7:3", "Am(add9)"], "swinglow": ["GM7:2 Em7:2", "CM9:1 Cm6:1", "G/D:2 Em7:2 Am7:1 D7:1", "Am7/D:2 D7(b9):2", "G6:2 G7:2", "CM9:1 Cm6:1", "G/D:2 Em7:2 Am7:1", "D9", "G6(9)"], "birthday": ["C6(9)", "G13:3 Dm7/G:3", "C6(9):2 Gm7:1", "C9", "FM7(#11)", "C/E:1 Am7:1", "G9sus4", "C6(9)"], "mary": ["CM9:2 Am7:2 Dm9:2 C/E:2", "Dm7:2 G7sus4:1 G7:1", "CM7:2 C6:2", "CM9:2 Am7:2 Dm9:2 Em7:1 A7:1", "Dm7:2 G13:1 G7:1", "C6(9)"], "london": ["C6:2 Dm7:2 C/E:1 F6:1 Am7:2", "Dm9:2 G7:2", "C6:1 Dm7:1 Em7:2", "C6:2 Dm7:2 C/E:1 F6:1 Am7:2", "Dm9:2 G13:2", "C6(9)"], "jacques": ["C6(9):4 Am7:4 FM7:4 Dm9:4 G9sus4:2 C/E:2 G9sus4:2 Am7:2 Dm7/G:2 C:2 G7sus4:2 C6(9):2"], "yankee": ["C6:2 Am7:2", "Am7:2 G7:2", "CM9:2 Em7:2", "G7sus4:2 G7:2", "C6:2 C7:2", "FM7:2 Fm6:2", "G7:2 G13:2", "C6(9)"], "deck": ["C:2 C/B:1 Am7:1 Dm7:2 G7:1 C:1", "Dm7:1 G7:1", "Em7:1 Am7:1", "Dm7:1 G7:1", "C6(9)", "C:2 C/B:1 Am7:1 Dm7:2 G7:1 C:1", "Dm7:1 G7:1", "Em7:1 Am7:1", "Dm7/G:1 G7(b9):1", "C6(9)"], "wewish": ["C6:1 CM7:3", "FM9", "D9", "G13", "E7(b9)", "Am9", "FM7", "G7sus4:1 G7:1", "C6(9)"], "macdonald": ["G6(9):2 Em7:2", "C6(9)", "G/B", "Am7:2 D13:2", "G6(9)", "G6(9):2 Em7:2", "CM9", "G/B:1 E7(b9):1", "Am7:2 D13:2", "G6(9)"], "oldman": ["C6(9):4 Am7:4", "FM9:2 Dm9:2", "G7sus4:1 G13:1 G7:2", "CM7:2 Am7:2 Dm7:2 Em7:1 A7:1", "Dm7:2 G7:2", "Em7:1 Dm7:1 C6(9):2"], "clementine": ["C6(9):3 Am7:3 Dm9:3", "G9sus4:3 G13:3", "CM7:2 Am7:1", "Dm7:1 G7:2", "C6(9)"], "redriver": ["CM7", "G13", "C6(9):4 Am7:2 Dm7:2", "G9sus4:2 G13:2", "CM9", "Gm7:1 C9:1", "FM9", "G7:2 G13:2", "C6(9)"], "michael": ["C6:4 Am7:2 C7:2", "FM9", "C6(9)", "Em7:2 A7(b13):2", "Dm9:2 Dm7/C:2", "G13:2 G7:2", "C6(9)"], "kumbaya": ["C6", "FM9", "C6(9):3 Am7:2", "Dm9", "G9sus4:1 G13:1", "CM9:2 C7:1", "FM7", "Em7:1 A7:1", "Dm7", "Am7", "G9sus4", "C6(9)"], "bonnie": ["C6(9)", "F6", "C/G:3 Am7:3", "CM9", "Am7/D", "Dm7/G:3 G7(b9):3", "C6(9)", "Dm9", "C/G:3 A7(b13):3", "Dm9", "G13", "C6(9)"], "risingsun": ["Am(add9):3 Am7/G:3", "E7(b13)", "Am:3 Am7/G:3", "G13", "CM7", "E7(b9)", "Am:3 AmM7/G#:3 Am7/G:3", "FM7(#11)", "Am/E", "E7(b13)", "Am(add9)"], "dannyboy": ["CM9:2 Am7:2", "Dm7:2 FM7:2", "C6", "Am7", "D9", "G7", "CM9", "C9", "FM7:1 F6:1", "G7(b9)", "Am7:1 Dm7:1", "Dm9:1 G9sus4:1", "C6(9)"], "homerange": ["C6(9):3 CM7:3", "FM7:3 Fm6:3", "C/G", "D9", "G7sus4:3 G13:3", "C6(9):3 CM7:3", "FM7:3 Fm6:3", "C/E", "G7:1 F/G:1 G7:1", "C6(9)"], "auralee": ["CM7", "Am7/D:2 D7:2", "G7sus4:1 G13:3", "C6(9):2 Am7:2", "Am9:2 CM7/G:2", "D9:2 Ab7:2", "G9sus4:1 G13:3", "C6(9)"], "shenandoah": ["C6(9):2 Dm9:2", "FM7", "C6(9):1 CM7:1", "FM9:2 Dm9:2", "C6(9):2 Am7:2", "Am9:2 Am7/G:2", "Dm9:2 F6:2", "C6(9):2 Am7:2", "Em7", "Am7", "Dm9", "G7sus4", "C6(9)"], "alohaoe": ["FM9:2 Dm7:2", "C6(9):2 Am7:2", "G13:2 G9sus4:2", "CM9", "FM7:2 Dm7:2", "C/G:2 Am7:2", "G7:2 G13:2", "C6(9)"], "harunoogawa": ["C6(9):4 Am7:2 C7:2", "FM7", "C/G:1 A7:1 Dm7:2 C6(9):2", "C6(9):4 Am7:2 C7:2", "FM9", "Em7:1 A7:1", "Dm9:1 G13:1", "C6(9)", "Dm9:2 G13:2", "FM9:2 BbM7:2", "Am7", "G13", "C6(9):2 Am7:2", "CM7:4 Am7:2 C7:2", "FM7:1 F#m7(b5):1", "C/G:1 A7:1", "Dm9:1 G13:1", "C6(9)"], "oborozukiyo": ["CM9:3 Am7:2", "E7/B", "Am7", "Dm7/G", "C6(9)", "CM7:2 C7:1", "F6", "Em7", "Am9", "G9sus4", "C6(9)", "Gm7:2 C7:1", "FM9", "Em7", "Am7", "D9", "G9sus4:2 G13:1", "CM9:2 C7:1", "FM9:2 Fm6:1", "D9", "G13", "C6(9)"], "momiji": ["CM9:2 Am7:2", "FM7", "Dm7/G", "CM7:2 Em7:2", "D9", "G13", "CM9", "E7(b9)", "FM9", "Gm7:1 C7:1", "FM7", "G9sus4:2 G13:2", "C6(9)", "CM7:1 C7:1", "FM9", "C6(9):2 E7:2", "Am7", "C/E", "Dm9", "G13", "C6", "C9", "FM7:1 Fm6:1", "C/G:1 A7:1", "D7", "G13:1 G7:1", "C6(9)"], "yuki": ["C6(9):4 Am7:4", "C6(9):2 Dm7:2", "G13:2 G7:2", "C6(9):4 Am7:2 C7:2", "FM9:1 C/E:1", "C/G:1 Am7:1", "Dm9:1 G13:1", "C6(9)"], "chatsumi": ["C6(9):4 Am7:4", "D9:2 G7sus4:2", "CM7:2 C6:2", "Am9", "CM7:2 Am7:2", "D9:2 G7:2", "G7sus4:4 C6(9):4 Am7:4", "D9:2 Ab7:2", "C6(9)", "Dm9:2 F6:2", "C/G", "G13", "C6(9)"], "natsuwakinu": ["CM9:2 C7:2", "FM9:2 Dm9:2", "F6", "Em7:1 A7(b13):1", "D9:2 G9sus4:2", "CM9:2 C7:2", "FM9", "C/G:2 Am7:2", "Dm7:1 G7(b9):1", "C6(9)"], "hana": ["C6(9)", "Dm7:1 FM7:1", "C/G:2 C6:2 Em7:1 A7:1", "D9:2 G13:2", "CM9", "Dm9:1 G13:1", "C6:1 A7(b9):1", "D9:2 G13:2", "C6(9)", "C6(9):2 Am7:2", "Dm9:2 G7(b9):2", "Em7:1 A7:1", "D9:1 Ab7:1", "G13:2 G7(b9):2", "CM9:2 C7:2", "FM7(#11)", "Em7:1 A7:1", "Dm9:2 G7(b9):2", "C6(9)"], "donguri": ["C6(9):2 Dm9:2 C6:2", "G13", "C6:1 C7:1", "FM9:1 F#dim7:1", "C/G:2 C6(9):2", "C6(9):2 Dm9:2 C6:2", "Dm7/G:1 G7(b9):1", "C6:1 A7:1", "Dm9", "G13:1 G7:1", "C6(9)"], "fujisan": ["C6(9):4 Am7:2 Em7:2", "Dm9:4 G9sus4:2 G13:2", "CM9:2 Am7:2", "FM7(#11):2 Dm7:2", "G9sus4:2 G13:2", "C6(9)", "Ab7:2 G7:2", "C6:2 C7:2", "FM7(#11)", "D9", "G7sus4:2 G7(b9):2", "CM9:1 C7:1", "FM7:1 Fm6:1", "C/E:2 A7:2", "Dm9:2 G9sus4:2", "C6(9)"]};
+SONGS.forEach(s=>{ if(SONG_ARR[s.id]) s.arr={...(s.arr||{}),2:SONG_ARR[s.id]}; });
+
 
 const QUAL_MAP={'':'maj',m:'m','7':'7',M7:'M7',maj7:'M7',m7:'m7',mM7:'mM7','6':'6',m6:'m6',sus2:'sus2',sus4:'sus4','7sus4':'7sus4',add9:'add9','9':'9',dim:'dim',dim7:'dim7',m7b5:'m7b5',aug:'aug'};
 const NAME_PC={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
@@ -3350,9 +3354,13 @@ function buildTab(p){
   if(p.mel){ p.mel.trim().split(/\s+/).forEach(tok=>{const [n,d]=tok.split(':'); raw.push({ms:n==='r'?[]:[noteMidi(n)],d:durOf(d)});}); }
   else { p.riff.split(';').forEach(tok=>{const [ns,d]=tok.split(':'); const notes=ns.split('+').map(x=>{const [str,f]=x.split('/');return {s:6-(+str),f:+f};}); raw.push({gt:notes,ms:notes.map(n=>STD[n.s]+n.f),d:d?+d:(p.unit||1)});}); }
   if(INS==='guitar'){
+    // 12フレットを超える高い音が続く曲は、まるごと1オクターブ下げて低いポジションで弾けるようにする
+    let oct=0;
+    if(!p.riff){ const all=raw.flatMap(r=>r.ms), hiN=all.filter(m=>m>76).length;
+      if(all.length&&(hiN>=3||hiN/all.length>=.15)&&Math.min(...all)-12>=40){ oct=-12; raw.forEach(r=>{ r.ms=r.ms.map(m=>m-12); }); } }
     const gp=tabPos(p,raw.flatMap(r=>r.ms));
     raw.forEach(r=>ev.push({notes:r.gt||r.ms.map(m=>{const fp=fingerNote(m,gp);return {s:fp.s,f:fp.f};}),d:r.d}));
-    let tt=0; ev.forEach(e=>{e.t=tt;tt+=e.d;}); return {ev,len:tt,shift:0};
+    let tt=0; ev.forEach(e=>{e.t=tt;tt+=e.d;}); return {ev,len:tt,shift:oct};
   }
   const k=octaveFit(raw.flatMap(r=>r.ms)), pos=isBass()?0:tabPos(p,raw.flatMap(r=>r.ms).map(m=>m+k));
   raw.forEach(r=>{
@@ -3365,7 +3373,7 @@ function buildTab(p){
   });
   let tt=0; ev.forEach(e=>{e.t=tt;tt+=e.d;}); return {ev,len:tt,shift:k};
 }
-const TAB_CAT={melody:'メロディ',classic:'クラシック',jazz:'ジャズ',riff:'リフ',basic:'基礎練習'};
+const TAB_CAT={melody:'メロディ',classic:'クラシック',jazz:'トラディショナル',riff:'リフ',basic:'基礎練習'};
 /* TABの伴奏：歌から作ったものは歌のコード、ch があればそのコード、なければメロディから合うコードを選ぶ */
 function parseChordSeq(str){ let t=0; return str.trim().split(/\s+/).map(tok=>{ const i=tok.lastIndexOf(':'), nm=tok.slice(0,i), d=+tok.slice(i+1), c=parseChordName(nm); const e={t,d,name:nm,root:c?c.root:0,type:c&&c.known?c.known:/5$/.test(nm)?'power':'maj',iv:c?c.iv:[0,7]}; t+=d; return e; }).filter(e=>e.name!=='r'); }   // r＝コードなし（弱起など）
 function songHarm(song){
@@ -3406,16 +3414,19 @@ function renderTabList(){
 }
 function renderTab(){
   const p=TABS_DATA[TB.idx]; TB.data=buildTab(p); TB.data.harm=tabHarm(p,TB.data);
-  $('#tabMeta').textContent=`${TAB_CAT[p.cat]} ・ キー ${p.key} ・ ${p.ts||p.beats+'拍子'}${p.swing?(p.cat==='jazz'?'（スウィング）':'（シャッフル）'):''}${TB.data.harm.length?' ・ 伴奏つき':''}${TB.kara?' ・ カラオケ（主旋律なし）':''}`;
+  $('#tabMeta').textContent=`${TAB_CAT[p.cat]} ・ キー ${p.key} ・ ${p.ts||p.beats+'拍子'}${p.swing?(p.cat==='jazz'?'（スウィング）':'（シャッフル）'):''}${TB.data.shift===-12&&INS==='guitar'?' ・ 1オクターブ下で表示':''}${TB.data.harm.length?' ・ 伴奏つき':''}${TB.kara?' ・ カラオケ（主旋律なし）':''}`;
   $('#tabTitle').textContent=p.t; $('#tabDesc').textContent=p.info;
   $('#tabTip').textContent='コツ ― '+p.tip+(INS==='guitar'||!TB.data.shift?'':`（${['','1','2','3'][Math.abs(TB.data.shift)/12]}オクターブ${TB.data.shift>0?'上':'下'}）`); $('#tabBpm').textContent=Math.round(p.bpm*TB.speed/100);
   drawTab();
 }
 function drawTab(){
   const el=$('#tabSheet'), p=TABS_DATA[TB.idx], {ev,len}=TB.data, W=Math.max(300,el.clientWidth-20);
-  const unit=p.unit||1, px=Math.max(22,Math.min(46,W/((p.beats/unit)*2+1))), barW=p.beats/unit*px, left=34, perRow=Math.max(1,Math.floor((W-left)/barW));
+  // いちばん短い音の間隔に合わせて横幅をとる（数字が重ならないように最低20px）。1小節が画面より広いときは横にスクロール
+  let mg=p.unit||1; ev.forEach((e,i)=>{ const n=ev[i+1]; if(n&&n.t-e.t>1e-6) mg=Math.min(mg,n.t-e.t); }); mg=Math.max(mg,1/6);
+  const unit=mg, px=Math.max(20,Math.min(46,W/((p.beats/unit)*2+1))), barW=p.beats/unit*px, left=34, perRow=Math.max(1,Math.floor((W-left)/barW));
+  const SW=Math.max(W,left+perRow*barW+10);
   const ns=tun().length, bars=Math.ceil(len/p.beats-1e-9), rows=Math.ceil(bars/perRow), gap=13, rowH=gap*(ns-1)+52;
-  let s=`<svg viewBox="0 0 ${W} ${rows*rowH+8}" role="img" aria-label="TAB譜">`;
+  let s=`<svg viewBox="0 0 ${SW} ${rows*rowH+8}" role="img" aria-label="TAB譜"${SW>W?` style="width:${SW}px;max-width:none"`:''}>`;
   for(let r=0;r<rows;r++){
     const y0=r*rowH+20, nb=Math.min(perRow,bars-r*perRow), x1=left+nb*barW;
     for(let i=0;i<ns;i++) s+=`<line class="tl" x1="${left-26}" y1="${y0+i*gap}" x2="${x1}" y2="${y0+i*gap}"/>`;
@@ -3477,7 +3488,7 @@ function tabPlay(){
   const loop=()=>{ if(!TB.playing) return; TB.raf=requestAnimationFrame(loop);
     const len=TB.data.len, el=(c.currentTime-TB.t0)/bd; let pos=el>=0?el%len:-1; let idx=-1;
     if(pos>=0) TB.data.ev.forEach((e,i)=>{ if(e.t<=pos+1e-6) idx=i; });
-    if(idx!==TB.cur){ document.querySelectorAll('#tabSheet .tev.on').forEach(g=>g.classList.remove('on')); const g=document.querySelector(`#tabSheet .tev[data-i="${idx}"]`); if(g) g.classList.add('on'); TB.cur=idx; } };
+    if(idx!==TB.cur){ document.querySelectorAll('#tabSheet .tev.on').forEach(g=>g.classList.remove('on')); const g=document.querySelector(`#tabSheet .tev[data-i="${idx}"]`); if(g){ g.classList.add('on'); const box=$('#tabSheet'); if(box.scrollWidth>box.clientWidth){ const r=g.getBoundingClientRect(), br=box.getBoundingClientRect(); if(r.left<br.left+24||r.right>br.right-24) box.scrollLeft+=r.left-br.left-br.width/3; } } TB.cur=idx; } };
   loop();
 }
 function tabStop(){
