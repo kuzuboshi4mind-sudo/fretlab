@@ -470,19 +470,19 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 @media (max-width:860px){.songs{grid-template-columns:minmax(0,1fr)}}
 
 /* tab */
-.tabsheet{padding:14px 10px;overflow-x:auto;overflow-y:hidden}
+.tabsheet{padding:12px 4px;overflow-x:auto;overflow-y:hidden}
 .tabsheet svg{display:block;width:100%;height:auto}
-.tabsheet .tl{stroke:var(--line);stroke-width:1}
-.tabsheet .bl{stroke:var(--muted);stroke-width:1.2}
+.tabsheet .tl{stroke:var(--muted);stroke-width:.9;opacity:.75}
+.tabsheet .bl{stroke:var(--fg);stroke-width:1.3}
 .tabsheet .tn{font-family:"Helvetica Neue",Helvetica,Arial,"Hiragino Sans",sans-serif;font-variant-numeric:tabular-nums;font-size:15px;font-weight:600;fill:var(--fg);text-anchor:middle;dominant-baseline:central}
 .tabsheet .tnb{fill:var(--surface)}
 .tabsheet .on .tn{fill:var(--root-ink)}
 .tabsheet .on .tnb{fill:var(--root)}
-.tabsheet .tabclef{font-family:var(--display);font-size:13px;font-weight:600;fill:var(--muted);letter-spacing:.1em}
+.tabsheet .tabclef{font-family:var(--display);font-size:10px;font-weight:600;fill:var(--muted);letter-spacing:.1em}
 .tabsheet .dur{stroke:var(--muted);stroke-width:1}
-.tabsheet .stem,.tabsheet .flag,.tabsheet .rs{stroke:var(--fg);stroke-width:1.1;fill:none;opacity:.75}.tabsheet .beam{stroke:var(--fg);stroke-width:3;opacity:.75}.tabsheet .rr,.tabsheet .hd{fill:var(--fg);opacity:.75}.tabsheet .hd{fill:none;stroke:var(--fg);stroke-width:1.1}
+.tabsheet .stem,.tabsheet .flag,.tabsheet .rs{stroke:var(--fg);stroke-width:1.2;fill:none}.tabsheet .beam{stroke:var(--fg);stroke-width:3.2}.tabsheet .rr{fill:var(--fg)}.tabsheet .hd{fill:none;stroke:var(--fg);stroke-width:1.2}.tabsheet .bnum{font-size:9px;fill:var(--muted)}
 .tabsheet .tup{font-size:9px;fill:var(--muted);text-anchor:middle}
-.tabsheet .tcn{font-family:var(--display);font-size:13px;font-weight:700;fill:var(--root)}.tabsheet .tcn.cont{font-weight:400;opacity:.5}
+.tabsheet .tcn{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:13px;font-weight:700;fill:var(--root)}.tabsheet .tcn.cont{font-weight:400;opacity:.5}
 .tabsheet .cnt{font-family:var(--mono);font-size:9px;fill:var(--muted);text-anchor:middle}
 
 /* practice log (pomodoro) */
@@ -3626,33 +3626,31 @@ function rhythmSVG(evs,X,yb,b0,B){
   });
   return s;
 }
-function drawTab(){
-  const el=$('#tabSheet'), p=TABS_DATA[TB.idx], {ev,len}=TB.data, harm=TB.data.harm||[], W=Math.max(300,el.clientWidth-20), B=p.beats;
-  // いちばん短い音の間隔に合わせて横幅をとる（数字が重ならないように最低22px）。1小節が画面より広いときは横にスクロール
-  let mg=p.unit||1; ev.forEach((e,i)=>{ const n=ev[i+1]; if(n&&n.t-e.t>1e-6) mg=Math.min(mg,n.t-e.t); }); mg=Math.max(mg,1/6);
-  const unit=mg, px=Math.max(22,Math.min(48,W/((B/unit)*2+1))), barW=B/unit*px, left=34, perRow=Math.max(1,Math.floor((W-left)/barW));
-  const SW=Math.max(W,left+perRow*barW+10);
-  const ns=tun().length, bars=Math.ceil(len/B-1e-9), rows=Math.ceil(bars/perRow), gap=15, top=30, rowH=top+gap*(ns-1)+52;
-  let s=`<svg viewBox="0 0 ${SW} ${rows*rowH+8}" role="img" aria-label="TAB譜"${SW>W?` style="width:${SW}px;max-width:none"`:''}>`;
-  const pos=t=>{ const bar=Math.floor(t/B+1e-9), r=Math.floor(bar/perRow); return {bar,r,y0:r*rowH+top,x:left+(bar-r*perRow)*barW+((t-bar*B)/unit+.5)*px}; };
+function drawTab(){   // PDFと同じ組み方：同じ幅の小節を1行に1〜4小節、小節番号・コード名・リズム（連桁・旗・休符）・拍
+  const el=$('#tabSheet'), p=TABS_DATA[TB.idx], {ev,len}=TB.data, harm=TB.data.harm||[], B=p.beats, W=Math.max(280,el.clientWidth-8);
+  const ns=tun().length, nb=Math.max(1,Math.ceil(len/B-1e-9));
+  let mg=1; ev.forEach((e,i)=>{ const n=ev[i+1]; if(n&&n.t-e.t>1e-6) mg=Math.min(mg,n.t-e.t); }); mg=Math.max(mg,1/6);
+  const clef=24, pad=11, need=(B/mg)*16+pad*2;
+  let bpr=Math.max(1,Math.min(B===3?5:4,Math.floor((W-clef)/need))); if(nb<bpr) bpr=nb;
+  const bw=Math.max((W-clef-2)/bpr,need), SW=Math.max(W,Math.ceil(clef+bpr*bw+2)), rows=Math.ceil(nb/bpr), g=15, top=40, rowH=top+(ns-1)*g+58;
+  let s=`<svg viewBox="0 0 ${SW} ${rows*rowH}" role="img" aria-label="TAB譜"${SW>W+1?` style="width:${SW}px;max-width:none"`:''}>`;
+  const X=(b,t)=>{ const r=Math.floor(b/bpr), j=b-r*bpr; return clef+j*bw+pad+(t-b*B)/B*(bw-2*pad); };
   for(let r=0;r<rows;r++){
-    const y0=r*rowH+top, nb=Math.min(perRow,bars-r*perRow), x1=left+nb*barW;
-    for(let i=0;i<ns;i++) s+=`<line class="tl" x1="${left-26}" y1="${y0+i*gap}" x2="${x1}" y2="${y0+i*gap}"/>`;
-    const cg=(ns-1)*gap/3.6; s+=`<text class="tabclef" x="${left-24}" y="${y0+cg*.4+gap*.3}">T</text><text class="tabclef" x="${left-24}" y="${y0+cg*1.7+gap*.3}">A</text><text class="tabclef" x="${left-24}" y="${y0+cg*3+gap*.3}">B</text>`;
-    for(let b=0;b<=nb;b++) s+=`<line class="bl" x1="${left+b*barW}" y1="${y0}" x2="${left+b*barW}" y2="${y0+(ns-1)*gap}"/>`;
-    for(let j=0;j<nb;j++){ const b=r*perRow+j, b0=b*B, X=t=>left+j*barW+((t-b0)/unit+.5)*px, yb=y0+(ns-1)*gap+9;
-      // コード名（小節の頭で続いているコードは薄く）
-      harm.forEach(h=>{ if(h.t+h.d<=b0+1e-6||h.t>=b0+B-1e-6) return; const st=h.t>=b0-1e-6; if(!st&&j>0) return;
-        s+=`<text class="tcn${st?'':' cont'}" x="${X(Math.max(h.t,b0))-px*.4}" y="${y0-11}">${h.name}</text>`; });
-      s+=rhythmSVG(ev.filter(e=>e.t>=b0-1e-6&&e.t<b0+B-1e-6),X,yb,b0,B);
-      for(let k=0;k<B;k++) s+=`<text class="cnt" x="${X(b0+k)}" y="${yb+33}">${k+1}</text>`; }
+    const y0=r*rowH+top, b0=r*bpr, n=Math.min(bpr,nb-b0), x1=clef+n*bw;
+    for(let i=0;i<ns;i++) s+=`<line class="tl" x1="0" y1="${y0+i*g}" x2="${x1}" y2="${y0+i*g}"/>`;
+    s+=`<text class="tabclef" x="3" y="${y0+(ns-1)*g*.2+4}">T</text><text class="tabclef" x="3" y="${y0+(ns-1)*g*.5+4}">A</text><text class="tabclef" x="3" y="${y0+(ns-1)*g*.8+4}">B</text>`;
+    for(let j=0;j<=n;j++) s+=`<line class="bl" x1="${clef+j*bw}" y1="${y0}" x2="${clef+j*bw}" y2="${y0+(ns-1)*g}"/>`;
+    for(let j=0;j<n;j++){ const b=b0+j, bx=clef+j*bw, yb=y0+(ns-1)*g+10;
+      s+=`<text class="bnum" x="${bx+3}" y="${y0-26}">${b+1}</text>`;
+      harm.forEach(h=>{ if(h.t+h.d<=b*B+1e-6||h.t>=(b+1)*B-1e-6) return; const st=h.t>=b*B-1e-6; if(!st&&j>0) return;
+        s+=`<text class="tcn${st?'':' cont'}" x="${X(b,Math.max(h.t,b*B))-4}" y="${y0-9}">${h.name}</text>`; });
+      s+=rhythmSVG(ev.filter(e=>e.t>=b*B-1e-6&&e.t<(b+1)*B-1e-6),t=>X(b,t),yb,b*B,B);
+      for(let k=0;k<B;k++) s+=`<text class="cnt" x="${X(b,b*B+k)}" y="${yb+36}">${k+1}</text>`; }
   }
-  ev.forEach((e,i)=>{
-    const {y0,x}=pos(e.t);
+  ev.forEach((e,i)=>{ if(!e.notes.length) return; const b=Math.floor(e.t/B+1e-9), r=Math.floor(b/bpr), y0=r*rowH+top, x=X(b,e.t);
     s+=`<g class="tev" data-i="${i}">`;
-    e.notes.forEach(n=>{const y=y0+(ns-1-n.s)*gap; const w=String(n.f).length>1?21:13; s+=`<rect class="tnb" x="${x-w/2}" y="${y-8}" width="${w}" height="16" rx="3"/><text class="tn" x="${x}" y="${y+.5}">${n.f}</text>`;});
-    s+='</g>';
-  });
+    e.notes.forEach(nn=>{ const y=y0+(ns-1-nn.s)*g, w=String(nn.f).length>1?21:13; s+=`<rect class="tnb" x="${x-w/2}" y="${y-8}" width="${w}" height="16" rx="3"/><text class="tn" x="${x}" y="${y+.5}">${nn.f}</text>`; });
+    s+='</g>'; });
   el.innerHTML=s+'</svg>';
 }
 /* ---------- 印刷・PDF（A4）：弾き語りシートとTAB譜。1〜2枚に収め、余白が出ないように行間を自動で広げる ---------- */
