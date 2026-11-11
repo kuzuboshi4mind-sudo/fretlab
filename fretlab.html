@@ -627,7 +627,9 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);border-radius:10px;padding:10px 12px 10px 16px;display:flex;gap:12px;align-items:center;z-index:20;box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:calc(100% - 32px);font-size:14px}
 .toast .btn{background:var(--bg);color:var(--fg);border-color:var(--bg);min-height:34px;padding:4px 12px}
 .top{align-items:center}
-.top-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.top-actions{margin-left:auto;display:flex;gap:8px;align-items:center;flex:none}
+@media (max-width:560px){ .top{flex-wrap:nowrap;gap:8px;padding-block:14px 6px} .mark{font-size:20px;letter-spacing:.18em;white-space:nowrap;min-width:0} .top-actions .install-btn{display:none} }
+@media (max-width:360px){ .theme-btn .tl{display:none} .theme-btn:not(.gear-btn){padding:4px;width:38px;justify-content:center} .mark{font-size:19px;letter-spacing:.14em} }
 .theme-btn{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:4px 14px 4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:13px;cursor:pointer;transition:background .2s,border-color .2s}
 .theme-btn:hover{border-color:var(--muted)}
 .theme-btn:focus-visible{outline:2px solid var(--cobalt-b);outline-offset:2px}
