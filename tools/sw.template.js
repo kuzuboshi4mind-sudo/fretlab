@@ -16,8 +16,9 @@ self.addEventListener('fetch', e => {
   if (req.mode === 'navigate') {
     // ページはネット優先（更新をすぐ反映。ブラウザの10分のキャッシュも使わず毎回確かめる）、オフラインならキャッシュ。
     // ページごとに別々に保存する（紹介ページ about/ がアプリ本体を上書きしないように）
-    const isApp = /\/(index\.html)?$/.test(url.pathname) && !url.pathname.includes('/about/');
-    const key = isApp ? 'index.html' : req.url;
+    const isEn = /\/en\/(index\.html)?$/.test(url.pathname);
+    const isApp = /\/(index\.html)?$/.test(url.pathname) && !url.pathname.includes('/about/') && !isEn;
+    const key = isApp ? 'index.html' : isEn ? 'en/index.html' : req.url;
     e.respondWith(fetch(req, { cache: 'no-cache' }).then(r => { if (r.ok) { const cp = r.clone(); caches.open(CACHE).then(c => c.put(key, cp)); } return r; })
       .catch(() => caches.match(key).then(hit => hit || caches.match('index.html'))));
     return;
