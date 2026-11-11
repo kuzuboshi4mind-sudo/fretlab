@@ -452,9 +452,12 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .seg-c .ch:hover{color:var(--root)}
 .seg-c .ly{font-size:17px;line-height:1.5}
 .sheet.en .seg-c .ly{font-family:var(--display);font-size:20px}
-.seg-c .ch.now{color:var(--root)}
+.seg-c .ch .chu{border-radius:10px;padding:2px 6px 2px 4px;transition:background .12s,box-shadow .12s,transform .12s}
+.seg-c .ch .chu.now{background:var(--root);color:var(--accent-ink,#fff);box-shadow:0 0 0 3px color-mix(in srgb,var(--root) 30%,transparent);transform:scale(1.08)}
+.seg-c .ch .chu.now .mini line,.seg-c .ch .chu.now .mini circle{stroke:currentColor}.seg-c .ch .chu.now .mini circle:not(.o){fill:currentColor}.seg-c .ch .chu.now .mini text{fill:currentColor}
+.seg-c .ch .chu.next{box-shadow:inset 0 0 0 1.5px var(--root)}
 .sline{border-radius:8px;transition:background .15s;padding-inline:4px;margin-inline:-4px}
-.sline.now{background:color-mix(in srgb,var(--root) 10%,transparent)}
+.sline.now{background:color-mix(in srgb,var(--root) 14%,transparent);border-radius:10px}
 .capo-badge{display:flex;gap:14px;align-items:center;padding:10px 14px;border:1px solid var(--root);border-radius:12px;background:color-mix(in srgb,var(--root) 8%,transparent)}
 .capo-badge svg{width:110px;flex:0 0 auto}
 .capo-badge .cb-neck{fill:var(--wood)} .capo-badge .cb-fret{stroke:var(--fretwire);stroke-width:2} .capo-badge .cb-bar{fill:var(--root)}
@@ -3061,7 +3064,7 @@ const songCapo=()=>SG.mode==='capo'&&INS==='guitar'?capoFor(SONGS[SG.idx],SG.shi
 function songTimeline(song){
   const marks=songMarks(song), kp=(keyRoot(song.key)+SG.shift+120)%12;
   let t=song.pre||0; const ev=[];
-  marks.forEach((m,k)=>{ songChordsAt(song,marks,k,SG.shift,kp).forEach(c=>{ ev.push({k,t,d:c.d,pc:c.pc,q:m.q,v:c.v}); t+=c.d; }); });
+  marks.forEach((m,k)=>{ songChordsAt(song,marks,k,SG.shift,kp).forEach((c,j)=>{ ev.push({k,j,t,d:c.d,pc:c.pc,q:m.q,v:c.v}); t+=c.d; }); });
   if(song.pre&&ev.length){ if(song.prech){ const pc0=(parseChord(song.prech).pc+SG.shift+120)%12, sv=songVoice(pc0,[parseChord(song.prech).q],kp); ev.unshift({k:-1,t:0,d:song.pre,pc:pc0,q:'',v:sv.v}); }
     else ev.unshift({k:-1,t:0,d:song.pre,pc:ev[0].pc,q:ev[0].q,v:ev[0].v}); }
   return {ev,len:t};
@@ -3086,7 +3089,7 @@ function renderSong(){
   $('#songCapo').textContent= SG.mode==='capo' ? ''
     : (cap?`カポ${cap}なら ${songKeyName(song,SG.shift-cap)} の形で弾けます`:'');
   if(INS!=='guitar') $('#songCapo').textContent=isBass()?'ルート中心に弾きます':'High-G チューニング';
-  $('#songStrum').textContent='ストロークの目安 ― '+song.strum;
+  $('#songStrum').textContent=SG.lv===2&&song.acc!=='arp'?'弾き方の目安 ― 難はアルペジオ（ベース → 3弦 → 2弦 → 1弦 → 2弦 …）。テンションの音を1音ずつ響かせます':'ストロークの目安 ― '+song.strum;
   const used=[]; const sheet=$('#songSheet'); sheet.innerHTML=''; sheet.className='card sheet'+(song.lang==='en'?' en':'');
   if(capo){ const cb=document.createElement('div'); cb.className='capo-badge';
     cb.innerHTML=`<svg viewBox="0 0 120 40" aria-hidden="true"><rect x="2" y="8" width="116" height="24" rx="3" class="cb-neck"/>${[24,52,76,98].map(x=>`<line x1="${x}" y1="8" x2="${x}" y2="32" class="cb-fret"/>`).join('')}<rect x="${[0,10,38,64,87,106,112,116][Math.min(capo,7)]-3}" y="2" width="9" height="36" rx="3" class="cb-bar"/></svg><div><b>CAPO ${capo}</b><span>${capo}フレットにカポを付けて、下のコードの形で弾きます（鳴る音は ${songKeyName(song,SG.shift)}）</span></div>`;
@@ -3098,7 +3101,7 @@ function renderSong(){
     let pend=null;
     const push=(ch,txt)=>{const sg=document.createElement('span');sg.className='seg-c';const c=document.createElement('span');c.className='ch';const l=document.createElement('span');l.className='ly';
       if(ch){ const list=songChordsAt(song,marks,k,dispShift,dispKeyPc);
-        list.forEach((sv,j)=>{ const u=document.createElement('span'); u.className='chu'; u.innerHTML=`<b class="chn"></b>${sv.v?miniDiagram(sv.v):''}`; u.querySelector('.chn').textContent=sv.nm;
+        list.forEach((sv,j)=>{ const u=document.createElement('span'); u.className='chu'; u.dataset.j=j; u.innerHTML=`<b class="chn"></b>${sv.v?miniDiagram(sv.v):''}`; u.querySelector('.chn').textContent=sv.nm;
           u.addEventListener('click',()=>songStrum(sv.v,capo)); c.appendChild(u); if(!used.some(x=>x.nm===sv.nm)) used.push(sv); });
         c.dataset.k=k++; }
       l.textContent=txt||' '; sg.append(c,l); row.appendChild(sg);};
@@ -3140,10 +3143,12 @@ function songSchedulePassRaw(){
       return;
     }
     const tu=tun(), k=ins().kind, strs=v.frets.map((f,i)=>f===null?null:i).filter(i=>i!==null), bass=strs[0];
-    if(song.acc==='arp'){   // アルペジオ：ベース → 上の弦へ → 戻る（6/8は1小節6音、ほかは1拍2音）
-      const up=strs.slice(1).slice(-3), pat=[bass,...up,...up.slice(0,-1).reverse()], sub=song.ts==='6/8'?3:2, per=sub*song.time;
-      for(let i=0;i<e.d*sub-1e-6;i++){ const t=e.t+i/sub, g=((Math.round((t-pre)*sub)%per)+per)%per, s0=g===0?bass:pat[g%pat.length];
-        keep(pluck(tu[s0]+v.frets[s0],at(t),g===0?.42:.27,{kind:k,str:s0,dur:bd*2.2})); }
+    if(song.acc==='arp'||SG.lv===2){   // アルペジオ（難はすべて）：ベース → 上の弦へ → 戻る。和音を重ねないので響きが濁らない
+      const up=strs.slice(1).slice(-3), sub=song.ts==='6/8'?3:2, per=sub*song.time;
+      const pat=song.ts==='6/8'||song.time===3?[bass,...up,...up.slice(0,-1).reverse()]:song.time===4?[bass,up[0],up[1],up[2],up[1],up[0],up[1],up[2]]:[bass,up[0],up[1],up[2]];
+      for(let i=0;i<e.d*sub-1e-6;i++){ const t=e.t+i/sub, g=((Math.round((t-pre)*sub)%per)+per)%per, s0=g===0||i===0?bass:pat[g%pat.length];
+        if(s0==null) continue;
+        keep(pluck(tu[s0]+v.frets[s0],at(t),g===0||i===0?.42:.27,{kind:k,str:s0,dur:bd*(SG.lv===2?1.6:2.2)})); }
       return; }
     for(let b=0;b<e.d-1e-6;b+=beat){
       const t=e.t+b, inBar=((Math.round(t-pre)%song.time)+song.time)%song.time;
@@ -3169,10 +3174,16 @@ function songPlay(){
   songSchedulePass(); $('#songPlay').textContent='■ 停止';
   SP.timer=setInterval(()=>{ const len=SP.tl.len; if(c.currentTime>SP.t0+(SP.passes-1)*len*SP.bd-1){ if(SP.loop) songSchedulePass(); else if(c.currentTime>SP.t0+SP.passes*len*SP.bd+.3) songStop(); } },200);
   const loop=()=>{ if(!SP.playing) return; SP.raf=requestAnimationFrame(loop);
-    const el=(c.currentTime-SP.t0)/SP.bd; let k=-2;
-    if(el>=0){ const pos=el%SP.tl.len; SP.tl.ev.forEach(e=>{ if(e.t<=pos+1e-6) k=e.k; }); }
-    if(k!==SP.cur){ SP.cur=k; document.querySelectorAll('#songSheet .ch.now').forEach(x=>x.classList.remove('now')); document.querySelectorAll('#songSheet .sline.now').forEach(x=>x.classList.remove('now'));
-      const ch=document.querySelector(`#songSheet .ch[data-k="${k}"]`); if(ch){ ch.classList.add('now'); const ln=ch.closest('.sline'); ln.classList.add('now'); } } };
+    const el=(c.currentTime-SP.t0)/SP.bd; let k=-2, j=0, ni=-1;
+    if(el>=0){ const pos=el%SP.tl.len; SP.tl.ev.forEach((e,i)=>{ if(e.t<=pos+1e-6){ k=e.k; j=e.j||0; ni=i+1; } }); }
+    const key=k+':'+j;
+    if(key!==SP.cur){ SP.cur=key; document.querySelectorAll('#songSheet .now,#songSheet .next').forEach(x=>x.classList.remove('now','next'));
+      // 今のコード：塗りつぶして強調。次のコード：枠だけ
+      const ch=document.querySelector(`#songSheet .ch[data-k="${k}"]`);
+      if(ch){ ch.classList.add('now'); const u=ch.querySelectorAll('.chu')[j]; if(u) u.classList.add('now'); const ln=ch.closest('.sline'); ln.classList.add('now');
+        const r=ln.getBoundingClientRect(); if(r.top<70||r.bottom>innerHeight-40) ln.scrollIntoView({block:'center',behavior:'smooth'}); }
+      const n=SP.tl.ev[ni<SP.tl.ev.length?ni:0];
+      if(n&&n.k>=0){ const nc=document.querySelector(`#songSheet .ch[data-k="${n.k}"]`); const nu=nc&&nc.querySelectorAll('.chu')[n.j||0]; if(nu&&!nu.classList.contains('now')) nu.classList.add('next'); } } };
   loop();
 }
 function songStop(){
