@@ -1009,12 +1009,13 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           </div>
           <div class="row prog-controls">
             <div><span class="label">キー</span><div class="bpm-mini"><button class="btn" id="songKeyDown" aria-label="キーを下げる">−</button><output id="songKey" class="song-key">C</output><button class="btn" id="songKeyUp" aria-label="キーを上げる">+</button></div></div>
+            <div><span class="label">難易度</span><div class="seg" id="songLv"><button data-v="0">易</button><button data-v="1">中</button><button data-v="2">難</button></div></div>
             <div><span class="label">表示</span><div class="seg" id="songMode"><button data-v="real">実際のコード</button><button data-v="capo">カポで簡単に</button></div></div>
           </div>
           <div class="row">
             <button class="btn primary big" id="songPlay">▶ 再生</button>
             <button class="btn repeat-btn" id="songLoop" type="button" aria-pressed="false" title="くり返し再生"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11V9a3 3 0 0 1 3-3h11"/><path d="M15 3l3 3-3 3"/><path d="M20 13v2a3 3 0 0 1-3 3H6"/><path d="M9 21l-3-3 3-3"/></svg>リピート</button>
-            <div style="flex:1;min-width:180px"><span class="label">速さ <b id="songSpeedOut">100</b>%（♩=<span id="songBpm"></span>）</span><input type="range" id="songSpeed" min="50" max="120" step="5" value="100" aria-label="速さ"></div>
+            <div style="flex:1;min-width:180px"><span class="label">速さ <b id="songSpeedOut">100</b>%（♩=<span id="songBpm"></span>）</span><input type="range" id="songSpeed" min="50" max="200" step="5" value="100" aria-label="速さ"></div>
 
           </div>
           <div class="msg" id="songCapo"></div>
@@ -1040,7 +1041,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           <div class="row">
             <button class="btn primary big" id="tabPlay">▶ 再生</button>
             <button class="btn repeat-btn" id="tabKara" type="button" aria-pressed="false" title="主旋律を消して伴奏だけを流します"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M8.5 21h7"/></svg>カラオケ</button>
-            <div style="flex:1;min-width:180px"><span class="label">速さ <b id="tabSpeedOut">100</b>%（♩=<span id="tabBpm"></span>）</span><input type="range" id="tabSpeed" min="50" max="120" step="5" value="100" aria-label="速さ"></div>
+            <div style="flex:1;min-width:180px"><span class="label">速さ <b id="tabSpeedOut">100</b>%（♩=<span id="tabBpm"></span>）</span><input type="range" id="tabSpeed" min="50" max="200" step="5" value="100" aria-label="速さ"></div>
             <label class="check"><input type="checkbox" id="tabLoop" checked> ループ</label>
             <label class="check"><input type="checkbox" id="tabAcc" checked> 伴奏</label>
             <label class="check"><input type="checkbox" id="tabClick"> クリック</label>
@@ -2992,7 +2993,7 @@ const SONGS=[
   {id:"chatsumi",lang:"ja",t:"茶摘",c:"文部省唱歌・1912年",key:"C",time:4,bpm:104,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑",lines:["[C]なつもちかづく [G7]はちじゅうはち[C]や", "[C]のにもやまにも [G7]わかばがし[C]げる", "[F]あれにみえるは [C]ちゃつみじゃないか", "[C]あかねだすきに [G7]すげの[C]かさ"],seq:[4, 2, 2, 4, 2, 2, 4, 4, 4, 2, 2]},
   {id:"natsuwakinu",lang:"ja",t:"夏は来ぬ",c:"作詞 佐佐木信綱／作曲 小山作之助・1896年",key:"C",time:4,bpm:92,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑",lines:["[C]うのはなの [G7]におうか[C]きねに", "[C]ほととぎす [F]はやもき[C]なきて", "[Am]しのびね[Dm]もらす", "[G7]なつは[C]きぬ"],seq:[4, 2, 2, 4, 2, 2, 4, 4, 4, 4]},
   {id:"hana",lang:"ja",t:"花",c:"作詞 武島羽衣／作曲 滝廉太郎・1900年",key:"C",time:4,bpm:88,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑（軽やかに）",lines:["[C]はるのうららの [G7]すみだ[C]がわ", "[C]のぼりくだりの [G7]ふなびと[C]が", "[F]かいのしずくも [C]はなと[Am]ちる", "[F]ながめをなにに [G7]たとう[C]べき"],seq:[4, 2, 2, 4, 2, 2, 4, 2, 2, 4, 2, 2]},
-  {id:"hamabe",lang:"ja",t:"浜辺の歌",c:"作詞 林古渓／作曲 成田為三・1918年",key:"C",time:2,ts:"6/8",bpm:56,part:"1番",strum:"6/8拍子：アルペジオ（1拍＝付点4分音符）",lines:["[C]あしたはまべを [G7]さまよえ[C]ば", "[C]むかしのことぞ [G7]しのばる[C]る", "[F]かぜのおとよ [C]くものさまよ", "[F]よするなみも [G7]かいのいろ[C]も"],seq:[4, 2, 2, 4, 2, 2, 4, 4, 4, 2, 2]},
+  {id:"hamabe",lang:"ja",t:"浜辺の歌",c:"作詞 林古渓／作曲 成田為三・1918年",key:"C",time:2,ts:"6/8",bpm:40,acc:"arp",part:"1番",strum:"6/8拍子：アルペジオ（ベース → 3弦 → 2弦 → 1弦 → 2弦 → 3弦）",lines:["[C]あしたはまべを [G7]さまよえ[C]ば", "[C]むかしのことぞ [G7]しのばる[C]る", "[F]かぜのおとよ [C]くものさまよ", "[F]よするなみも [G7]かいのいろ[C]も"],seq:[4, 2, 2, 4, 2, 2, 4, 4, 4, 2, 2]},
   {id:"donguri",lang:"ja",t:"どんぐりころころ",c:"作詞 青木存義／作曲 梁田貞・1921年",key:"C",time:4,bpm:112,part:"1番",strum:"4拍子：↓ ↓ ↓ ↓（元気よく）",lines:["[C]どんぐりころころ [G7]どんぶり[C]こ", "[C]おいけにはまって [G7]さあたい[C]へん", "[F]どじょうがでてきて [C]こんにち[Am]は", "[F]ぼっちゃんいっしょに [G7]あそびま[C]しょう"],seq:[4, 2, 2, 4, 2, 2, 4, 2, 2, 4, 2, 2]},
   {id:"fujisan",lang:"ja",t:"富士山（ふじの山）",c:"作詞 巌谷小波・文部省唱歌・1910年",key:"C",time:4,bpm:100,part:"1番",strum:"4拍子：↓ ↓↑ ↓ ↓↑（堂々と）",lines:["[C]あたまをくもの [G7]うえに[C]だし", "[C]しほうのやまを [G7]みおろし[C]て", "[F]かみなりさまを [C]したに[Am]きく", "[F]ふじは[C]にっぽん [G7]いちの[C]やま"],seq:[4, 2, 2, 4, 2, 2, 4, 2, 2, 2, 2, 2, 2]}
 ];
@@ -3001,7 +3002,42 @@ const QUAL_MAP={'':'maj',m:'m','7':'7',M7:'M7',maj7:'M7',m7:'m7',mM7:'mM7','6':'
 const NAME_PC={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
 function parseChord(ch){const m=/^([A-G])([#b♯♭]?)(.*)$/.exec(ch);if(!m) return null;let pc=NAME_PC[m[1]]+(m[2]==='#'||m[2]==='♯'?1:m[2]==='b'||m[2]==='♭'?-1:0);return {pc:(pc+12)%12,q:m[3]};}
 const keyRoot=k=>parseChord(k).pc, keyMinor=k=>/m$/.test(k);
-const SG={idx:store.get('sIdx',0),lang:'all',shift:0,mode:'real',speed:100};
+const SG={idx:store.get('sIdx',0),lang:'all',shift:0,mode:'real',speed:100,lv:store.get('songLv',0)};
+/* 難易度：易＝元のコード、中＝セブンス、難＝テンション（9th・13th・♭9・♯11 など）。キーの中での役割（度数）で決める */
+function arrangeSym(song,marks,k,lv){
+  const m=marks[k]; if(!lv) return m.q;
+  const kp=keyRoot(song.key), minor=keyMinor(song.key), d=(m.pc-kp+12)%12, nx=marks[k+1]||marks[0], nMin=nx.q==='m'||(minor&&(nx.pc-kp+12)%12===0);
+  const last=k===marks.length-1, q=m.q, maj=q===''||q==='7';
+  if(lv===1){
+    if(q==='m') return minor&&d===2?'m7(b5)':'m7';
+    if(q==='7') return '7';
+    if(minor) return d===3||d===8?'M7':'7';
+    return d===0||d===5?'M7':d===7||d===2||d===4||d===9||d===11?'7':'add9';
+  }
+  if(q==='m'){
+    if(minor) return d===0?(last?'m6(9)':'m9'):d===5?'m9':d===2?'m7(b5)':'m7';
+    return d===2||d===9?'m9':d===4?'m7(11)':d===5?'m6':'m7';   // 4度のマイナー（借用の iv）は m6
+  }
+  if(minor){
+    if(d===7) return '7(b9)';
+    if(d===3) return 'M9'; if(d===8) return 'M7(#11)'; if(d===10) return '13';
+    return nMin?'7(b9)':'9';
+  }
+  if(d===0&&q==='') return last?'6(9)':'M9';
+  if(d===5&&q==='') return 'M7(#11)';
+  if(d===10) return '9';
+  if(d===7) return nMin?'7(b9)':'13';
+  return nMin?'7(b9)':(d===2?'9':'13');   // 2度・3度・6度のメジャー＝セカンダリー・ドミナント
+}
+// 1つのコードの名前と押さえ方。難しいコードが押さえられない楽器では1段やさしい形にする
+function songVoice(pc,syms,keyPc){
+  for(let i=syms.length-1;i>=0;i--){ const sym=syms[i];
+    if(i===0){ const type=QUAL_MAP[sym]??'maj', v=bestVoicing(pc,type); return {nm:chordName(pc,sym,keyPc),v,dia:()=>v?diagram(v,pc,type):''}; }
+    const ch=parseChordName((FLAT_ROOTS.has(keyPc)?NOTES_F:NOTES_S)[pc]+sym), v=ch&&freeVoicing(ch);
+    if(v) return {nm:ch.name,v,dia:()=>withCustom(ch,()=>diagram(v,ch.root,'custom'))}; }
+}
+function songMarks(song){ return song.lines.join(' ').match(/\[[^\]]+\]/g).map(x=>parseChord(x.slice(1,-1))); }
+function songSymsAt(song,marks,k){ const out=[]; for(let l=0;l<=SG.lv;l++) out.push(arrangeSym(song,marks,k,l)); return out; }
 function songKeyName(song,shift){const r=(keyRoot(song.key)+shift+120)%12;return (FLAT_ROOTS.has(r)?NOTES_F:NOTES_S)[r]+(keyMinor(song.key)?'m':'');}
 const EASY_MAJ=[0,7,2,9,4], EASY_MIN=[9,4,2];
 function capoFor(song,shift){
@@ -3012,9 +3048,9 @@ function chordName(pc,q,keyPc){return (FLAT_ROOTS.has(keyPc)?NOTES_F:NOTES_S)[pc
 const songCapo=()=>SG.mode==='capo'&&INS==='guitar'?capoFor(SONGS[SG.idx],SG.shift):0;   // カポの提案はギターのとき
 // コード進行のタイムライン（実際に鳴る音の高さ）
 function songTimeline(song){
-  const marks=song.lines.join(' ').match(/\[[^\]]+\]/g).map(x=>parseChord(x.slice(1,-1)));
-  let t=song.pre||0; const ev=marks.map((m,k)=>{const e={k,t,d:song.seq[k],pc:(m.pc+SG.shift+120)%12,q:m.q};t+=song.seq[k];return e;});
-  if(song.pre&&ev.length) ev.unshift({k:-1,t:0,d:song.pre,pc:ev[0].pc,q:ev[0].q});
+  const marks=songMarks(song), kp=(keyRoot(song.key)+SG.shift+120)%12;
+  let t=song.pre||0; const ev=marks.map((m,k)=>{const pc=(m.pc+SG.shift+120)%12, e={k,t,d:song.seq[k],pc,q:m.q,v:songVoice(pc,songSymsAt(song,marks,k),kp).v};t+=song.seq[k];return e;});
+  if(song.pre&&ev.length) ev.unshift({k:-1,t:0,d:song.pre,pc:ev[0].pc,q:ev[0].q,v:ev[0].v});
   return {ev,len:t};
 }
 function renderSongList(){
@@ -3042,22 +3078,22 @@ function renderSong(){
   if(capo){ const cb=document.createElement('div'); cb.className='capo-badge';
     cb.innerHTML=`<svg viewBox="0 0 120 40" aria-hidden="true"><rect x="2" y="8" width="116" height="24" rx="3" class="cb-neck"/>${[24,52,76,98].map(x=>`<line x1="${x}" y1="8" x2="${x}" y2="32" class="cb-fret"/>`).join('')}<rect x="${[0,10,38,64,87,106,112,116][Math.min(capo,7)]-3}" y="2" width="9" height="36" rx="3" class="cb-bar"/></svg><div><b>CAPO ${capo}</b><span>${capo}フレットにカポを付けて、下のコードの形で弾きます（鳴る音は ${songKeyName(song,SG.shift)}）</span></div>`;
     sheet.appendChild(cb); }
-  let k=0;
+  let k=0; const marks=songMarks(song);
   song.lines.forEach(line=>{
     const row=document.createElement('div'); row.className='sline';
     const parts=line.split(/(\[[^\]]+\])/).filter(x=>x!=='');
     let pend=null;
     const push=(ch,txt)=>{const sg=document.createElement('span');sg.className='seg-c';const c=document.createElement('span');c.className='ch';const l=document.createElement('span');l.className='ly';
-      if(ch){const p=parseChord(ch), pc=(p.pc+dispShift+120)%12, nm=chordName(pc,p.q,dispKeyPc), mv=bestVoicing(pc,QUAL_MAP[p.q]??'maj');
-        c.innerHTML=`<b class="chn"></b>${mv?miniDiagram(mv):''}`; c.querySelector('.chn').textContent=nm; c.dataset.k=k++; if(!used.some(u=>u.nm===nm)) used.push({nm,pc,q:p.q}); c.addEventListener('click',()=>songStrum(pc,p.q,capo));}
+      if(ch){const p=parseChord(ch), pc=(p.pc+dispShift+120)%12, sv=songVoice(pc,songSymsAt(song,marks,k),dispKeyPc), nm=sv.nm, mv=sv.v;
+        c.innerHTML=`<b class="chn"></b>${mv?miniDiagram(mv):''}`; c.querySelector('.chn').textContent=nm; c.dataset.k=k++; if(!used.some(u=>u.nm===nm)) used.push(sv); c.addEventListener('click',()=>songStrum(mv,capo));}
       l.textContent=txt||' '; sg.append(c,l); row.appendChild(sg);};
     parts.forEach(x=>{ if(x.startsWith('[')){ if(pend!==null) push(pend,''); pend=x.slice(1,-1);} else { push(pend,x); pend=null; } });
     if(pend!==null) push(pend,'');
     sheet.appendChild(row);
   });
   const ce=$('#songChords'); ce.innerHTML='';
-  used.forEach(u=>{ const type=QUAL_MAP[u.q]??'maj'; const v=bestVoicing(u.pc,type); const d=document.createElement('div'); d.className='card';
-    d.innerHTML=`<div class="cn"></div>${v?diagram(v,u.pc,type):''}`; d.querySelector('.cn').textContent=u.nm; d.addEventListener('click',()=>songStrum(u.pc,u.q,capo)); ce.appendChild(d); });
+  used.forEach(u=>{ const d=document.createElement('div'); d.className='card';
+    d.innerHTML=`<div class="cn"></div>${u.dia()}`; d.querySelector('.cn').textContent=u.nm; d.addEventListener('click',()=>songStrum(u.v,capo)); ce.appendChild(d); });
 }
 // 小さな横向きのコード図（歌詞の横に置く）：上が1弦、左がナット
 function miniDiagram(v){
@@ -3072,7 +3108,7 @@ function miniDiagram(v){
   notes.forEach(x=>{ if(x.f>0) o+=`<circle cx="${(gx(x.f-base)+gx(x.f-base+1))/2}" cy="${sy(x.s)}" r="2.3"/>`; });
   return o+'</svg>';
 }
-function songStrum(pc,q,capo){ stopAllPlayback(); const type=QUAL_MAP[q]??'maj', v=bestVoicing(pc,type); playShape(v,{capo}); }
+function songStrum(v,capo){ stopAllPlayback(); if(v) playShape(v,{capo}); }
 /* 再生：伴奏（コード）＋メロディ。キーを変えると両方移調される */
 const SP={bus:null,loop:store.get('songRepeat',false),playing:false,srcs:[],timer:null,raf:0,t0:0,bd:0,passes:0,tl:null,cur:-2};
 function songSchedulePass(){ onBus(SP.bus,songSchedulePassRaw); }
@@ -3080,7 +3116,7 @@ function songSchedulePassRaw(){
   const song=SONGS[SG.idx], c=ac(), bd=SP.bd, {ev,len}=SP.tl, start=SP.t0+SP.passes*len*bd, beat=song.time===2?1:1;
   const at=t=>Math.max(0,start+t*bd-c.currentTime), keep=s=>{if(s) SP.srcs.push(s);};
   ev.forEach(e=>{
-    const type=QUAL_MAP[e.q]??'maj', v=bestVoicing(e.pc,type); if(!v) return;
+    const v=e.v; if(!v) return;
     if(isBass()){   // ベース：小節の頭はルート、4拍子の3拍目は5度
       const rt=bassRoot(e.pc);
       for(let b=0;b<e.d-1e-6;b+=beat){ const t=e.t+b, inBar=Math.round(t)%song.time;
@@ -3089,6 +3125,11 @@ function songSchedulePassRaw(){
       return;
     }
     const tu=tun(), k=ins().kind, strs=v.frets.map((f,i)=>f===null?null:i).filter(i=>i!==null), bass=strs[0];
+    if(song.acc==='arp'){   // アルペジオ：ベース → 上の弦へ → 戻る（6/8は1小節6音、ほかは1拍2音）
+      const up=strs.slice(1).slice(-3), pat=[bass,...up,...up.slice(0,-1).reverse()], sub=song.ts==='6/8'?3:2, per=sub*song.time;
+      for(let i=0;i<e.d*sub-1e-6;i++){ const t=e.t+i/sub, g=Math.round(t*sub)%per, s0=g===0?bass:pat[g%pat.length];
+        keep(pluck(tu[s0]+v.frets[s0],at(t),g===0?.42:.27,{kind:k,str:s0,dur:bd*2.2})); }
+      return; }
     for(let b=0;b<e.d-1e-6;b+=beat){
       const t=e.t+b, inBar=Math.round(t)%song.time;
       if(song.time===3){
@@ -3127,6 +3168,7 @@ function songStop(){
 (function initSongs(){
   segInit($('#songLang'),'all',v=>{SG.lang=v;renderSongList();});
   segInit($('#songMode'),'real',v=>{SG.mode=v;renderSong();});
+  segInit($('#songLv'),String(SG.lv),v=>{songStop();SG.lv=+v;store.set('songLv',SG.lv);renderSong();});
   instHooks.push(renderSong);
   $('#songKeyDown').addEventListener('click',()=>{songStop();SG.shift=SG.shift-1<-6?SG.shift+11:SG.shift-1;renderSong();});
   $('#songKeyUp').addEventListener('click',()=>{songStop();SG.shift=SG.shift+1>6?SG.shift-11:SG.shift+1;renderSong();});
