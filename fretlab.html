@@ -474,13 +474,16 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .tabsheet svg{display:block;width:100%;height:auto}
 .tabsheet .tl{stroke:var(--line);stroke-width:1}
 .tabsheet .bl{stroke:var(--muted);stroke-width:1.2}
-.tabsheet .tn{font-family:var(--mono);font-size:13px;font-weight:500;fill:var(--fg);text-anchor:middle;dominant-baseline:central}
+.tabsheet .tn{font-family:"Helvetica Neue",Helvetica,Arial,"Hiragino Sans",sans-serif;font-variant-numeric:tabular-nums;font-size:15px;font-weight:600;fill:var(--fg);text-anchor:middle;dominant-baseline:central}
 .tabsheet .tnb{fill:var(--surface)}
 .tabsheet .on .tn{fill:var(--root-ink)}
 .tabsheet .on .tnb{fill:var(--root)}
 .tabsheet .tabclef{font-family:var(--display);font-size:13px;font-weight:600;fill:var(--muted);letter-spacing:.1em}
 .tabsheet .dur{stroke:var(--muted);stroke-width:1}
-.tabsheet .cnt{font-family:var(--mono);font-size:10px;fill:var(--muted);text-anchor:middle}
+.tabsheet .stem,.tabsheet .flag,.tabsheet .rs{stroke:var(--fg);stroke-width:1.1;fill:none;opacity:.75}.tabsheet .beam{stroke:var(--fg);stroke-width:3;opacity:.75}.tabsheet .rr,.tabsheet .hd{fill:var(--fg);opacity:.75}.tabsheet .hd{fill:none;stroke:var(--fg);stroke-width:1.1}
+.tabsheet .tup{font-size:9px;fill:var(--muted);text-anchor:middle}
+.tabsheet .tcn{font-family:var(--display);font-size:13px;font-weight:700;fill:var(--root)}.tabsheet .tcn.cont{font-weight:400;opacity:.5}
+.tabsheet .cnt{font-family:var(--mono);font-size:9px;fill:var(--muted);text-anchor:middle}
 
 /* practice log (pomodoro) */
 .pomo{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:start}
@@ -746,8 +749,8 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 .pr-tabrow .cn{font-size:10.5px;font-weight:700;fill:#8a5a2b}
 .pr-tabrow .cnt{font-size:7px;fill:#a2988a;text-anchor:middle}
 .pr-tabrow .nb{fill:#fff}
-.pr-tabrow .tn{font-size:10.5px;font-weight:700;fill:#1b1a17;text-anchor:middle;dominant-baseline:middle;font-family:"Roboto Mono",ui-monospace,monospace}
-.pr-tabrow .stem,.pr-tabrow .flag{stroke:#4a463f;stroke-width:1;fill:none}.pr-tabrow .half{fill:none;stroke:#6b655c;stroke-width:.9}
+.pr-tabrow .tn{font-size:12.5px;font-weight:700;fill:#1b1a17;text-anchor:middle;dominant-baseline:middle;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-variant-numeric:tabular-nums}
+.pr-tabrow .stem,.pr-tabrow .flag,.pr-tabrow .rs{stroke:#2b2925;stroke-width:1;fill:none}.pr-tabrow .beam{stroke:#2b2925;stroke-width:2.8}.pr-tabrow .rr{fill:#2b2925}.pr-tabrow .hd{fill:none;stroke:#2b2925;stroke-width:1}.pr-tabrow .tup{font-size:8px;fill:#4a463f;text-anchor:middle}.pr-tabrow .half{fill:none;stroke:#6b655c;stroke-width:.9}
 .pr-tip{font-size:8pt;color:#6b655c;margin:2mm 0 0}
 .pr-page footer{font-size:6.5pt;color:#a2988a;text-align:right;margin-top:1.5mm}
 </style>
@@ -1067,6 +1070,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           </div>
           <div class="row">
             <button class="btn primary big" id="songPlay">▶ 再生</button>
+            <button class="btn repeat-btn" id="songPdf" type="button" title="A4で印刷・PDFに保存"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9.5 13h6M9.5 16.5h6"/></svg>PDF・印刷</button>
             <button class="btn repeat-btn" id="songLoop" type="button" aria-pressed="false" title="くり返し再生"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11V9a3 3 0 0 1 3-3h11"/><path d="M15 3l3 3-3 3"/><path d="M20 13v2a3 3 0 0 1-3 3H6"/><path d="M9 21l-3-3 3-3"/></svg>リピート</button>
             <div style="flex:1;min-width:180px"><span class="label">速さ <b id="songSpeedOut">125</b>%（♩=<span id="songBpm"></span>）</span><input type="range" id="songSpeed" min="50" max="200" step="5" value="125" aria-label="速さ"></div>
 
@@ -1093,6 +1097,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
           <div><div class="label" id="tabMeta"></div><h3 class="prog-title" id="tabTitle"></h3><p class="msg" id="tabDesc" style="margin:4px 0 0"></p></div>
           <div class="row">
             <button class="btn primary big" id="tabPlay">▶ 再生</button>
+            <button class="btn repeat-btn" id="tabPdf" type="button" title="A4で印刷・PDFに保存"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9.5 13h6M9.5 16.5h6"/></svg>PDF・印刷</button>
             <button class="btn repeat-btn" id="tabKara" type="button" aria-pressed="false" title="主旋律を消して伴奏だけを流します"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M8.5 21h7"/></svg>カラオケ</button>
             <div style="flex:1;min-width:180px"><span class="label">速さ <b id="tabSpeedOut">125</b>%（♩=<span id="tabBpm"></span>）</span><input type="range" id="tabSpeed" min="50" max="200" step="5" value="125" aria-label="速さ"></div>
             <label class="check"><input type="checkbox" id="tabLoop" checked> ループ</label>
@@ -3453,7 +3458,7 @@ function autoHarm(p,ev,len){
 function tabHarm(p,data){
   if(p.song){ const sg=SONGS.find(x=>x.id===p.song); if(sg) return songHarm(sg).map(h=>({...h,t:h.t+(p.lead||0)})); }
   if(p.ch) return parseChordSeq(p.ch);
-  if(p.cat==='melody') return autoHarm(p,data.ev,data.len);
+  if(p.cat==='melody'||p.cat==='classic'||p.cat==='jazz') return autoHarm(p,data.ev,data.len);
   return [];
 }
 const TB={idx:store.get('tbIdx',0),cat:'all',speed:125,playing:false,srcs:[],timer:null,raf:0,cur:null,data:null,t0:0,bd:0,passes:0};
@@ -3472,25 +3477,68 @@ function renderTab(){
   $('#tabTip').textContent='コツ ― '+p.tip+(INS==='guitar'||!TB.data.shift?'':`（${['','1','2','3'][Math.abs(TB.data.shift)/12]}オクターブ${TB.data.shift>0?'上':'下'}）`); $('#tabBpm').textContent=Math.round(p.bpm*TB.speed/100);
   drawTab();
 }
+// リズム表記（TAB譜の下）：拍ごとに連桁でつなぐ・付点・3連符・休符。X(t)＝拍位置→x座標、yb＝符尾の付け根
+function rhythmSVG(evs,X,yb,b0,B){
+  const E=1e-6, L=17, isShort=e=>e.d<1-E, trip=d=>Math.abs(d*3-Math.round(d*3))<1e-4&&Math.abs(d*2-Math.round(d*2))>1e-4&&Math.abs(d*4-Math.round(d*4))>1e-4;
+  let s='';
+  const dotted=d=>[1.5,3,.75,.375].some(x=>Math.abs(d-x)<1e-4);
+  const nbeams=d=>d<=1/6+E?2:d<=.25+E?2:d<=.5+E||trip(d)?1:0;
+  // 休符
+  const rest=(x,d)=>{ const y=yb+3;
+    if(d>=4-E) return `<rect class="rr" x="${x-4}" y="${y+2}" width="8" height="3"/>`;
+    if(d>=2-E) return `<rect class="rr" x="${x-4}" y="${y+5}" width="8" height="3"/>`;
+    if(d>=1-E) return `<path class="rs" d="M${x-2} ${y}l4 4l-4 4l4 4q-5 -1 -2 4"/>`;
+    const k=d<=.25+E?2:1; let o=''; for(let i=0;i<k;i++) o+=`<circle class="rr" cx="${x-2+i*1}" cy="${y+3+i*4}" r="1.5"/>`; return o+`<path class="rs" d="M${x+3} ${y+2}l-4 ${8+k*4}"/>`; };
+  // 拍ごとのまとまり
+  const notes=evs.filter(e=>e.notes.length), groups=[]; let cur=[];
+  evs.forEach(e=>{ const beat=Math.floor(e.t-b0+E);
+    if(e.notes.length&&isShort(e)&&cur.length&&Math.floor(cur[0].t-b0+E)===beat){ cur.push(e); }
+    else { if(cur.length) groups.push(cur); cur=e.notes.length&&isShort(e)?[e]:[]; } });
+  if(cur.length) groups.push(cur);
+  const inGroup=new Set(groups.filter(g=>g.length>1).flat());
+  evs.forEach(e=>{ const x=X(e.t);
+    if(!e.notes.length){ // 長い休符は 全・2分・4分・8分・16分 に分けて並べる
+      let left=e.d, t=e.t; for(const u of [4,2,1,.5,.25]){ while(left>=u-E){ s+=rest(X(t),u); t+=u; left-=u; } } return; }
+    if(e.d>=4-E){ s+=`<ellipse class="hd" cx="${x}" cy="${yb+6}" rx="3.6" ry="2.6"/>`; return; }
+    const len=e.d>=2-E?L*.55:L;
+    s+=`<line class="stem" x1="${x}" y1="${yb}" x2="${x}" y2="${yb+len}"/>`;
+    if(dotted(e.d)) s+=`<circle class="rr" cx="${x+4.5}" cy="${yb+len-2}" r="1.3"/>`;
+    if(isShort(e)&&!inGroup.has(e)){ const k=nbeams(e.d); for(let i=0;i<k;i++) s+=`<path class="flag" d="M${x} ${yb+L-i*4.5}q5 -2 6 -7"/>`; }
+  });
+  groups.filter(g=>g.length>1).forEach(g=>{ const xs=g.map(e=>X(e.t)), y=yb+L;
+    s+=`<line class="beam" x1="${xs[0]}" y1="${y}" x2="${xs[xs.length-1]}" y2="${y}"/>`;
+    g.forEach((e,i)=>{ if(nbeams(e.d)<2) return; const nx=g[i+1], pv=g[i-1];
+      if(nx&&nbeams(nx.d)>=2) s+=`<line class="beam" x1="${xs[i]}" y1="${y-4.5}" x2="${xs[i+1]}" y2="${y-4.5}"/>`;
+      else if(!(pv&&nbeams(pv.d)>=2)){ const dir=nx?1:-1; s+=`<line class="beam" x1="${xs[i]}" y1="${y-4.5}" x2="${xs[i]+dir*6}" y2="${y-4.5}"/>`; } });
+    if(g.some(e=>trip(e.d))) s+=`<text class="tup" x="${(xs[0]+xs[xs.length-1])/2}" y="${y+9}">3</text>`;
+  });
+  return s;
+}
 function drawTab(){
-  const el=$('#tabSheet'), p=TABS_DATA[TB.idx], {ev,len}=TB.data, W=Math.max(300,el.clientWidth-20);
-  // いちばん短い音の間隔に合わせて横幅をとる（数字が重ならないように最低20px）。1小節が画面より広いときは横にスクロール
+  const el=$('#tabSheet'), p=TABS_DATA[TB.idx], {ev,len}=TB.data, harm=TB.data.harm||[], W=Math.max(300,el.clientWidth-20), B=p.beats;
+  // いちばん短い音の間隔に合わせて横幅をとる（数字が重ならないように最低22px）。1小節が画面より広いときは横にスクロール
   let mg=p.unit||1; ev.forEach((e,i)=>{ const n=ev[i+1]; if(n&&n.t-e.t>1e-6) mg=Math.min(mg,n.t-e.t); }); mg=Math.max(mg,1/6);
-  const unit=mg, px=Math.max(20,Math.min(46,W/((p.beats/unit)*2+1))), barW=p.beats/unit*px, left=34, perRow=Math.max(1,Math.floor((W-left)/barW));
+  const unit=mg, px=Math.max(22,Math.min(48,W/((B/unit)*2+1))), barW=B/unit*px, left=34, perRow=Math.max(1,Math.floor((W-left)/barW));
   const SW=Math.max(W,left+perRow*barW+10);
-  const ns=tun().length, bars=Math.ceil(len/p.beats-1e-9), rows=Math.ceil(bars/perRow), gap=13, rowH=gap*(ns-1)+52;
+  const ns=tun().length, bars=Math.ceil(len/B-1e-9), rows=Math.ceil(bars/perRow), gap=15, top=30, rowH=top+gap*(ns-1)+52;
   let s=`<svg viewBox="0 0 ${SW} ${rows*rowH+8}" role="img" aria-label="TAB譜"${SW>W?` style="width:${SW}px;max-width:none"`:''}>`;
+  const pos=t=>{ const bar=Math.floor(t/B+1e-9), r=Math.floor(bar/perRow); return {bar,r,y0:r*rowH+top,x:left+(bar-r*perRow)*barW+((t-bar*B)/unit+.5)*px}; };
   for(let r=0;r<rows;r++){
-    const y0=r*rowH+20, nb=Math.min(perRow,bars-r*perRow), x1=left+nb*barW;
+    const y0=r*rowH+top, nb=Math.min(perRow,bars-r*perRow), x1=left+nb*barW;
     for(let i=0;i<ns;i++) s+=`<line class="tl" x1="${left-26}" y1="${y0+i*gap}" x2="${x1}" y2="${y0+i*gap}"/>`;
     const cg=(ns-1)*gap/3.6; s+=`<text class="tabclef" x="${left-24}" y="${y0+cg*.4+gap*.3}">T</text><text class="tabclef" x="${left-24}" y="${y0+cg*1.7+gap*.3}">A</text><text class="tabclef" x="${left-24}" y="${y0+cg*3+gap*.3}">B</text>`;
     for(let b=0;b<=nb;b++) s+=`<line class="bl" x1="${left+b*barW}" y1="${y0}" x2="${left+b*barW}" y2="${y0+(ns-1)*gap}"/>`;
-    for(let b=0;b<nb;b++) for(let k=0;k<p.beats;k++) s+=`<text class="cnt" x="${left+b*barW+(k/unit+.5)*px}" y="${y0+(ns-1)*gap+18}">${k+1}</text>`;
+    for(let j=0;j<nb;j++){ const b=r*perRow+j, b0=b*B, X=t=>left+j*barW+((t-b0)/unit+.5)*px, yb=y0+(ns-1)*gap+9;
+      // コード名（小節の頭で続いているコードは薄く）
+      harm.forEach(h=>{ if(h.t+h.d<=b0+1e-6||h.t>=b0+B-1e-6) return; const st=h.t>=b0-1e-6; if(!st&&j>0) return;
+        s+=`<text class="tcn${st?'':' cont'}" x="${X(Math.max(h.t,b0))-px*.4}" y="${y0-11}">${h.name}</text>`; });
+      s+=rhythmSVG(ev.filter(e=>e.t>=b0-1e-6&&e.t<b0+B-1e-6),X,yb,b0,B);
+      for(let k=0;k<B;k++) s+=`<text class="cnt" x="${X(b0+k)}" y="${yb+33}">${k+1}</text>`; }
   }
   ev.forEach((e,i)=>{
-    const bar=Math.floor(e.t/p.beats+1e-9), r=Math.floor(bar/perRow), y0=r*rowH+20, x=left+(bar-r*perRow)*barW+((e.t-bar*p.beats)/unit+.5)*px;
+    const {y0,x}=pos(e.t);
     s+=`<g class="tev" data-i="${i}">`;
-    e.notes.forEach(n=>{const y=y0+(ns-1-n.s)*gap; const w=String(n.f).length>1?18:12; s+=`<rect class="tnb" x="${x-w/2}" y="${y-7}" width="${w}" height="14" rx="3"/><text class="tn" x="${x}" y="${y}">${n.f}</text>`;});
+    e.notes.forEach(n=>{const y=y0+(ns-1-n.s)*gap; const w=String(n.f).length>1?21:13; s+=`<rect class="tnb" x="${x-w/2}" y="${y-8}" width="${w}" height="16" rx="3"/><text class="tn" x="${x}" y="${y+.5}">${n.f}</text>`;});
     s+='</g>';
   });
   el.innerHTML=s+'</svg>';
@@ -3539,7 +3587,7 @@ function printTabHTML(){
   const nb=Math.ceil(len/B-1e-9);
   let mg=1; ev.forEach((e,i)=>{ const n=ev[i+1]; if(n&&n.t-e.t>1e-6) mg=Math.min(mg,n.t-e.t); }); mg=Math.max(mg,1/6);
   const clef=26, pad=9, need=(B/mg)*15+pad*2;
-  const pageH=1047, headH=118, gapMin=9, gapMax=21, extra=54;
+  const pageH=1047, headH=118, gapMin=10, gapMax=22, extra=66;
   // 1行の小節数：音の細かさで決まる上限の中で、1枚がちょうど埋まるいちばん広い小節幅を選ぶ（どの小節も同じ幅）
   const bprMax=Math.max(1,Math.min(B===3?5:4,Math.floor((PR.W-clef)/need)));
   let bpr=bprMax; for(let c=Math.min(2,bprMax);c<=bprMax;c++){ const rw=Math.ceil(nb/c), gg=((pageH-headH)/rw-extra-14)/(ns-1); if(gg>=12){ bpr=c; break; } }
@@ -3559,13 +3607,10 @@ function printTabHTML(){
     for(let j=0;j<n;j++){ const b=b0+j, bx=clef+j*bw, X=tt=>bx+pad+(tt-b*B)/B*(bw-2*pad);
       s+=`<text class="bn" x="${bx+2}" y="${y0-12}">${b+1}</text>`;
       harmAt(b).forEach(h=>{ const tt=Math.max(h.t,b*B); s+=`<text class="cn" x="${X(tt)}" y="${y0-9}">${prEsc(h.name)}</text>`; });
+      s+=rhythmSVG(ev.filter(e=>e.t>=b*B-1e-6&&e.t<(b+1)*B-1e-6),X,y0+(ns-1)*g+9,b*B,B);
       for(let k=0;k<B;k++) s+=`<text class="cnt" x="${X(b*B+k)}" y="${y0+(ns-1)*g+42}">${k+1}</text>`;
       ev.forEach(e=>{ if(e.t<b*B-1e-6||e.t>=(b+1)*B-1e-6) return; const x=X(e.t);
-        e.notes.forEach(nn=>{ const y=y0+(ns-1-nn.s)*g, w=String(nn.f).length>1?15:10; s+=`<rect x="${x-w/2}" y="${y-6}" width="${w}" height="12" class="nb"/><text class="tn" x="${x}" y="${y+.5}">${nn.f}</text>`; });
-        // 音の長さ（棒）：4分＝棒、8分＝旗1、16分＝旗2
-        if(e.notes.length){ const yb=y0+(ns-1)*g+21, sx=x, dd=e.d, L=13;   // 音の長さ：棒＝4分、旗1本＝8分、2本＝16分、白丸＝2分以上
-          s+=dd>=2-1e-6?`<circle class="half" cx="${sx}" cy="${yb+L-3}" r="2.6"/><line class="stem" x1="${sx+2.6}" y1="${yb}" x2="${sx+2.6}" y2="${yb+L-3}"/>`:`<line class="stem" x1="${sx}" y1="${yb}" x2="${sx}" y2="${yb+L}"/>`;
-          if(dd<1-1e-6) s+=`<path class="flag" d="M${sx} ${yb+L}q4 -2 6 -6"/>`; if(dd<.5-1e-6) s+=`<path class="flag" d="M${sx} ${yb+L-4}q4 -2 6 -6"/>`; }
+        e.notes.forEach(nn=>{ const y=y0+(ns-1-nn.s)*g, w=String(nn.f).length>1?18:11; s+=`<rect x="${x-w/2}" y="${y-7}" width="${w}" height="14" class="nb"/><text class="tn" x="${x}" y="${y+.5}">${nn.f}</text>`; });
       }); }
     return s+'</svg>'; };
   const rowsHTML=Array.from({length:rows},(_,r)=>rowSVG(r));
@@ -3582,6 +3627,11 @@ function openPrint(kind){
   return el;
 }
 window.openPrint=openPrint;
+// 印刷ダイアログを開く（「PDFに保存」を選ぶとPDFになる）。終わったら印刷用の表示を片づける
+function printNow(kind){ if(kind==='song') songStop(); else if(TB.playing) tabStop(); openPrint(kind); setTimeout(()=>window.print(),80); }
+window.addEventListener('afterprint',()=>document.body.classList.remove('pr-on'));
+document.addEventListener('DOMContentLoaded',()=>{});
+setTimeout(()=>{ const a=$('#songPdf'), b=$('#tabPdf'); if(a) a.addEventListener('click',()=>printNow('song')); if(b) b.addEventListener('click',()=>printNow('tab')); },0);
 function tabSchedule(){ onBus(TB.bus,tabScheduleRaw); }
 function tabScheduleRaw(){
   const p=TABS_DATA[TB.idx], c=ac(), bd=60/(p.bpm*TB.speed/100), {ev,len}=TB.data, start=TB.t0+TB.passes*len*bd;
