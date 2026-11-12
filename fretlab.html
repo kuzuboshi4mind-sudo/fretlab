@@ -856,7 +856,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 .intro-wind .bfly .wl,.intro-wind .bfly .wr{transform-box:view-box;transform-origin:16px 14px;animation:bfly-flap .13s ease-in-out infinite alternate}
 .intro-wind .bfly .wr{animation-delay:0s}
 @keyframes bfly-flap{0%{transform:scaleX(1)}100%{transform:scaleX(.12)}}
-.intro-wind .apl{position:absolute;left:0;top:0;width:34px;height:34px;will-change:transform,opacity;filter:drop-shadow(0 2px 2px rgba(0,0,0,.22))}
+.intro-wind .apl{position:absolute;left:0;top:0;width:48px;height:48px;transform-origin:50% 100%;will-change:transform,opacity;filter:drop-shadow(0 2px 2px rgba(0,0,0,.22))}
 .intro-wind .apl svg{display:block;width:100%;height:100%;overflow:visible}
 @keyframes intro-draw{to{stroke-dashoffset:0}}
 @keyframes intro-rise{from{transform:translateY(8px) scale(.985)}to{transform:none}}
@@ -5003,21 +5003,22 @@ async function aiSend(text){
     const xs=[.22,.5,.78].sort(()=>Math.random()-.5);
     xs.forEach((fx,i)=>{
       const a=document.createElement('div'); a.className='apl'; a.innerHTML=svg(i); box.appendChild(a);
-      const sz=28+Math.random()*10; a.style.width=a.style.height=sz+'px';
-      const x=W*fx+(Math.random()-.5)*W*.1-sz/2, g=H-sz-18-Math.random()*20, dir=Math.random()<.75?1:-1; let dx=dir*(35+Math.random()*70);
-      dx=Math.max(8-x,Math.min(W-sz-8-x,dx));   // 画面の外へは転がさない
-      const
-      turn=dx/(sz/2)*180/Math.PI, r0=(Math.random()-.5)*40;
-      const T=(xx,yy,rr)=>`translate(${xx.toFixed(0)}px,${yy.toFixed(0)}px) rotate(${rr.toFixed(0)}deg)`;
+      const sz=44+Math.random()*12; a.style.width=a.style.height=sz+'px';
+      const x=W*fx+(Math.random()-.5)*W*.08-sz/2, g=H-sz-14-Math.random()*26;
+      let dx=(Math.random()<.7?1:-1)*(6+Math.random()*16);   // 転がるのは少しだけ
+      dx=Math.max(6-x,Math.min(W-sz-6-x,dx));
+      const turn=dx/(sz/2)*180/Math.PI, r0=(Math.random()-.5)*30;
+      const T=(xx,yy,rr,sx=1,sy=1)=>`translate(${xx.toFixed(0)}px,${yy.toFixed(0)}px) rotate(${rr.toFixed(0)}deg) scale(${sx},${sy})`;
+      // ドサッ：速く落ちて、つぶれて、小さくはねて、少し転がって止まる
       a.animate([
-        {transform:T(x,-sz-10,r0),offset:0,easing:'cubic-bezier(.5,0,1,1)'},
-        {transform:T(x,g,r0+10),offset:.4,easing:'cubic-bezier(0,0,.5,1)'},
-        {transform:T(x+dx*.12,g-26,r0+10+turn*.12),offset:.53,easing:'cubic-bezier(.5,0,1,1)'},
-        {transform:T(x+dx*.24,g,r0+10+turn*.24),offset:.64,easing:'cubic-bezier(0,0,.5,1)'},
-        {transform:T(x+dx*.32,g-6,r0+10+turn*.32),offset:.7,easing:'cubic-bezier(.5,0,1,1)'},
-        {transform:T(x+dx*.4,g,r0+10+turn*.4),offset:.75,easing:'cubic-bezier(.2,.6,.4,1)'},
-        {transform:T(x+dx,g,r0+10+turn),offset:1}
-      ],{duration:1900+Math.random()*300,delay:i*260+Math.random()*120,fill:'both'});
+        {transform:T(x,-sz-20,r0),offset:0,easing:'cubic-bezier(.55,0,1,.9)'},
+        {transform:T(x,g,r0),offset:.34},
+        {transform:T(x,g+sz*.08,r0,1.12,.84),offset:.4,easing:'cubic-bezier(0,0,.4,1)'},
+        {transform:T(x+dx*.25,g-9,r0+turn*.25),offset:.52,easing:'cubic-bezier(.5,0,1,1)'},
+        {transform:T(x+dx*.45,g+sz*.03,r0+turn*.45,1.05,.94),offset:.62,easing:'ease-out'},
+        {transform:T(x+dx*.85,g,r0+turn*.85),offset:.85,easing:'ease-out'},
+        {transform:T(x+dx,g,r0+turn),offset:1}
+      ],{duration:1250+Math.random()*150,delay:i*110+Math.random()*90,fill:'both'});
     });
   };
   let started=false;
@@ -5026,7 +5027,7 @@ async function aiSend(text){
     try{ sound(); }catch(e){}
     const bf=!calm&&(Math.random()<.1||/[?&]butterfly/.test(location.search));
     const ap=!calm&&(Math.random()<1/30||/[?&]apple/.test(location.search));
-    const extra=ap?900:bf?400:0;   // 蝶やリンゴのときは少しだけ長く見せる
+    const extra=ap?700:bf?400:0;   // 蝶やリンゴのときは少しだけ長く見せる
     if(!calm){ el.classList.add('blow'); strings(); wind(); if(bf) butterfly(); if(ap) apples(); }
     setTimeout(()=>el.classList.add('leaving'),calm?500:1900+extra);
     setTimeout(()=>{ if(el.isConnected) el.remove(); },calm?1200:2800+extra);
