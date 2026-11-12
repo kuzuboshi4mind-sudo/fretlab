@@ -1,0 +1,28 @@
+# 録音・録画
+T={
+'赤いボタンで録画開始':'Press the red button to start filming',
+'カメラを使えませんでした。カメラとマイクの使用を許可してください。':'Could not use the camera. Please allow camera and microphone access.',
+'録画を開始':'Start filming','録画を停止':'Stop filming',
+'録画中… もう一度押すと止まります':'Filming… press again to stop',
+'このブラウザは録音・録画に対応していません。':'This browser does not support recording.',
+"${video?'動画':'練習'} ${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}":"${video?'Video':'Practice'} ${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}",
+'保存しました（${recFmt(dur)}・${fmtSize(blob.size)}）':'Saved (${recFmt(dur)} · ${fmtSize(blob.size)})',
+'端末の空きが足りず保存できませんでした。今のうちに「保存」で書き出してください':'Not enough space to save it. Use “Save” to export it now.',
+'準備しています…':'Preparing…',
+'${its.length}件を書き出しました':'Exported ${its.length}',
+'${its.length}件をダウンロードしました':'Downloaded ${its.length}',
+'録音 <b>${na.length}</b>件・動画 <b>${nv.length}</b>件・合計 <b>${fmtSize(sum)}</b>':'Audio <b>${na.length}</b> · Video <b>${nv.length}</b> · Total <b>${fmtSize(sum)}</b>',
+'／保存できる残り 約${fmtSize(Math.max(0,e.quota-(e.usage||0)))}':' / about ${fmtSize(Math.max(0,e.quota-(e.usage||0)))} free',
+'<br>自動で消されにくい設定：<b>オン</b>':'<br>Protected from automatic deletion: <b>On</b>',
+'<br>自動で消されにくい設定：オフ<button class="btn pbtn" type="button" id="recPersist">オンにする</button>':'<br>Protected from automatic deletion: Off<button class="btn pbtn" type="button" id="recPersist">Turn on</button>',
+'このブラウザでは今はオンにできませんでした。ホーム画面に追加して使うと消されにくくなります。':'This browser could not turn it on right now. Adding the app to your Home Screen makes deletion less likely.',
+'選んだ${n}件を書き出す':'Export ${n} selected','選んだものを書き出す':'Export selected',
+'<p class="msg">まだ録音・録画はありません。</p>':'<p class="msg">No recordings yet.</p>',
+'<input type="checkbox" class="ck" aria-label="選ぶ"><div><div class="rn"></div><div class="rd"><span class="kd">${vid?\'動画\':\'音声\'}</span>${recFmt(it.dur)}・${fmtSize(it.size||it.blob.size)}</div></div><div class="ra"><button class="btn sv">保存</button><button class="btn dl">削除</button></div>${vid?\'<video controls playsinline preload="metadata"></video>\':\'<audio controls preload="none"></audio>\'}':
+'<input type="checkbox" class="ck" aria-label="Select"><div><div class="rn"></div><div class="rd"><span class="kd">${vid?\'Video\':\'Audio\'}</span>${recFmt(it.dur)} · ${fmtSize(it.size||it.blob.size)}</div></div><div class="ra"><button class="btn sv">Save</button><button class="btn dl">Delete</button></div>${vid?\'<video controls playsinline preload="metadata"></video>\':\'<audio controls preload="none"></audio>\'}',
+'名前':'Name','タップで名前を変更':'Tap to rename',
+'「カメラをオン」でカメラを起動':'Tap “Camera on” to start the camera','カメラをオン':'Camera on',
+'<p class="msg">この環境では録音・録画を保存できません。</p>':'<p class="msg">Recordings cannot be saved in this environment.</p>',
+'録音・録画':'Record','演奏を録って聴き返す。動画でフォームも確認。':'Record yourself and play it back. Use video to check your form.',
+'音声':'Audio','動画':'Video','カメラを切り替え':'Switch camera','⟲ 前/後':'⟲ Flip','すべて選ぶ':'Select all',
+}

@@ -657,6 +657,28 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .rec-item .ra .btn{min-height:34px;padding:4px 12px;font-size:13px}
 .rec-item .ra .btn.confirm{color:var(--bad);border-color:var(--bad)}
 @media (prefers-reduced-motion:reduce){.rec-btn.on i{animation:none}}
+.rec-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.cam-wrap{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:3/4;max-height:min(60vh,520px);width:100%;max-width:420px;align-self:center}
+.cam-wrap video{width:100%;height:100%;object-fit:cover;display:block}
+.cam-wrap.front video{transform:scaleX(-1)}
+.cam-flip{position:absolute;right:10px;bottom:10px;min-height:36px;padding:4px 12px;font-size:13px;background:rgba(0,0,0,.5);color:#fff;border-color:rgba(255,255,255,.4)}
+.cam-start{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+.cam-start[hidden]{display:none}
+.cam-rec{position:absolute;left:10px;top:10px;color:#fff;background:#c8463a;border-radius:6px;padding:2px 8px;font-size:12px;font-family:var(--mono);animation:recblink 1.2s infinite}
+.rec-store{font-size:12.5px;color:var(--muted);line-height:1.6}
+.rec-store b{color:var(--fg);font-weight:600}
+.rec-store .pbtn{min-height:30px;padding:2px 10px;font-size:12px;margin-left:6px}
+.rec-bulk{display:flex;flex-wrap:wrap;align-items:center;gap:10px;border-top:1px solid var(--line);padding-top:12px}
+.rec-bulk .btn{min-height:36px;padding:4px 14px;font-size:13px}
+.rec-all{display:flex;align-items:center;gap:6px;font-size:13.5px;cursor:pointer}
+.rec-item{grid-template-columns:auto minmax(0,1fr) auto}
+.rec-item .ck{width:20px;height:20px;margin:0}
+.rec-item audio,.rec-item video{grid-column:1/-1}
+.rec-item video{width:100%;max-height:60vh;border-radius:10px;background:#000}
+.rec-item .rn{cursor:text}
+.rec-item .rn input{width:100%;min-height:34px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);padding:2px 8px;font:inherit}
+.rec-item .kd{display:inline-block;font-size:11px;border:1px solid var(--line);border-radius:5px;padding:0 5px;margin-right:6px;color:var(--muted);vertical-align:1px}
+@media (max-width:420px){.rec-item .ra .btn{padding:4px 9px}}
 
 /* drum grid */
 .drumgrid-scroll{overflow-x:auto}
@@ -1335,11 +1357,23 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
     </div>
     <div class="card rec-card">
       <div class="rec-head">
-        <div><b>録音</b><p class="msg" style="margin:2px 0 0">演奏を録って聴き返す。</p></div>
+        <div><b>録音・録画</b><p class="msg" style="margin:2px 0 0">演奏を録って聴き返す。動画でフォームも確認。</p></div>
+        <div class="seg" id="recMode"><button data-v="audio">音声</button><button data-v="video">動画</button></div>
+      </div>
+      <div class="cam-wrap" id="camWrap" hidden>
+        <video id="camView" playsinline muted autoplay></video>
+        <button class="btn cam-flip" id="camFlip" type="button" aria-label="カメラを切り替え">⟲ 前/後</button>
+        <span class="cam-rec" id="camRec" hidden>● REC</span>
       </div>
       <div class="rec-ctrl">
         <button class="rec-btn" id="recBtn" aria-label="録音を開始"><i></i></button>
         <div class="rec-info"><div class="rec-time" id="recTime">00:00</div><div class="rec-level"><i id="recLevel"></i></div><div class="msg" id="recMsg">赤いボタンで録音開始</div></div>
+      </div>
+      <div class="rec-store" id="recStore"></div>
+      <div class="rec-bulk" id="recBulk" hidden>
+        <label class="rec-all"><input type="checkbox" id="recAll"> すべて選ぶ</label>
+        <button class="btn primary" id="recExport" type="button" disabled>選んだものを書き出す</button>
+        <span class="msg" id="recBulkMsg"></span>
       </div>
       <div class="rec-list" id="recList"></div>
     </div>
@@ -1904,6 +1938,7 @@ function showTab(id){
   store.set('tab',id);
   if(id==='tips') try{renderTips();}catch(e){}  // 起動直後（データ定義前）は後で描画される
   try{tunerAuto(id);}catch(e){}
+  try{ if(id!=='log') camOff(); }catch(e){}
   try{history.replaceState(null,'',location.pathname+location.search+'#'+id)}catch(e){}
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>showTab(t.dataset.tab)));
@@ -4367,76 +4402,170 @@ const backupData=()=>JSON.stringify({app:'fretlab',v:2,log:LOG.entries,timers:LO
   renderTimers(); renderLog(); trophyCheck();
 })();
 
-/* ---------- 録音（端末内の IndexedDB に保存） ---------- */
-const REC={rec:null,stream:null,chunks:[],start:0,tick:null,raf:0,an:null,items:[],urls:{},del:null};
+/* ---------- 録音・録画（端末内の IndexedDB に保存） ---------- */
+const REC={rec:null,stream:null,cam:null,kind:'audio',chunks:[],start:0,tick:null,raf:0,an:null,items:[],urls:{},del:null,
+  mode:store.get('recMode','audio'),facing:store.get('camFacing','user'),sel:new Set(),edit:null};
 function recDB(){return new Promise((ok,ng)=>{const r=indexedDB.open('fretlab-rec',1);r.onupgradeneeded=()=>r.result.createObjectStore('recs',{keyPath:'id'});r.onsuccess=()=>ok(r.result);r.onerror=()=>ng(r.error);});}
 async function recAll(){const db=await recDB();return new Promise((ok,ng)=>{const q=db.transaction('recs').objectStore('recs').getAll();q.onsuccess=()=>ok(q.result.sort((a,b)=>b.id-a.id));q.onerror=()=>ng(q.error);});}
 async function recPut(item){const db=await recDB();return new Promise((ok,ng)=>{const t=db.transaction('recs','readwrite');t.objectStore('recs').put(item);t.oncomplete=ok;t.onerror=()=>ng(t.error);});}
 async function recDel(id){const db=await recDB();return new Promise((ok,ng)=>{const t=db.transaction('recs','readwrite');t.objectStore('recs').delete(id);t.oncomplete=ok;t.onerror=()=>ng(t.error);});}
 const recFmt=ms=>{const s=Math.round(ms/1000);return pad(Math.floor(s/60))+':'+pad(s%60);};
-function recMime(){const c=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg'];return (window.MediaRecorder&&c.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t)))||'';}
+const fmtSize=b=>b<1048576?`${Math.max(1,Math.round(b/1024))}KB`:b<1073741824?`${(b/1048576).toFixed(b<10485760?1:0)}MB`:`${(b/1073741824).toFixed(1)}GB`;
+const isVideo=it=>it.kind==='video'||/^video\//.test(it.type||'');
+function recMime(video){
+  const c=video?['video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm']:['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg'];
+  return (window.MediaRecorder&&c.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t)))||'';
+}
+const AUDIO_C={echoCancellation:false,noiseSuppression:false,autoGainControl:true};
+// カメラ（動画モードのときだけ使う。ほかのタブへ移ったり、アプリを裏にしたら止める）
+async function camOn(){
+  if(REC.cam) return REC.cam;
+  if(!navigator.mediaDevices) throw new Error('unsupported');
+  audioMode('play-and-record');
+  REC.cam=await navigator.mediaDevices.getUserMedia({video:{facingMode:REC.facing,width:{ideal:1280},height:{ideal:720}},audio:AUDIO_C});
+  const v=$('#camView'); v.srcObject=REC.cam; try{await v.play();}catch(e){}
+  $('#camWrap').classList.toggle('front',REC.facing==='user'); $('#camStart').hidden=true;
+  return REC.cam;
+}
+function camOff(){
+  if(REC.rec&&REC.rec.state==='recording'&&REC.kind==='video'){ REC.rec.stop(); return; }   // 録画中なら保存してから止める
+  if(REC.cam){ REC.cam.getTracks().forEach(t=>t.stop()); REC.cam=null; }
+  const v=$('#camView'); if(v) v.srcObject=null; const b=$('#camStart'); if(b) b.hidden=false;
+  if(!T.stream&&!(REC.rec&&REC.rec.state==='recording')) audioMode();
+}
+async function camStart(){ try{ await camOn(); $('#recMsg').textContent='赤いボタンで録画開始'; }catch(e){ $('#recMsg').textContent='カメラを使えませんでした。カメラとマイクの使用を許可してください。'; } }
+function recSetMode(v){
+  if(REC.rec&&REC.rec.state==='recording') return;
+  REC.mode=v; store.set('recMode',v); $('#camWrap').hidden=v!=='video';
+  if(v==='video') camStart(); else { camOff(); $('#recMsg').textContent='赤いボタンで録音開始'; }
+  $('#recBtn').setAttribute('aria-label',v==='video'?'録画を開始':'録音を開始');
+}
 async function recToggle(){
   if(REC.rec&&REC.rec.state==='recording'){ REC.rec.stop(); return; }
-  const msg=$('#recMsg');
+  const msg=$('#recMsg'), video=REC.mode==='video';
   try{
     if(!window.MediaRecorder||!navigator.mediaDevices) throw new Error('unsupported');
     audioMode('play-and-record');
-    REC.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:true}});
-    const mime=recMime(); REC.rec=new MediaRecorder(REC.stream,mime?{mimeType:mime}:undefined); REC.chunks=[];
+    let stream;
+    if(video) stream=await camOn();
+    else stream=REC.stream=await navigator.mediaDevices.getUserMedia({audio:AUDIO_C});
+    const mime=recMime(video), opt={}; if(mime) opt.mimeType=mime;
+    if(video){ opt.videoBitsPerSecond=2500000; opt.audioBitsPerSecond=128000; }
+    try{ REC.rec=new MediaRecorder(stream,opt); }catch(e){ REC.rec=new MediaRecorder(stream); }
+    REC.kind=video?'video':'audio'; REC.chunks=[];
     REC.rec.ondataavailable=e=>{if(e.data&&e.data.size) REC.chunks.push(e.data);};
     REC.rec.onstop=recSave;
-    REC.rec.start(250); REC.start=Date.now();
-    const c=ac(), src=c.createMediaStreamSource(REC.stream); REC.an=c.createAnalyser(); REC.an.fftSize=1024; src.connect(REC.an);
-    const buf=new Float32Array(REC.an.fftSize);
-    const lv=()=>{ if(!REC.an) return; REC.raf=requestAnimationFrame(lv); REC.an.getFloatTimeDomainData(buf); let pk=0; for(const v of buf) pk=Math.max(pk,Math.abs(v)); $('#recLevel').style.width=Math.min(100,pk*140)+'%'; };
-    lv(); REC.tick=setInterval(()=>$('#recTime').textContent=recFmt(Date.now()-REC.start),250);
-    $('#recBtn').classList.add('on'); $('#recBtn').setAttribute('aria-label','録音を停止'); msg.textContent='録音中… もう一度押すと止まります';
+    REC.rec.start(1000); REC.start=Date.now();
+    const at=stream.getAudioTracks();
+    if(at.length){ const c=ac(), src=c.createMediaStreamSource(new MediaStream(at)); REC.an=c.createAnalyser(); REC.an.fftSize=1024; src.connect(REC.an); REC.src=src;
+      const buf=new Float32Array(REC.an.fftSize);
+      const lv=()=>{ if(!REC.an) return; REC.raf=requestAnimationFrame(lv); REC.an.getFloatTimeDomainData(buf); let pk=0; for(const v of buf) pk=Math.max(pk,Math.abs(v)); $('#recLevel').style.width=Math.min(100,pk*140)+'%'; };
+      lv(); }
+    REC.tick=setInterval(()=>$('#recTime').textContent=recFmt(Date.now()-REC.start),250);
+    $('#recBtn').classList.add('on'); $('#recBtn').setAttribute('aria-label',video?'録画を停止':'録音を停止');
+    $('#camRec').hidden=!video; $('#camFlip').disabled=true; document.querySelectorAll('#recMode button').forEach(b=>b.disabled=true);
+    msg.textContent=video?'録画中… もう一度押すと止まります':'録音中… もう一度押すと止まります';
   }catch(e){
-    msg.textContent=e.message==='unsupported'?'このブラウザは録音に対応していません。':'マイクを使えませんでした。マイクの使用を許可してください。';
+    msg.textContent=e.message==='unsupported'?'このブラウザは録音・録画に対応していません。':video?'カメラを使えませんでした。カメラとマイクの使用を許可してください。':'マイクを使えませんでした。マイクの使用を許可してください。';
     recCleanup();
   }
 }
 function recCleanup(){
-  clearInterval(REC.tick); cancelAnimationFrame(REC.raf); REC.an=null;
-  if(REC.stream) REC.stream.getTracks().forEach(t=>t.stop()); REC.stream=null; if(!T.stream) audioMode();
-  $('#recBtn').classList.remove('on'); $('#recBtn').setAttribute('aria-label','録音を開始'); $('#recLevel').style.width='0';
+  clearInterval(REC.tick); cancelAnimationFrame(REC.raf); try{REC.src&&REC.src.disconnect();}catch(e){} REC.an=null; REC.src=null;
+  if(REC.stream) REC.stream.getTracks().forEach(t=>t.stop()); REC.stream=null;
+  // 録画のあとはカメラの映像を出したまま。タブを離れていたらカメラも止める
+  if(REC.cam&&(REC.mode!=='video'||document.querySelector('[data-panel="log"]').hidden||document.visibilityState==='hidden')){ REC.cam.getTracks().forEach(t=>t.stop()); REC.cam=null; $('#camView').srcObject=null; $('#camStart').hidden=false; }
+  if(!T.stream&&!REC.cam) audioMode();
+  $('#recBtn').classList.remove('on'); $('#recBtn').setAttribute('aria-label',REC.mode==='video'?'録画を開始':'録音を開始'); $('#recLevel').style.width='0';
+  $('#camRec').hidden=true; $('#camFlip').disabled=false; document.querySelectorAll('#recMode button').forEach(b=>b.disabled=false);
 }
 async function recSave(){
-  const dur=Date.now()-REC.start, type=REC.rec.mimeType||REC.chunks[0]?.type||'audio/webm'; recCleanup();
+  const dur=Date.now()-REC.start, video=REC.kind==='video', type=REC.rec.mimeType||REC.chunks[0]?.type||(video?'video/mp4':'audio/webm'); recCleanup();
   if(dur<800||!REC.chunks.length){ $('#recMsg').textContent='短すぎるため保存しませんでした'; return; }
-  const d=new Date(), name=`練習 ${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  const item={id:Date.now(),name,date:d.toISOString(),dur,type,blob:new Blob(REC.chunks,{type})};
-  try{ await recPut(item); $('#recMsg').textContent=`保存しました（${recFmt(dur)}）`; }
-  catch(e){ $('#recMsg').textContent='保存できませんでした'; REC.items.unshift(item); }
-  $('#recTime').textContent='00:00'; recRender();
+  const d=new Date(), name=`${video?'動画':'練習'} ${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const blob=new Blob(REC.chunks,{type}); REC.chunks=[];
+  const item={id:Date.now(),name,date:d.toISOString(),dur,type,kind:REC.kind,size:blob.size,blob};
+  try{ await recPut(item); $('#recMsg').textContent=`保存しました（${recFmt(dur)}・${fmtSize(blob.size)}）`; }
+  catch(e){ $('#recMsg').textContent='端末の空きが足りず保存できませんでした。今のうちに「保存」で書き出してください'; REC.items.unshift(item); }
+  $('#recTime').textContent='00:00';
+  try{ if(navigator.storage&&navigator.storage.persist&&!(await navigator.storage.persisted())) await navigator.storage.persist(); }catch(e){}
+  recRender();
 }
-function recExt(type){return /mp4|aac|m4a/.test(type)?'m4a':/ogg/.test(type)?'ogg':'webm';}
-async function recShare(it){
-  const fname=`fretlab-${it.name.replace(/[\/: ]/g,'-')}.${recExt(it.type)}`, file=new File([it.blob],fname,{type:it.type});
-  try{ if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:it.name}); return; } }catch(e){ if(e.name==='AbortError') return; }
-  const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=fname; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+function recExt(type){return /video\/mp4/.test(type)?'mp4':/mp4|aac|m4a/.test(type)?'m4a':/ogg/.test(type)?'ogg':'webm';}
+const recFile=it=>new File([it.blob],`fretlab-${it.name.replace(/[\/\\:*?"<>| ]/g,'-')}.${recExt(it.type)}`,{type:it.type});
+function recDownload(file){ const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=file.name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000); }
+async function recShareFiles(files,title){
+  try{ if(navigator.canShare&&navigator.canShare({files})){ await navigator.share({files,title}); return 'shared'; } }catch(e){ if(e.name==='AbortError') return 'cancel'; }
+  for(const f of files){ recDownload(f); await new Promise(r=>setTimeout(r,400)); }
+  return 'downloaded';
+}
+async function recShare(it){ await recShareFiles([recFile(it)],it.name); }
+async function recExport(){
+  const its=REC.items.filter(x=>REC.sel.has(x.id)); if(!its.length) return;
+  const m=$('#recBulkMsg'); m.textContent='準備しています…';
+  const r=await recShareFiles(its.map(recFile),'Fretlab');
+  m.textContent=r==='cancel'?'':r==='shared'?`${its.length}件を書き出しました`:`${its.length}件をダウンロードしました`;
+}
+// 使っている容量と、自動で消されにくくする設定
+async function recStorage(){
+  const el=$('#recStore'), na=REC.items.filter(x=>!isVideo(x)), nv=REC.items.filter(isVideo);
+  const sum=REC.items.reduce((s,x)=>s+(x.size||x.blob&&x.blob.size||0),0);
+  let h=`録音 <b>${na.length}</b>件・動画 <b>${nv.length}</b>件・合計 <b>${fmtSize(sum)}</b>`;
+  try{ if(navigator.storage&&navigator.storage.estimate){ const e=await navigator.storage.estimate(); if(e.quota) h+=`／保存できる残り 約${fmtSize(Math.max(0,e.quota-(e.usage||0)))}`; } }catch(e){}
+  let per=null; try{ if(navigator.storage&&navigator.storage.persisted) per=await navigator.storage.persisted(); }catch(e){}
+  el.innerHTML=h+(per===null?'':per?'<br>自動で消されにくい設定：<b>オン</b>':'<br>自動で消されにくい設定：オフ<button class="btn pbtn" type="button" id="recPersist">オンにする</button>');
+  const pb=$('#recPersist'); if(pb) pb.addEventListener('click',async()=>{ let ok=false; try{ ok=await navigator.storage.persist(); }catch(e){}
+    if(!ok) $('#recMsg').textContent='このブラウザでは今はオンにできませんでした。ホーム画面に追加して使うと消されにくくなります。'; recStorage(); });
+}
+function recBulkUI(){
+  const n=REC.sel.size; $('#recBulk').hidden=!REC.items.length;
+  $('#recExport').disabled=!n; $('#recExport').textContent=n?`選んだ${n}件を書き出す`:'選んだものを書き出す';
+  const all=$('#recAll'); all.checked=n>0&&n===REC.items.length; all.indeterminate=n>0&&n<REC.items.length;
 }
 async function recRender(){
   try{ const saved=await recAll(); const extra=REC.items.filter(x=>!saved.some(s=>s.id===x.id)); REC.items=[...extra,...saved]; }catch(e){}
+  REC.sel.forEach(id=>{ if(!REC.items.some(x=>x.id===id)) REC.sel.delete(id); });
   const el=$('#recList'); el.innerHTML='';
   Object.values(REC.urls).forEach(u=>URL.revokeObjectURL(u)); REC.urls={};
-  if(!REC.items.length){ el.innerHTML='<p class="msg">まだ録音はありません。</p>'; return; }
+  recStorage(); recBulkUI();
+  if(!REC.items.length){ el.innerHTML='<p class="msg">まだ録音・録画はありません。</p>'; return; }
   REC.items.forEach(it=>{
-    const r=document.createElement('div'); r.className='rec-item';
+    const r=document.createElement('div'), vid=isVideo(it); r.className='rec-item';
     const url=URL.createObjectURL(it.blob); REC.urls[it.id]=url;
-    r.innerHTML=`<div><div class="rn"></div><div class="rd">${recFmt(it.dur)}</div></div><div class="ra"><button class="btn sv">保存</button><button class="btn dl">削除</button></div><audio controls preload="none"></audio>`;
-    r.querySelector('.rn').textContent=it.name; r.querySelector('audio').src=url;
-    r.querySelector('audio').addEventListener('play',()=>stopAllPlayback());
+    r.innerHTML=`<input type="checkbox" class="ck" aria-label="選ぶ"><div><div class="rn"></div><div class="rd"><span class="kd">${vid?'動画':'音声'}</span>${recFmt(it.dur)}・${fmtSize(it.size||it.blob.size)}</div></div><div class="ra"><button class="btn sv">保存</button><button class="btn dl">削除</button></div>${vid?'<video controls playsinline preload="metadata"></video>':'<audio controls preload="none"></audio>'}`;
+    const ck=r.querySelector('.ck'); ck.checked=REC.sel.has(it.id);
+    ck.addEventListener('change',()=>{ if(ck.checked) REC.sel.add(it.id); else REC.sel.delete(it.id); recBulkUI(); });
+    const rn=r.querySelector('.rn');
+    if(REC.edit===it.id){
+      const inp=document.createElement('input'); inp.type='text'; inp.maxLength=40; inp.value=it.name; inp.setAttribute('aria-label','名前'); rn.appendChild(inp);
+      const done=async save=>{ if(REC.edit!==it.id) return; REC.edit=null; const v=inp.value.trim().slice(0,40); if(save&&v&&v!==it.name){ it.name=v; try{await recPut(it);}catch(e){} } recRender(); };
+      inp.addEventListener('keydown',e=>{ if(e.key==='Enter') done(true); if(e.key==='Escape') done(false); });
+      inp.addEventListener('blur',()=>done(true));
+      setTimeout(()=>{inp.focus();inp.select();},0);
+    } else { rn.textContent=it.name+' ✎'; rn.title='タップで名前を変更'; rn.addEventListener('click',()=>{REC.edit=it.id;recRender();}); }
+    const media=r.querySelector('audio,video'); media.src=vid?url+'#t=0.1':url;
+    media.addEventListener('play',()=>stopAllPlayback());
     r.querySelector('.sv').addEventListener('click',()=>recShare(it));
     const del=r.querySelector('.dl');
     del.addEventListener('click',async()=>{
-      if(REC.del===it.id){ REC.del=null; try{await recDel(it.id);}catch(e){} REC.items=REC.items.filter(x=>x.id!==it.id); recRender(); return; }
+      if(REC.del===it.id){ REC.del=null; try{await recDel(it.id);}catch(e){} REC.items=REC.items.filter(x=>x.id!==it.id); REC.sel.delete(it.id); recRender(); return; }
       REC.del=it.id; document.querySelectorAll('.rec-item .dl.confirm').forEach(b=>{b.classList.remove('confirm');b.textContent='削除';}); del.classList.add('confirm'); del.textContent='本当に削除';
     });
     el.appendChild(r);
   });
 }
-(function initRec(){ $('#recBtn').addEventListener('click',recToggle); if(window.indexedDB) recRender(); else $('#recList').innerHTML='<p class="msg">この環境では録音を保存できません。</p>'; })();
+(function initRec(){
+  $('#recBtn').addEventListener('click',recToggle);
+  segInit($('#recMode'),REC.mode,recSetMode);
+  $('#camWrap').hidden=REC.mode!=='video';
+  if(REC.mode==='video') $('#recMsg').textContent='「カメラをオン」でカメラを起動';
+  const cs=document.createElement('button'); cs.id='camStart'; cs.type='button'; cs.className='btn primary cam-start'; cs.textContent='カメラをオン'; cs.addEventListener('click',camStart); $('#camWrap').appendChild(cs);
+  $('#camFlip').addEventListener('click',async()=>{ if(REC.rec&&REC.rec.state==='recording') return; REC.facing=REC.facing==='user'?'environment':'user'; store.set('camFacing',REC.facing); if(REC.cam){ REC.cam.getTracks().forEach(t=>t.stop()); REC.cam=null; } camStart(); });
+  $('#recAll').addEventListener('change',e=>{ REC.sel=new Set(e.target.checked?REC.items.map(x=>x.id):[]); document.querySelectorAll('#recList .ck').forEach(c=>c.checked=e.target.checked); recBulkUI(); });
+  $('#recExport').addEventListener('click',recExport);
+  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'&&REC.cam&&!(REC.rec&&REC.rec.state==='recording')) camOff(); });
+  if(window.indexedDB) recRender(); else $('#recList').innerHTML='<p class="msg">この環境では録音・録画を保存できません。</p>';
+})();
 
 /* ---------- fretboard map + quiz ---------- */
 const F={mode:'name',key:0,find:-1,natural:false,quiz:null,score:0,total:0};
