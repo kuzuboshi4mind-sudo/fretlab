@@ -522,6 +522,118 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .week-bars .wb span{font-size:10.5px;color:var(--muted);font-family:var(--mono)}
 .week-bars .wb.today span{color:var(--fg);font-weight:600}
 .log-more{margin-top:16px}
+/* マイ記録：タイマー・振り返り・トロフィー */
+:root{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--s5:#e87ba4;--s6:#008300;--s0:#a3a39b}
+@media (prefers-color-scheme: dark){:root:not([data-scheme]){--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--s5:#d55181;--s6:#2f9a2f;--s0:#6f736e}}
+:root[data-scheme="dark"],:root[data-theme="navy"],:root[data-theme="bordeaux"]{--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--s5:#d55181;--s6:#2f9a2f;--s0:#6f736e}
+.tm-head{display:flex;align-items:center;justify-content:space-between;width:100%;gap:8px}
+.tm-edit{min-height:36px;padding:4px 12px;font-size:13px;display:inline-flex;align-items:center;gap:6px}
+.tm-edit[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tm-list{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%}
+.tm-chip{display:flex;flex-direction:column;align-items:center;gap:0;min-width:84px;max-width:100%;padding:8px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);cursor:pointer;font:inherit;line-height:1.3}
+.tm-chip b{font-weight:600;font-size:14px;overflow-wrap:anywhere}
+.tm-chip small{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.tm-chip .dot{width:8px;height:8px;border-radius:50%;margin-bottom:3px}
+.tm-chip[aria-pressed="true"]{border-color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg)}
+.tm-chip:disabled{cursor:default;opacity:.55}
+.tm-chip[aria-pressed="true"]:disabled{opacity:1}
+.tm-editor{width:100%;display:flex;flex-direction:column;gap:8px}
+.tm-row{display:grid;grid-template-columns:10px minmax(0,1fr) 76px auto auto;gap:8px;align-items:center}
+.tm-row .dot{width:10px;height:10px;border-radius:50%}
+.tm-row input{min-width:0;width:100%;min-height:40px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg);padding:4px 10px;font:inherit}
+.tm-row input[type=number]{font-family:var(--mono);text-align:right}
+.tm-row .u{font-size:13px;color:var(--muted)}
+.tm-row .x{min-height:40px;padding:4px 12px}
+.tm-foot{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap}
+.pomo-title{font-size:14px;font-weight:600;max-width:150px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px}
+.pomo-main.over .pomo-time{color:var(--good)}
+.pomo-main.over .ring-fg{animation:ringpulse 1.6s ease-in-out infinite}
+@keyframes ringpulse{50%{opacity:.55}}
+.ring.glow .ring-fg{filter:drop-shadow(0 0 5px var(--glow,#fff))}
+.ring.thick circle{stroke-width:11}
+.ring.dashed .ring-bg{stroke-dasharray:3 6}
+.lg-banner{position:relative;overflow:hidden;border-radius:16px;padding:14px 18px;margin-bottom:16px;color:#fff;display:flex;align-items:center;gap:14px;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.lg-banner .bi{font-size:30px;line-height:1;flex:0 0 auto}
+.lg-banner b{display:block;font-size:17px;letter-spacing:.04em}
+.lg-banner small{opacity:.9;font-size:12.5px}
+.lg-banner::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.22) 45%,transparent 60%);pointer-events:none}
+.rv-card,.tr-card{margin-top:16px;display:flex;flex-direction:column;gap:14px}
+.rv-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.rv-nav{display:flex;align-items:center;gap:8px}
+.rv-nav .btn{min-height:38px;min-width:42px;padding:2px 10px;font-size:18px}
+.rv-nav span{font-family:var(--mono);font-size:13.5px;min-width:9.5em;text-align:center}
+.rv-total{display:flex;align-items:baseline;gap:12px}
+.rv-total b{font-family:var(--display);font-weight:400;font-size:44px;line-height:1;font-variant-numeric:lining-nums}
+.rv-bars{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:2px;align-items:end;height:120px}
+.rv-bars[hidden]{display:none}
+.rv-bars .b{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:4px;min-width:0}
+.rv-bars .b i{display:flex;flex-direction:column-reverse;width:100%;max-width:26px;min-height:2px;border-radius:4px 4px 0 0;overflow:hidden;background:var(--line)}
+.rv-bars .b i u{display:block;width:100%;text-decoration:none}
+.rv-bars .b i u+u{border-bottom:1px solid var(--surface)}
+.rv-bars .b span{font-size:10px;color:var(--muted);font-family:var(--mono);white-space:nowrap;height:1.4em}
+.rv-bars .b.now span{color:var(--fg);font-weight:600}
+.rv-break{display:grid;grid-template-columns:150px minmax(0,460px);gap:20px;align-items:center}
+.rv-donut{width:150px;height:150px}
+.rv-donut circle{fill:none;stroke-width:16}
+.rv-donut text{font-family:var(--mono);font-size:10px;fill:var(--muted);text-anchor:middle}
+.rv-legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.rv-legend li{display:grid;grid-template-columns:12px minmax(0,1fr) auto 3.2em;gap:8px;align-items:center;font-size:14px}
+.rv-legend .sw{width:12px;height:12px;border-radius:3px}
+.rv-legend .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rv-legend .v{font-family:var(--mono);font-size:13px;font-weight:600}
+.rv-legend .p{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+.rv-recs-head{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.rv-recs-head .btn{min-height:36px;padding:4px 12px;font-size:13px}
+.rv-list{display:flex;flex-direction:column}
+.rv-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:10px;align-items:center;padding-block:8px;border-top:1px solid var(--line);font-size:14px}
+.rv-row:first-child{border-top:0}
+.rv-row .d{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.rv-row .t{display:flex;align-items:center;gap:7px;min-width:0}
+.rv-row .t i{flex:0 0 auto;width:9px;height:9px;border-radius:50%}
+.rv-row .t span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rv-row .t em{font-style:normal;color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rv-row .m{font-family:var(--mono);font-size:13px;font-weight:600;white-space:nowrap}
+.rv-row .ed{min-height:34px;padding:2px 10px;font-size:13px}
+.rv-more{align-self:center;margin-top:6px}
+.rv-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel);margin-block:6px}
+.rv-form label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);min-width:0}
+.rv-form input{min-width:0;width:100%;min-height:40px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg);padding:4px 10px;font:inherit;font-size:15px}
+.rv-form .full{grid-column:1/-1}
+.rv-form .chips{display:flex;flex-wrap:wrap;gap:6px}
+.rv-form .chips button{min-height:30px;padding:2px 10px;font-size:12.5px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--fg);cursor:pointer;font-family:inherit}
+.rv-form .acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px}
+.rv-form .acts .del{margin-left:auto;color:var(--bad)}
+.rv-form .acts .del.confirm{border-color:var(--bad)}
+.tr-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.tr-head p{margin:2px 0 0}
+.tr-count{font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap}
+.tr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px}
+.tr{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:10px 4px;border-radius:12px;border:1px solid var(--line);background:var(--surface);min-width:0}
+.tr .md{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:12px;font-weight:700;color:#3a2a06;background:radial-gradient(circle at 35% 30%,#fff6c8,#e8b93c 55%,#a8771a);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tr b{font-size:13px}
+.tr small{font-size:11px;color:var(--muted);line-height:1.35;overflow-wrap:anywhere}
+.tr.lock .md{background:var(--panel);color:var(--muted);box-shadow:none;border:1px dashed var(--line)}
+.tr.lock b{color:var(--muted)}
+.tr.next{border-color:var(--fg)}
+.tr-dress{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.dress{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;margin-bottom:6px}
+.dr{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;border:0;background:none;padding:4px 2px;cursor:pointer;color:var(--fg);font:inherit;font-size:11px;width:68px}
+.dr .pv{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:16px}
+.dr .pv.bn{width:64px;height:30px;border-radius:8px;font-size:15px}
+.dr[aria-checked="true"] .pv{outline:2.5px solid var(--fg);outline-offset:3px}
+.dr:disabled{cursor:default;color:var(--muted)}
+.dr:disabled .pv{filter:grayscale(1);opacity:.35}
+.dr span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+@media (max-width:560px){
+  .rv-break{grid-template-columns:minmax(0,1fr);justify-items:center}
+  .rv-legend{width:100%}
+  .rv-row{grid-template-columns:minmax(0,1fr) auto auto}
+  .rv-row .d{grid-column:1/-1;margin-bottom:-6px}
+  .tm-row{grid-template-columns:10px minmax(0,1fr) 64px auto}
+  .tm-row .u{display:none}
+  .rv-bars .b span{font-size:9px}
+}
+@media (prefers-reduced-motion:reduce){.pomo-main.over .ring-fg{animation:none}}
 @media (max-width:860px){.pomo{grid-template-columns:minmax(0,1fr)}}
 
 /* recorder */
@@ -624,7 +736,9 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .log-row .del.confirm{color:var(--bad);border-color:var(--bad)}
 .tag{display:inline-block;white-space:nowrap;font-size:11.5px;background:var(--panel);border-radius:999px;padding:2px 9px}
 details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);border-radius:10px;padding:10px 12px 10px 16px;display:flex;gap:12px;align-items:center;z-index:20;box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:calc(100% - 32px);font-size:14px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);border-radius:10px;padding:10px 12px 10px 16px;display:flex;gap:12px;align-items:center;z-index:20;box-shadow:0 6px 24px rgba(0,0,0,.25);width:max-content;max-width:min(560px,calc(100% - 32px));box-sizing:border-box;font-size:14px}
+.toast span{flex:1 1 auto;min-width:0}
+.toast .btn{flex:0 0 auto}
 .toast .btn{background:var(--bg);color:var(--fg);border-color:var(--bg);min-height:34px;padding:4px 12px}
 .top{align-items:center}
 .top-actions{margin-left:auto;display:flex;gap:8px;align-items:center;flex:none}
@@ -1165,13 +1279,16 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
 
   <!-- PRACTICE LOG -->
   <section data-panel="log" hidden>
-    <div class="panel-head"><div><h2>マイ記録</h2><p>時間を選んでスタート。自動で記録。</p></div></div>
+    <div class="panel-head"><div><h2>マイ記録</h2><p>タイマーを選んでスタート。止めるまで時間を数えて記録。</p></div></div>
+    <div class="lg-banner" id="lgBanner" hidden></div>
     <div class="pomo">
-      <div class="card pomo-main">
-        <div class="seg" id="pomoLen"><button data-v="5">5分</button><button data-v="15">15分</button><button data-v="25">25分</button><button data-v="45">45分</button></div>
+      <div class="card pomo-main" id="pomoMain">
+        <div class="tm-head"><span class="label">タイマー</span><button class="btn tm-edit" id="tmEdit" type="button" aria-pressed="false" aria-label="タイマーを編集"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>編集</span></button></div>
+        <div class="tm-list" id="tmList"></div>
+        <div class="tm-editor" id="tmEditor" hidden></div>
         <div class="ring-wrap">
-          <svg class="ring" viewBox="0 0 220 220" aria-hidden="true"><circle class="ring-bg" cx="110" cy="110" r="96"/><circle class="ring-fg" id="ringFg" cx="110" cy="110" r="96"/></svg>
-          <div class="ring-center"><div class="pomo-time" id="pomoTime">25:00</div><div class="pomo-state" id="pomoState">準備OK</div></div>
+          <svg class="ring" viewBox="0 0 220 220" aria-hidden="true"><defs id="ringDefs"></defs><circle class="ring-bg" cx="110" cy="110" r="96"/><circle class="ring-fg" id="ringFg" cx="110" cy="110" r="96"/></svg>
+          <div class="ring-center"><div class="pomo-title" id="pomoTitle"></div><div class="pomo-time" id="pomoTime">25:00</div><div class="pomo-state" id="pomoState">準備OK</div></div>
         </div>
         <div class="row" style="justify-content:center">
           <button class="btn primary big" id="pomoStart">スタート</button>
@@ -1193,8 +1310,27 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
             <div><span class="label">この7日</span><b id="stWeek">0</b><small>分</small></div>
             <div><span class="label">これまで</span><b id="stAll">0</b><small id="stAllU">分</small></div>
           </div>
-          <div class="week-bars" id="weekBars"></div>
         </div>
+      </div>
+    </div>
+    <div class="card rv-card">
+      <div class="rv-head">
+        <div class="seg" id="rvMode"><button data-v="d">日</button><button data-v="w">週</button><button data-v="m">月</button><button data-v="y">年</button></div>
+        <div class="rv-nav"><button class="btn" id="rvPrev" type="button" aria-label="前の期間">‹</button><span id="rvLabel"></span><button class="btn" id="rvNext" type="button" aria-label="次の期間">›</button></div>
+      </div>
+      <div class="rv-total"><span class="label">合計</span><b id="rvTotal">0min</b></div>
+      <div class="rv-bars" id="rvBars"></div>
+      <div class="rv-break"><svg id="rvDonut" class="rv-donut" viewBox="0 0 120 120" role="img" aria-label="タイトル別の時間"></svg><ul class="rv-legend" id="rvLegend"></ul></div>
+      <div class="rv-recs-head"><b>記録</b><button class="btn" id="rvAdd" type="button">＋ 記録を追加</button></div>
+      <div id="rvList" class="rv-list"></div>
+    </div>
+    <div class="card tr-card">
+      <div class="tr-head"><div><b>トロフィー</b><p class="msg" id="trNext"></p></div><span class="tr-count" id="trCount"></span></div>
+      <div class="goal-bar"><i id="trFill"></i></div>
+      <div class="tr-grid" id="trGrid"></div>
+      <div class="tr-dress">
+        <span class="label">タイマーの着せ替え</span><div class="dress" id="dressSkin"></div>
+        <span class="label">バナー</span><div class="dress" id="dressBanner"></div>
       </div>
     </div>
     <div class="card rec-card">
@@ -1208,9 +1344,8 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
       <div class="rec-list" id="recList"></div>
     </div>
     <details class="card log-more">
-      <summary>これまでの記録とバックアップ</summary>
+      <summary>目標とバックアップ</summary>
       <div class="row" style="margin-top:12px"><label class="msg" for="goalSel">1日の目標</label><select id="goalSel"><option>15</option><option>30</option><option>45</option><option>60</option><option>90</option></select><span class="msg">分</span></div>
-      <div id="logList" class="log-list"></div>
       <p class="msg">バックアップ：コピーして保管、貼り付けて「復元」。</p>
       <textarea id="backupTxt" rows="3" class="search" style="width:100%;font-family:var(--mono);font-size:12px" aria-label="バックアップデータ"></textarea>
       <div class="row"><button class="btn" id="backupCopy">コピー</button><button class="btn" id="backupLoad">復元</button><span class="msg" id="backupMsg"></span></div>
@@ -3879,110 +4014,357 @@ function tabStop(){
   new ResizeObserver(()=>{ if(!$('[data-panel="tab"]').hidden) drawTab(); }).observe($('#tabSheet'));
 })();
 
-/* ---------- practice log（ポモドーロ式タイマー） ---------- */
+/* ---------- practice log（自分で決めるタイマー・振り返り・トロフィー） ---------- */
 const pad=n=>String(n).padStart(2,'0');
 const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-const LOG={entries:store.get('log',[]),goal:store.get('goal',30),del:null,
-  pomo:store.get('pomo',{len:25,state:'idle',end:0,left:0,started:0,acc:0}),tick:null,lastDone:0};
+const EN=LANG==='en';
+const WD='日月火水木金土';
+const TM_DEF=[{id:'t1',title:'練習',min:25},{id:'t2',title:'基礎練習',min:15},{id:'t3',title:'曲の練習',min:45}];
+const LOG={entries:store.get('log',[]),goal:store.get('goal',30),
+  timers:store.get('timers',null),pomo:store.get('pomo',null),tick:null,lastDone:0,
+  rv:{mode:store.get('rvMode','w'),off:0,edit:null,more:false},editT:false,
+  skin:store.get('skin','classic'),banner:store.get('banner','none')};
 if(!Array.isArray(LOG.entries)) LOG.entries=[];
+if(!Array.isArray(LOG.timers)||!LOG.timers.length) LOG.timers=TM_DEF.map(t=>({...t}));
+// 古い形のタイマー（5/15/25/45分）は、まっさらな状態から始める
+if(!LOG.pomo||LOG.pomo.v!==2) LOG.pomo={v:2,tid:LOG.timers[0].id,title:LOG.timers[0].title,len:LOG.timers[0].min,state:'idle',since:0,acc:0,end:0,notified:false,rec:0};
 const saveLog=()=>store.set('log',LOG.entries);
 const savePomo=()=>store.set('pomo',LOG.pomo);
+const saveTimers=()=>store.set('timers',LOG.timers);
 function addEntry(date,min,cat,memo){
   LOG.entries.push({id:Date.now()+Math.random(),date,min:Math.max(1,Math.min(600,Math.round(min))),cat:cat||'練習',memo:(memo||'').slice(0,200)});
   saveLog(); renderLog();
 }
 function dayTotals(){const m={};LOG.entries.forEach(e=>m[e.date]=(m[e.date]||0)+e.min);return m;}
-// 経過時間（ミリ秒）：実行中は終了時刻から逆算、一時停止中は保存した残り時間から
-function pomoLeft(){const p=LOG.pomo; return p.state==='run'||p.state==='break'?Math.max(0,p.end-Date.now()):p.state==='pause'?p.left:p.len*60000;}
-function pomoElapsedMin(){const p=LOG.pomo; return (p.len*60000-pomoLeft())/60000;}
+const fmtHM=min=>{min=Math.round(min); const h=Math.floor(min/60), m=min%60; return h?(m?`${h}h ${m}min`:`${h}h`):`${m}min`;};
+const fmtHours=min=>min<60?`${Math.round(min)}分`:`${+(min/60).toFixed(min<600?1:0)}時間`;
+
+/* --- タイマー（0になったら知らせて、止めるまで数え続ける） --- */
+function pomoElapsed(){const p=LOG.pomo; return p.acc+(p.state==='run'?Date.now()-p.since:0);}
 function pomoRender(){
-  const p=LOG.pomo, left=pomoLeft(), total=(p.state==='break'?5:p.len)*60000, s=Math.ceil(left/1000);
-  $('#pomoTime').textContent=pad(Math.floor(s/60))+':'+pad(s%60);
-  $('#ringFg').style.strokeDashoffset=p.state==='done'?'0':(603.2*(left/total)).toFixed(1);
-  if(p.state==='done') $('#pomoTime').textContent=pad(p.len)+':00';
-  const main=document.querySelector('.pomo-main'); main.classList.toggle('break',p.state==='break'); main.classList.toggle('done',p.state==='done');
-  $('#pomoState').textContent={idle:'準備OK',run:'練習中',pause:'一時停止中',break:'休憩中',done:'達成！'}[p.state];
+  const p=LOG.pomo, main=$('#pomoMain'), el=pomoElapsed(), len=p.len*60000;
+  let txt, ratio;
+  if(p.state==='break'){ const l=Math.max(0,p.end-Date.now()), s=Math.ceil(l/1000); txt=pad(Math.floor(s/60))+':'+pad(s%60); ratio=l/300000; }
+  else if(p.state==='done'){ txt=p.rec>=60?`${Math.floor(p.rec/60)}:${pad(p.rec%60)}:00`:pad(p.rec)+':00'; ratio=0; }
+  else if(el<len){ const s=Math.ceil((len-el)/1000); txt=pad(Math.floor(s/60))+':'+pad(s%60); ratio=(len-el)/len; }
+  else { const s=Math.floor((el-len)/1000); txt='+'+(s>=3600?Math.floor(s/3600)+':'+pad(Math.floor(s/60)%60):pad(Math.floor(s/60)))+':'+pad(s%60); ratio=0; }
+  const over=(p.state==='run'||p.state==='pause')&&el>=len;
+  $('#pomoTime').textContent=txt;
+  $('#pomoTitle').textContent=p.state==='break'?'休憩':p.title;
+  $('#ringFg').style.strokeDashoffset=(603.2*ratio).toFixed(1);
+  main.classList.toggle('break',p.state==='break'); main.classList.toggle('done',p.state==='done'); main.classList.toggle('over',over&&p.state==='run');
+  $('#pomoState').textContent=over?(p.state==='pause'?'一時停止中':'延長中'):{idle:'準備OK',run:'練習中',pause:'一時停止中',break:'休憩中',done:'記録しました'}[p.state];
   $('#pomoStart').textContent=p.state==='run'?'一時停止':p.state==='pause'?'再開':p.state==='break'?'休憩をやめる':'スタート';
   $('#pomoStop').disabled=!(p.state==='run'||p.state==='pause');
-  document.querySelectorAll('#pomoLen button').forEach(b=>{b.disabled=p.state==='run'||p.state==='pause';b.setAttribute('aria-pressed',String(+b.dataset.v===p.len));});
+  const busy=p.state==='run'||p.state==='pause';
+  document.querySelectorAll('#tmList .tm-chip').forEach(b=>{b.disabled=busy;b.setAttribute('aria-pressed',String(b.dataset.id===p.tid));});
+  $('#tmEdit').disabled=busy;
 }
 function pomoChime(){ const c=ac(), t=c.currentTime+.05; [0,.18,.36].forEach((d,i)=>metroHit(8,t+d,i===2?0:1,.9)); }
+function pomoNotify(){
+  const p=LOG.pomo, body=`「${p.title}」の${p.len}分が終わりました。止めるまで時間を数えます。`;
+  try{pomoChime();}catch(e){}
+  try{navigator.vibrate&&navigator.vibrate([200,100,200]);}catch(e){}
+  const t=$('#toast'); t.innerHTML=''; const s=document.createElement('span'); s.textContent='⏰ '+body; t.appendChild(s);
+  const x=document.createElement('button'); x.className='btn'; x.textContent='閉じる'; x.addEventListener('click',()=>t.hidden=true); t.appendChild(x);
+  t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,12000);
+  if(window.Notification&&Notification.permission==='granted'&&document.visibilityState!=='visible'){
+    const opt={body,tag:'fretlab-timer',icon:'icons/icon-192.png'};
+    (navigator.serviceWorker&&navigator.serviceWorker.getRegistration?navigator.serviceWorker.getRegistration():Promise.resolve(null))
+      .then(r=>r&&r.showNotification?r.showNotification('Fretlab',opt):new Notification('Fretlab',opt)).catch(()=>{try{new Notification('Fretlab',opt);}catch(e){}});
+  }
+}
 function pomoTick(){
   const p=LOG.pomo;
-  if((p.state==='run'||p.state==='break')&&pomoLeft()<=0){
-    if(p.state==='run') pomoFinish(true); else { p.state='idle'; savePomo(); $('#pomoMsg').textContent='休憩おわり。次の1セットいきましょう！'; try{pomoChime();}catch(e){} }
-  }
+  if(p.state==='run'&&!p.notified&&pomoElapsed()>=p.len*60000){ p.notified=true; savePomo(); pomoNotify(); }
+  if(p.state==='break'&&Date.now()>=p.end){ p.state='idle'; savePomo(); $('#pomoMsg').textContent='休憩おわり。次の1セットいきましょう！'; try{pomoChime();}catch(e){} }
   pomoRender();
 }
-function pomoFinish(complete){
-  const p=LOG.pomo, min=complete?p.len:Math.floor(pomoElapsedMin());
-  if(min>=1){ addEntry(ymd(new Date()),min,'練習',''); LOG.lastDone=Date.now(); }
-  p.state=complete?'done':'idle'; p.left=0; savePomo();
+function pomoFinish(){
+  const p=LOG.pomo, el=pomoElapsed(), min=Math.round(el/60000), full=el>=p.len*60000;
+  if(min>=1){ addEntry(ymd(new Date()),min,p.title,''); LOG.lastDone=Date.now(); }
+  p.state=min>=1?'done':'idle'; p.rec=min; p.acc=0; p.notified=false; savePomo();
   const msg=$('#pomoMsg'); msg.textContent='';
   if(min>=1){
-    msg.append(complete?`おつかれさま！ ＋${min}分 記録しました`:`＋${min}分 記録しました`);
-    if(complete){ try{pomoChime();}catch(e){} const b=document.createElement('button'); b.className='btn'; b.textContent='5分休憩'; b.addEventListener('click',pomoBreak); msg.appendChild(b); }
+    msg.append(full?`おつかれさま！「${p.title}」＋${fmtHM(min)} 記録しました`:`「${p.title}」＋${fmtHM(min)} 記録しました`);
+    if(full){ const b=document.createElement('button'); b.className='btn'; b.textContent='5分休憩'; b.addEventListener('click',pomoBreak); msg.appendChild(b); }
   } else msg.textContent='1分未満のため記録しませんでした';
-  pomoRender();
+  pomoRender(); trophyCheck();
 }
 function pomoBreak(){ const p=LOG.pomo; p.state='break'; p.end=Date.now()+5*60000; savePomo(); $('#pomoMsg').textContent='肩と指をゆるめて、深呼吸。'; pomoRender(); }
 function pomoStartPause(){
   const p=LOG.pomo; ac();
-  if(p.state==='run'){ p.left=pomoLeft(); p.state='pause'; }
-  else if(p.state==='pause'){ p.end=Date.now()+p.left; p.state='run'; }
+  if(p.state==='run'){ p.acc=pomoElapsed(); p.state='pause'; }
+  else if(p.state==='pause'){ p.since=Date.now(); p.state='run'; }
   else if(p.state==='break'){ p.state='idle'; $('#pomoMsg').textContent=''; }
-  else { p.state='run'; p.end=Date.now()+p.len*60000; $('#pomoMsg').textContent=''; }
+  else { p.state='run'; p.since=Date.now(); p.acc=0; p.notified=false; $('#pomoMsg').textContent='';
+    if(window.Notification&&Notification.permission==='default') try{Notification.requestPermission().catch(()=>{});}catch(e){} }
   savePomo(); pomoRender();
 }
+function pomoPick(t){ const p=LOG.pomo; if(p.state==='run'||p.state==='pause') return; p.tid=t.id; p.title=t.title; p.len=t.min; if(p.state!=='break') p.state='idle'; savePomo(); $('#pomoMsg').textContent=''; pomoRender(); }
+
+/* --- タイトルごとの色（タイマーの順に固定。ほかのタイトルは残りの色、それ以上は灰色） --- */
+function colorMap(titles){
+  const m={}, used=new Set();
+  LOG.timers.forEach((t,i)=>{ if(!(t.title in m)){ m[t.title]=`var(--s${i+1})`; used.add(i+1);} });
+  const free=[1,2,3,4,5,6].filter(i=>!used.has(i));
+  titles.forEach(t=>{ if(!(t in m)) m[t]=free.length?`var(--s${free.shift()})`:'var(--s0)'; });
+  return m;
+}
+
+/* --- タイマーの一覧と編集（5つまで） --- */
+function renderTimers(){
+  const list=$('#tmList'), ed=$('#tmEditor'), cm=colorMap([]);
+  list.hidden=LOG.editT; ed.hidden=!LOG.editT; $('#tmEdit').setAttribute('aria-pressed',String(LOG.editT));
+  $('#tmEdit span').textContent=LOG.editT?'完了':'編集';
+  list.innerHTML='';
+  LOG.timers.forEach(t=>{ const b=document.createElement('button'); b.type='button'; b.className='tm-chip'; b.dataset.id=t.id;
+    b.innerHTML=`<i class="dot" style="background:${cm[t.title]}"></i><b></b><small>${t.min}分</small>`; b.querySelector('b').textContent=t.title;
+    b.addEventListener('click',()=>pomoPick(t)); list.appendChild(b); });
+  if(!LOG.editT){ pomoRender(); return; }
+  ed.innerHTML='';
+  LOG.timers.forEach((t,i)=>{
+    const r=document.createElement('div'); r.className='tm-row';
+    r.innerHTML=`<i class="dot" style="background:${cm[t.title]}"></i><input type="text" maxlength="16" aria-label="タイトル"><input type="number" min="1" max="180" step="1" inputmode="numeric" aria-label="分"><span class="u">分</span><button class="btn x" type="button" aria-label="このタイマーを削除">✕</button>`;
+    const [ti,mi]=r.querySelectorAll('input'); ti.value=t.title; mi.value=t.min;
+    ti.addEventListener('change',()=>{ const v=ti.value.trim().slice(0,16)||t.title, old=t.title; if(v===old){ti.value=v;return;}
+      // 同じ名前のタイマーがほかにないときだけ、これまでの記録の名前も変える
+      if(!LOG.timers.some(o=>o!==t&&o.title===old)){ LOG.entries.forEach(e=>{if(e.cat===old)e.cat=v;}); saveLog(); }
+      t.title=v; if(LOG.pomo.tid===t.id){LOG.pomo.title=v;savePomo();} saveTimers(); renderTimers(); renderLog(); });
+    mi.addEventListener('change',()=>{ const v=Math.max(1,Math.min(180,Math.round(+mi.value)||t.min)); mi.value=v; t.min=v; if(LOG.pomo.tid===t.id&&LOG.pomo.state!=='run'&&LOG.pomo.state!=='pause'){LOG.pomo.len=v;savePomo();} saveTimers(); renderTimers(); });
+    const x=r.querySelector('.x'); x.disabled=LOG.timers.length<=1;
+    x.addEventListener('click',()=>{ LOG.timers.splice(i,1); if(LOG.pomo.tid===t.id){const f=LOG.timers[0];LOG.pomo.tid=f.id;LOG.pomo.title=f.title;LOG.pomo.len=f.min;savePomo();} saveTimers(); renderTimers(); renderLog(); });
+    ed.appendChild(r);
+  });
+  const f=document.createElement('div'); f.className='tm-foot';
+  const add=document.createElement('button'); add.type='button'; add.className='btn'; add.textContent='＋ タイマーを追加'; add.disabled=LOG.timers.length>=5;
+  add.addEventListener('click',()=>{ LOG.timers.push({id:'t'+Date.now().toString(36),title:'新しいタイマー',min:20}); saveTimers(); renderTimers(); const ins=ed.querySelectorAll('input[type=text]'); const last=ins[ins.length-1]; if(last){last.focus();last.select();} });
+  const note=document.createElement('span'); note.className='msg'; note.textContent=`${LOG.timers.length}/5`;
+  f.append(add,note); ed.appendChild(f);
+  pomoRender();
+}
+
+/* --- 振り返り（日・週・月・年） --- */
+function rvRange(){
+  const {mode,off}=LOG.rv, n=new Date(); n.setHours(0,0,0,0);
+  let a,b;
+  if(mode==='d'){ a=new Date(n); a.setDate(a.getDate()+off); b=new Date(a); b.setDate(b.getDate()+1); }
+  else if(mode==='w'){ a=new Date(n); a.setDate(a.getDate()-((a.getDay()+6)%7)+off*7); b=new Date(a); b.setDate(b.getDate()+7); }
+  else if(mode==='m'){ a=new Date(n.getFullYear(),n.getMonth()+off,1); b=new Date(a.getFullYear(),a.getMonth()+1,1); }
+  else { a=new Date(n.getFullYear()+off,0,1); b=new Date(a.getFullYear()+1,0,1); }
+  return {a,b};
+}
+function rvLabel(a,b){
+  const {mode}=LOG.rv, e=new Date(b), M=EN?['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']:null; e.setDate(e.getDate()-1);
+  if(mode==='d') return EN?`${'SunMonTueWedThuFriSat'.substr(a.getDay()*3,3)}, ${M[a.getMonth()]} ${a.getDate()}`:`${a.getMonth()+1}月${a.getDate()}日（${WD[a.getDay()]}）`;
+  if(mode==='w') return `${a.getMonth()+1}/${a.getDate()} – ${e.getMonth()+1}/${e.getDate()}`;
+  if(mode==='m') return EN?`${M[a.getMonth()]} ${a.getFullYear()}`:`${a.getFullYear()}年${a.getMonth()+1}月`;
+  return EN?String(a.getFullYear()):`${a.getFullYear()}年`;
+}
+function donutSVG(parts,total){
+  const C=2*Math.PI*44, gap=parts.length>1?2:0; let acc=0, h='';
+  if(!total) return `<circle cx="60" cy="60" r="44" style="stroke:var(--line)"/><text x="60" y="64">0min</text>`;
+  parts.forEach(p=>{ const len=Math.max(0,p.v/total*C-gap); h+=`<circle cx="60" cy="60" r="44" style="stroke:${p.c}" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-acc).toFixed(2)}" transform="rotate(-90 60 60)"><title>${p.t.replace(/[<&]/g,'')}: ${fmtHM(p.v)}</title></circle>`; acc+=p.v/total*C; });
+  return h;
+}
+function renderReview(){
+  const {a,b}=rvRange(), A=ymd(a), B=ymd(b), mode=LOG.rv.mode;
+  const es=LOG.entries.filter(e=>e.date>=A&&e.date<B);
+  const per={}; es.forEach(e=>per[e.cat]=(per[e.cat]||0)+e.min);
+  const total=es.reduce((s,e)=>s+e.min,0);
+  const titles=Object.keys(per).sort((x,y)=>per[y]-per[x]), cm=colorMap(titles);
+  $('#rvLabel').textContent=rvLabel(a,b); $('#rvNext').disabled=LOG.rv.off>=0;
+  $('#rvTotal').textContent=fmtHM(total);
+  // 棒グラフ（週=7日、月=日ごと、年=月ごと。日は出さない）
+  const bars=$('#rvBars'); bars.innerHTML=''; bars.hidden=mode==='d';
+  if(mode!=='d'){
+    const cols=[], today=ymd(new Date()), cur=today.slice(0,7);
+    if(mode==='y') for(let m=0;m<12;m++){ const k=`${a.getFullYear()}-${pad(m+1)}`; cols.push({k,lab:EN?'JFMAMJJASOND'[m]:String(m+1),now:k===cur,f:e=>e.date.slice(0,7)===k,tip:EN?`${m+1}/${a.getFullYear()}`:`${m+1}月`}); }
+    else for(let d=new Date(a);d<b;d.setDate(d.getDate()+1)){ const k=ymd(d), dd=d.getDate(); cols.push({k,lab:mode==='w'?WD[d.getDay()]:(dd===1||dd%5===0?String(dd):''),now:k===today,f:e=>e.date===k,tip:`${d.getMonth()+1}/${dd}`}); }
+    const vals=cols.map(c=>{const o={};es.filter(c.f).forEach(e=>o[e.cat]=(o[e.cat]||0)+e.min);return o;});
+    const mx=Math.max(1,...vals.map(o=>Object.values(o).reduce((s,v)=>s+v,0)));
+    bars.style.gap=cols.length>12?'2px':'8px';
+    cols.forEach((c,i)=>{ const o=vals[i], sum=Object.values(o).reduce((s,v)=>s+v,0), el=document.createElement('div'); el.className='b'+(c.now?' now':'');
+      const segs=titles.filter(t=>o[t]).map(t=>`<u style="height:${(o[t]/sum*100).toFixed(1)}%;background:${cm[t]}"></u>`).join('');
+      el.innerHTML=`<i style="height:${sum?Math.max(3,Math.round(sum/mx*100)):0}%">${segs}</i><span>${c.lab}</span>`;
+      el.title=`${c.tip} ${fmtHM(sum)}`+titles.filter(t=>o[t]).map(t=>`\n${t}: ${fmtHM(o[t])}`).join(''); bars.appendChild(el); });
+  }
+  // 円グラフと凡例（6つより多いときは「その他」にまとめる）
+  let parts=titles.map(t=>({t,v:per[t],c:cm[t]}));
+  if(parts.length>6){ const rest=parts.slice(5); parts=parts.slice(0,5).concat([{t:'その他',v:rest.reduce((s,p)=>s+p.v,0),c:'var(--s0)'}]); }
+  $('#rvDonut').innerHTML=donutSVG(parts,total);
+  const lg=$('#rvLegend'); lg.innerHTML='';
+  if(!parts.length) lg.innerHTML='<li class="msg" style="display:block">この期間の記録はまだありません。</li>';
+  parts.forEach(p=>{ const li=document.createElement('li'); li.innerHTML=`<i class="sw" style="background:${p.c}"></i><span class="n"></span><span class="v">${fmtHM(p.v)}</span><span class="p">${Math.round(p.v/total*100)}%</span>`; li.querySelector('.n').textContent=p.t; lg.appendChild(li); });
+  // 記録の一覧（後から直せる）
+  const list=$('#rvList'); list.innerHTML='';
+  const rows=es.slice().sort((x,y)=>x.date<y.date?1:x.date>y.date?-1:y.id-x.id);
+  const show=LOG.rv.more?rows:rows.slice(0,20);
+  if(LOG.rv.edit==='new') list.appendChild(rvForm(null,A));
+  show.forEach(e=>{
+    if(LOG.rv.edit===e.id){ list.appendChild(rvForm(e)); return; }
+    const [yy,mm,dd]=e.date.split('-'), r=document.createElement('div'); r.className='rv-row';
+    r.innerHTML=`<span class="d">${+mm}/${+dd}（${WD[new Date(+yy,+mm-1,+dd).getDay()]}）</span><span class="t"><i style="background:${cm[e.cat]}"></i><span></span><em></em></span><span class="m">${fmtHM(e.min)}</span><button class="btn ed" type="button">✎ 編集</button>`;
+    r.querySelector('.t span').textContent=e.cat; r.querySelector('.t em').textContent=e.memo||'';
+    r.querySelector('.ed').addEventListener('click',()=>{LOG.rv.edit=e.id;renderReview();});
+    list.appendChild(r);
+  });
+  if(!rows.length&&LOG.rv.edit!=='new') list.innerHTML='<p class="msg">記録はまだありません。「＋ 記録を追加」で手で書き足せます。</p>';
+  if(rows.length>show.length){ const m=document.createElement('button'); m.className='btn rv-more'; m.type='button'; m.textContent=`もっと見る（あと${rows.length-show.length}件）`; m.addEventListener('click',()=>{LOG.rv.more=true;renderReview();}); list.appendChild(m); }
+}
+function rvForm(e,defDate){
+  const f=document.createElement('div'); f.className='rv-form';
+  const td=ymd(new Date()); let date=e?e.date:(defDate&&defDate<=td&&LOG.rv.mode==='d'?defDate:td);
+  f.innerHTML=`<label>日付<input type="date" name="date" max="${td}"></label><label>時間（分）<input type="number" name="min" min="1" max="600" step="1" inputmode="numeric"></label>
+    <label class="full">タイトル<input type="text" name="cat" maxlength="16"></label><div class="chips full"></div>
+    <label class="full">メモ<input type="text" name="memo" maxlength="200" placeholder="弾いた曲・気づいたことなど"></label>
+    <div class="acts"><button class="btn primary" type="button" data-a="save">保存</button><button class="btn" type="button" data-a="cancel">やめる</button>${e?'<button class="btn del" type="button" data-a="del">削除</button>':''}</div>`;
+  const q=n=>f.querySelector(`[name=${n}]`);
+  q('date').value=date; q('min').value=e?e.min:(LOG.timers[0]||{}).min||25; q('cat').value=e?e.cat:(LOG.timers[0]||{}).title||'練習'; q('memo').value=e?e.memo||'':'';
+  const ch=f.querySelector('.chips'); [...new Set(LOG.timers.map(t=>t.title))].forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.addEventListener('click',()=>{q('cat').value=t; if(!e){const tm=LOG.timers.find(x=>x.title===t); if(tm) q('min').value=tm.min;}});ch.appendChild(b);});
+  f.addEventListener('click',ev=>{
+    const a=ev.target.dataset&&ev.target.dataset.a; if(!a) return;
+    if(a==='cancel'){ LOG.rv.edit=null; renderReview(); return; }
+    if(a==='del'){ if(!ev.target.classList.contains('confirm')){ ev.target.classList.add('confirm'); ev.target.textContent='本当に削除'; return; }
+      LOG.entries=LOG.entries.filter(x=>x!==e); saveLog(); LOG.rv.edit=null; renderLog(); return; }
+    if(a==='save'){
+      const d=q('date').value, m=Math.round(+q('min').value), c=q('cat').value.trim().slice(0,16)||'練習';
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||!(m>=1)){ q(!(m>=1)?'min':'date').focus(); return; }
+      const v={date:d,min:Math.min(600,m),cat:c,memo:q('memo').value.slice(0,200)};
+      if(e) Object.assign(e,v); else LOG.entries.push({id:Date.now()+Math.random(),...v});
+      saveLog(); LOG.rv.edit=null; renderLog(); trophyCheck();
+    }
+  });
+  setTimeout(()=>{ try{ f.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(_){} },0);
+  return f;
+}
+
+/* --- トロフィーとごほうび（バナー・タイマーの着せ替え） --- */
+const SKINS={
+  classic:{name:'クラシック'},
+  mint:{name:'ミント',c:['#7be0c3','#1f9e83']},
+  sunset:{name:'サンセット',c:['#ffc35a','#ff6a5c','#d9467a']},
+  ocean:{name:'オーシャン',c:['#58c8f0','#2a6fdb']},
+  sakura:{name:'さくら',c:['#ffc4d6','#e5638f']},
+  neon:{name:'ネオン',c:['#3dff8a','#00d4ff'],glow:'#4ff3c0'},
+  aurora:{name:'オーロラ',c:['#8b5cf6','#22c38e','#38bdf8'],thick:1},
+  gold:{name:'ゴールド',c:['#ffe58a','#e0a526','#9c6b12'],glow:'#f3c85a',thick:1},
+  rainbow:{name:'レインボー',c:['#ff5a5f','#ffb030','#ffe14a','#53c95a','#3a8fe0','#8a5be0'],thick:1},
+  diamond:{name:'ダイヤモンド',c:['#ffffff','#a9dcff','#c8b6ff','#ffffff'],glow:'#bfe3ff',thick:1,dash:1}
+};
+const BANNERS={
+  none:{name:'なし'},
+  step:{name:'はじめの一歩',i:'🌱',bg:'linear-gradient(120deg,#5fb37c,#2f7a55)'},
+  bud:{name:'練習の芽',i:'🌿',bg:'linear-gradient(120deg,#8bbf5a,#4c8a3a)'},
+  steady:{name:'コツコツ職人',i:'🔨',bg:'linear-gradient(120deg,#c98b4a,#8a5226)'},
+  wall:{name:'百時間の壁を越えて',i:'🧱',bg:'linear-gradient(120deg,#d06a4c,#8f3b3b)'},
+  seeker:{name:'フレットの探究者',i:'🧭',bg:'linear-gradient(120deg,#3f7fc4,#24467e)'},
+  groove:{name:'グルーヴの番人',i:'🥁',bg:'linear-gradient(120deg,#7a55c7,#3d2a7a)'},
+  stage:{name:'ステージの主役',i:'🎤',bg:'linear-gradient(120deg,#e0466c,#7a1f4f)'},
+  takumi:{name:'匠',i:'🏯',bg:'linear-gradient(120deg,#2b2b2b,#6b5a2e 60%,#c9a24a)'},
+  master:{name:'マスター・オブ・フレット',i:'👑',bg:'linear-gradient(120deg,#b8860b,#f5d76e 45%,#b8860b 55%,#7a5306)'}
+};
+const MS=[[10,'skin','mint'],[30,'banner','step'],[60,'skin','sunset'],[180,'banner','bud'],[600,'skin','ocean'],[1500,'banner','steady'],
+  [3000,'skin','sakura'],[6000,'banner','wall'],[12000,'skin','neon'],[18000,'banner','seeker'],[30000,'skin','aurora'],[45000,'banner','groove'],
+  [60000,'skin','gold'],[120000,'banner','stage'],[180000,'skin','rainbow'],[300000,'banner','takumi'],[450000,'skin','diamond'],[600000,'banner','master']];
+const totalMin=()=>LOG.entries.reduce((s,e)=>s+e.min,0);
+const msLabel=m=>m<60?`${m}分`:`${m/60}h`;
+function earnedCount(){ const t=totalMin(); return MS.filter(x=>t>=x[0]).length; }
+function unlocked(kind,id){ if(id==='classic'||id==='none') return true; const i=MS.findIndex(x=>x[1]===kind&&x[2]===id); return i>=0&&totalMin()>=MS[i][0]; }
+function applySkin(){
+  let id=LOG.skin; if(!SKINS[id]||!unlocked('skin',id)) id='classic';
+  const sk=SKINS[id], fg=$('#ringFg'), ring=fg.closest('svg');
+  ring.classList.toggle('glow',!!sk.glow); ring.classList.toggle('thick',!!sk.thick); ring.classList.toggle('dashed',!!sk.dash);
+  if(sk.glow) ring.style.setProperty('--glow',sk.glow); else ring.style.removeProperty('--glow');
+  if(sk.c){ $('#ringDefs').innerHTML=`<linearGradient id="skinG" x1="0" y1="0" x2="1" y2="1">${sk.c.map((c,i)=>`<stop offset="${(i/(sk.c.length-1)*100).toFixed(0)}%" stop-color="${c}"/>`).join('')}</linearGradient>`; fg.style.stroke='url(#skinG)'; }
+  else { $('#ringDefs').innerHTML=''; fg.style.stroke=''; }
+}
+function applyBanner(){
+  const el=$('#lgBanner'); let id=LOG.banner; if(!BANNERS[id]||!unlocked('banner',id)) id='none';
+  if(id==='none'){ el.hidden=true; return; }
+  const bn=BANNERS[id]; el.style.background=bn.bg; el.hidden=false;
+  el.innerHTML=`<span class="bi">${bn.i}</span><div><b></b><small>累計 ${fmtHM(totalMin())}・トロフィー ${earnedCount()}/${MS.length}</small></div>`; el.querySelector('b').textContent=bn.name;
+}
+function rewardName(x){ return x[1]==='skin'?`着せ替え「${SKINS[x[2]].name}」`:`バナー「${BANNERS[x[2]].name}」`; }
+function renderTrophies(){
+  const t=totalMin(), n=earnedCount(), nx=MS[n];
+  $('#trCount').textContent=`${n}/${MS.length}`;
+  const prev=n?MS[n-1][0]:0;
+  $('#trFill').style.width=(nx?Math.min(100,(t-prev)/(nx[0]-prev)*100):100)+'%';
+  $('#trNext').textContent=nx?`累計 ${fmtHM(t)}。次の「${msLabel(nx[0])}」まであと ${fmtHM(nx[0]-t)}（${rewardName(nx)}）`:`累計 ${fmtHM(t)}。すべてのトロフィーを獲得しました！`;
+  const g=$('#trGrid'); g.innerHTML='';
+  MS.forEach((x,i)=>{ const d=document.createElement('div'); d.className='tr'+(i<n?'':' lock')+(i===n?' next':'');
+    d.innerHTML=`<span class="md">${i<n?'🏆':'🔒'}</span><b>${msLabel(x[0])}</b><small></small>`; d.querySelector('small').textContent=(x[1]==='skin'?'着せ替え ':'バナー ')+(x[1]==='skin'?SKINS[x[2]].name:BANNERS[x[2]].name);
+    d.title=i<n?'獲得済み':`あと ${fmtHM(x[0]-t)}`; g.appendChild(d); });
+  const mk=(box,kind,dict,cur,set)=>{ box.innerHTML=''; Object.entries(dict).forEach(([id,o])=>{ const ok=unlocked(kind,id), b=document.createElement('button'); b.type='button'; b.className='dr'; b.setAttribute('role','radio'); b.setAttribute('aria-checked',String(cur===id&&ok)); b.disabled=!ok;
+      const pv=kind==='skin'?(o.c?`background:conic-gradient(${o.c.join(',')},${o.c[0]})`:'background:var(--root)'):(o.bg?`background:${o.bg}`:'background:var(--panel)');
+      b.innerHTML=`<span class="pv${kind==='banner'?' bn':''}" style="${pv}">${ok?(kind==='banner'?(o.i||'—'):''):'🔒'}</span><span></span>`; b.lastChild.textContent=o.name;
+      if(!ok){ const m=MS.find(x=>x[1]===kind&&x[2]===id); b.title=`累計 ${msLabel(m[0])} で使えます`; }
+      b.addEventListener('click',()=>set(id)); box.appendChild(b); }); };
+  mk($('#dressSkin'),'skin',SKINS,SKINS[LOG.skin]&&unlocked('skin',LOG.skin)?LOG.skin:'classic',id=>{LOG.skin=id;store.set('skin',id);applySkin();renderTrophies();});
+  mk($('#dressBanner'),'banner',BANNERS,BANNERS[LOG.banner]&&unlocked('banner',LOG.banner)?LOG.banner:'none',id=>{LOG.banner=id;store.set('banner',id);applyBanner();renderTrophies();});
+  applySkin(); applyBanner();
+}
+// 新しいトロフィーを取ったら知らせる（いちばん新しいもの1つだけ）
+function trophyCheck(){
+  const n=earnedCount(), seen=store.get('trSeen',-1);
+  if(seen<0){ store.set('trSeen',n); return; }
+  if(n>seen){ const x=MS[n-1], t=$('#toast'); t.innerHTML=''; const s=document.createElement('span'); s.textContent=`🏆 トロフィー獲得！ 累計 ${msLabel(x[0])}。${rewardName(x)}が使えるようになりました`; t.appendChild(s);
+    const b=document.createElement('button'); b.className='btn'; b.textContent='使う'; b.addEventListener('click',()=>{ if(x[1]==='skin'){LOG.skin=x[2];store.set('skin',x[2]);} else {LOG.banner=x[2];store.set('banner',x[2]);} renderTrophies(); t.hidden=true; });
+    const c=document.createElement('button'); c.className='btn'; c.textContent='閉じる'; c.addEventListener('click',()=>t.hidden=true);
+    t.append(b,c); t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,12000); }
+  if(n!==seen) store.set('trSeen',n);
+}
+
 function renderLog(){
   const tot=dayTotals(), now=new Date(), td=ymd(now), today=tot[td]||0;
   $('#todayMin').textContent=today;
   const dots=$('#todayDots'); dots.innerHTML='';
-  LOG.entries.filter(e=>e.date===td).forEach((e,i,arr)=>{const d=document.createElement('i'); if(e.min<15) d.className='s'; if(i===arr.length-1&&Date.now()-LOG.lastDone<3000) d.classList.add('pop'); d.title=e.min+'分'; dots.appendChild(d);});
-  const pct=Math.min(100,today/LOG.goal*100); $('#goalFill').style.width=pct+'%'; document.querySelector('.goal-bar').classList.toggle('met',today>=LOG.goal);
+  LOG.entries.filter(e=>e.date===td).forEach((e,i,arr)=>{const d=document.createElement('i'); if(e.min<15) d.className='s'; if(i===arr.length-1&&Date.now()-LOG.lastDone<3000) d.classList.add('pop'); d.title=`${e.cat} ${e.min}分`; dots.appendChild(d);});
+  const pct=Math.min(100,today/LOG.goal*100); $('#goalFill').style.width=pct+'%'; $('#goalFill').parentNode.classList.toggle('met',today>=LOG.goal);
   $('#goalMsg').textContent= today>=LOG.goal?`今日の目標 ${LOG.goal}分 達成！`:`目標 ${LOG.goal}分まで あと${LOG.goal-today}分`;
-  let week=0; const days=[]; for(let i=6;i>=0;i--){const d=new Date(now); d.setDate(d.getDate()-i); const v=tot[ymd(d)]||0; week+=v; days.push({d,v,i});}
+  let week=0; for(let i=6;i>=0;i--){const d=new Date(now); d.setDate(d.getDate()-i); week+=tot[ymd(d)]||0;}
   let streak=0; const d=new Date(now); if(!tot[td]) d.setDate(d.getDate()-1); while(tot[ymd(d)]){streak++;d.setDate(d.getDate()-1);}
-  const all=LOG.entries.reduce((a,e)=>a+e.min,0);
+  const all=totalMin();
   $('#stStreak').textContent=streak; $('#stWeek').textContent=week;
   $('#stAll').textContent=all>=60?(all/60).toFixed(1):all; $('#stAllU').textContent=all>=60?'時間':'分';
-  const mx=Math.max(LOG.goal,...days.map(x=>x.v),1), wb=$('#weekBars'); wb.innerHTML='';
-  days.forEach(x=>{const c=document.createElement('div'); c.className='wb'+(x.v?' on':'')+(x.v>=LOG.goal?' met':'')+(x.i===0?' today':'');
-    c.innerHTML=`<i style="height:${Math.round(x.v/mx*80)}%"></i><span>${x.i===0?'今日':'日月火水木金土'[x.d.getDay()]}</span>`; c.title=`${x.d.getMonth()+1}/${x.d.getDate()} ${x.v}分`; wb.appendChild(c);});
-  const list=$('#logList'); list.innerHTML='';
-  const byDay=Object.entries(tot).sort((a,b)=>a[0]<b[0]?1:-1).slice(0,30);
-  if(!byDay.length) list.innerHTML='<p class="msg">まだ記録がありません。</p>';
-  byDay.forEach(([date,min])=>{const [yy,mm,dd]=date.split('-'), n=LOG.entries.filter(e=>e.date===date).length, r=document.createElement('div'); r.className='log-row';
-    r.innerHTML=`<span class="d">${+mm}/${+dd}（${'日月火水木金土'[new Date(+yy,+mm-1,+dd).getDay()]}）</span><span class="m">${min}分</span><span class="memo">${n}セット</span><span></span>`; list.appendChild(r);});
+  renderReview(); renderTrophies();
 }
 let toastTimer=null;
 function offerLog(mins,cat){
   const t=$('#toast'); t.innerHTML=`<span>${cat}を${mins}分練習しました。記録しますか？</span>`;
   const b=document.createElement('button');b.className='btn';b.textContent='記録する';
-  b.addEventListener('click',()=>{addEntry(ymd(new Date()),mins,cat,'');t.innerHTML='<span>練習記録に追加しました</span>';clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.hidden=true,2500);});
+  b.addEventListener('click',()=>{addEntry(ymd(new Date()),mins,cat,'');trophyCheck();t.innerHTML='<span>練習記録に追加しました</span>';clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.hidden=true,2500);});
   const x=document.createElement('button');x.className='btn';x.textContent='閉じる';x.addEventListener('click',()=>t.hidden=true);
   t.append(b,x); t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,15000);
 }
+const backupData=()=>JSON.stringify({app:'fretlab',v:2,log:LOG.entries,timers:LOG.timers,skin:LOG.skin,banner:LOG.banner});
 (function initLog(){
-  segInit($('#pomoLen'),String(LOG.pomo.len),v=>{ if(LOG.pomo.state==='run'||LOG.pomo.state==='pause') return; LOG.pomo.len=+v; LOG.pomo.state='idle'; savePomo(); $('#pomoMsg').textContent=''; pomoRender(); });
   $('#pomoStart').addEventListener('click',pomoStartPause);
-  $('#pomoStop').addEventListener('click',()=>pomoFinish(false));
+  $('#pomoStop').addEventListener('click',pomoFinish);
+  $('#tmEdit').addEventListener('click',()=>{ LOG.editT=!LOG.editT; renderTimers(); });
+  segInit($('#rvMode'),LOG.rv.mode,v=>{LOG.rv.mode=v;LOG.rv.off=0;LOG.rv.edit=null;LOG.rv.more=false;store.set('rvMode',v);renderReview();});
+  $('#rvPrev').addEventListener('click',()=>{LOG.rv.off--;LOG.rv.edit=null;LOG.rv.more=false;renderReview();});
+  $('#rvNext').addEventListener('click',()=>{if(LOG.rv.off<0){LOG.rv.off++;LOG.rv.edit=null;LOG.rv.more=false;renderReview();}});
+  $('#rvAdd').addEventListener('click',()=>{LOG.rv.edit='new';renderReview();});
   const g=$('#goalSel'); g.value=String(LOG.goal); g.addEventListener('change',()=>{LOG.goal=+g.value;store.set('goal',LOG.goal);renderLog();});
-  document.querySelector('.log-more').addEventListener('toggle',e=>{if(e.target.open) $('#backupTxt').value=JSON.stringify({app:'fretlab',v:1,log:LOG.entries});});
-  $('#backupCopy').addEventListener('click',()=>{const t=$('#backupTxt');t.value=JSON.stringify({app:'fretlab',v:1,log:LOG.entries});
+  document.querySelector('.log-more').addEventListener('toggle',e=>{if(e.target.open) $('#backupTxt').value=backupData();});
+  $('#backupCopy').addEventListener('click',()=>{const t=$('#backupTxt');t.value=backupData();
     navigator.clipboard.writeText(t.value).then(()=>$('#backupMsg').textContent='コピーしました').catch(()=>{t.select();$('#backupMsg').textContent='選択しました。手動でコピーしてください';});});
   $('#backupLoad').addEventListener('click',()=>{
     try{const o=JSON.parse($('#backupTxt').value);const arr=Array.isArray(o)?o:o.log;
       if(!Array.isArray(arr)||!arr.every(e=>e&&/^\d{4}-\d{2}-\d{2}$/.test(e.date)&&+e.min>0)) throw 0;
       LOG.entries=arr.map(e=>({id:e.id||Date.now()+Math.random(),date:e.date,min:+e.min,cat:String(e.cat||'練習'),memo:String(e.memo||'')}));
-      saveLog();renderLog();$('#backupMsg').textContent=`${arr.length}件を復元しました`;
+      if(o&&Array.isArray(o.timers)&&o.timers.length){ LOG.timers=o.timers.slice(0,5).filter(t=>t&&t.title&&+t.min>0).map((t,i)=>({id:String(t.id||'t'+i),title:String(t.title).slice(0,16),min:Math.max(1,Math.min(180,Math.round(+t.min)))})); if(!LOG.timers.length) LOG.timers=TM_DEF.map(t=>({...t})); saveTimers(); }
+      if(o&&typeof o.skin==='string'){LOG.skin=o.skin;store.set('skin',o.skin);} if(o&&typeof o.banner==='string'){LOG.banner=o.banner;store.set('banner',o.banner);}
+      store.set('trSeen',earnedCount());
+      saveLog();renderTimers();renderLog();$('#backupMsg').textContent=`${arr.length}件を復元しました`;
     }catch(e){$('#backupMsg').textContent='読み込めませんでした';}
   });
-  // アプリを閉じている間に時間が来ていたら、ここで記録する
-  if(LOG.pomo.state==='run'&&pomoLeft()<=0) pomoFinish(true);
-  if(LOG.pomo.state==='break'&&pomoLeft()<=0){LOG.pomo.state='idle';savePomo();}
+  if(LOG.pomo.state==='break'&&Date.now()>=LOG.pomo.end){LOG.pomo.state='idle';savePomo();}
+  if(!LOG.timers.some(t=>t.id===LOG.pomo.tid)&&LOG.pomo.state!=='run'&&LOG.pomo.state!=='pause'){const f=LOG.timers[0];Object.assign(LOG.pomo,{tid:f.id,title:f.title,len:f.min});savePomo();}
   LOG.tick=setInterval(pomoTick,500);
-  pomoRender(); renderLog();
+  renderTimers(); renderLog(); trophyCheck();
 })();
 
 /* ---------- 録音（端末内の IndexedDB に保存） ---------- */
