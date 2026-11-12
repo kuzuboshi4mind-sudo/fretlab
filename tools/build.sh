@@ -53,6 +53,7 @@ MAN
 sed "s/__VERSION__/$VERSION/" tools/sw.template.js > www/sw.js
 # 英語版（en/）：日本語の文字列を tools/i18n の辞書で置き換えて作る
 python3 tools/make_en.py www/index.html www/en/index.html
+sed -i "s/__VERSION__/$VERSION/" www/index.html www/en/index.html
 # 紹介ページなど、アプリ以外の静的ページ
 cp -R site/. www/
 echo "built www/ (cache fretlab-$VERSION)"

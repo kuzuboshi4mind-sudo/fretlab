@@ -17,3 +17,4 @@ T={
 '🏆 アチーブメント達成！ 累計 ${msLabel(x[0])}。${rewardName(x)}が使えるようになりました':'🏆 Achievement unlocked! ${msLabel(x[0])} total. You unlocked the ${rewardName(x)}.',
 '✓ 保存しました（${recFmt(dur)}）':'✓ Saved (${recFmt(dur)})','すべて':'All',
 }
+T['アプリの版 __VERSION__']='App version __VERSION__'
