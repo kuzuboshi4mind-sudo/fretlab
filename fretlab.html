@@ -521,7 +521,6 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .week-bars .wb.met i{background:var(--good)}
 .week-bars .wb span{font-size:10.5px;color:var(--muted);font-family:var(--mono)}
 .week-bars .wb.today span{color:var(--fg);font-weight:600}
-.log-more{margin-top:16px}
 /* マイ記録：タイマー・振り返り・トロフィー */
 :root{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--s5:#e87ba4;--s6:#008300;--s0:#a3a39b}
 @media (prefers-color-scheme: dark){:root:not([data-scheme]){--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--s5:#d55181;--s6:#2f9a2f;--s0:#6f736e}}
@@ -1401,13 +1400,6 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
         </div>
       </div>
     </div>
-    <details class="card log-more">
-      <summary>目標とバックアップ</summary>
-      <div class="row" style="margin-top:12px"><label class="msg" for="goalSel">1日の目標</label><select id="goalSel"><option>15</option><option>30</option><option>45</option><option>60</option><option>90</option></select><span class="msg">分</span></div>
-      <p class="msg">バックアップ：コピーして保管、貼り付けて「復元」。</p>
-      <textarea id="backupTxt" rows="3" class="search" style="width:100%;font-family:var(--mono);font-size:12px" aria-label="バックアップデータ"></textarea>
-      <div class="row"><button class="btn" id="backupCopy">コピー</button><button class="btn" id="backupLoad">復元</button><span class="msg" id="backupMsg"></span></div>
-    </details>
   </section>
 
   <div class="toast" id="toast" hidden></div>
@@ -4395,7 +4387,6 @@ function offerLog(mins,cat){
   const x=document.createElement('button');x.className='btn';x.textContent='閉じる';x.addEventListener('click',()=>t.hidden=true);
   t.append(b,x); t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,15000);
 }
-const backupData=()=>JSON.stringify({app:'fretlab',v:2,log:LOG.entries,timers:LOG.timers,skin:LOG.skin,banner:LOG.banner});
 (function initLog(){
   $('#pomoStart').addEventListener('click',pomoStartPause);
   $('#pomoStop').addEventListener('click',pomoFinish);
@@ -4408,20 +4399,6 @@ const backupData=()=>JSON.stringify({app:'fretlab',v:2,log:LOG.entries,timers:LO
   $('#achBtn').addEventListener('click',openA); $('#lgBanner').addEventListener('click',openA);
   $('#achClose').addEventListener('click',closeA); am.addEventListener('click',e=>{ if(e.target===am) closeA(); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!am.hidden) closeA(); });
-  const g=$('#goalSel'); g.value=String(LOG.goal); g.addEventListener('change',()=>{LOG.goal=+g.value;store.set('goal',LOG.goal);renderLog();});
-  document.querySelector('.log-more').addEventListener('toggle',e=>{if(e.target.open) $('#backupTxt').value=backupData();});
-  $('#backupCopy').addEventListener('click',()=>{const t=$('#backupTxt');t.value=backupData();
-    navigator.clipboard.writeText(t.value).then(()=>$('#backupMsg').textContent='コピーしました').catch(()=>{t.select();$('#backupMsg').textContent='選択しました。手動でコピーしてください';});});
-  $('#backupLoad').addEventListener('click',()=>{
-    try{const o=JSON.parse($('#backupTxt').value);const arr=Array.isArray(o)?o:o.log;
-      if(!Array.isArray(arr)||!arr.every(e=>e&&/^\d{4}-\d{2}-\d{2}$/.test(e.date)&&+e.min>0)) throw 0;
-      LOG.entries=arr.map(e=>({id:e.id||Date.now()+Math.random(),date:e.date,min:+e.min,cat:String(e.cat||'練習'),memo:String(e.memo||'')}));
-      if(o&&Array.isArray(o.timers)&&o.timers.length){ LOG.timers=o.timers.slice(0,5).filter(t=>t&&t.title&&+t.min>0).map((t,i)=>({id:String(t.id||'t'+i),title:String(t.title).slice(0,16),min:Math.max(1,Math.min(180,Math.round(+t.min)))})); if(!LOG.timers.length) LOG.timers=TM_DEF.map(t=>({...t})); saveTimers(); }
-      if(o&&typeof o.skin==='string'){LOG.skin=o.skin;store.set('skin',o.skin);} if(o&&typeof o.banner==='string'){LOG.banner=o.banner;store.set('banner',o.banner);}
-      store.set('trSeen',earnedCount());
-      saveLog();renderTimers();renderLog();$('#backupMsg').textContent=`${arr.length}件を復元しました`;
-    }catch(e){$('#backupMsg').textContent='読み込めませんでした';}
-  });
   if(LOG.pomo.state==='break'&&Date.now()>=LOG.pomo.end){LOG.pomo.state='idle';savePomo();}
   if(!LOG.timers.some(t=>t.id===LOG.pomo.tid)&&LOG.pomo.state!=='run'&&LOG.pomo.state!=='pause'){const f=LOG.timers[0];Object.assign(LOG.pomo,{tid:f.id,title:f.title,len:f.min});savePomo();}
   LOG.tick=setInterval(pomoTick,500);
