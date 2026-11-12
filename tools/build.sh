@@ -9,7 +9,7 @@ python3 tools/make_icons.py www/icons
   cat <<'HEAD'
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f7f3">
 <meta name="description" content="ギタリストのための練習アプリ。メトロノーム、ドラム、チューナー、コード、コード進行、指板、スケール、練習記録。">
 <meta name="apple-mobile-web-app-capable" content="yes">

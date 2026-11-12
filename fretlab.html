@@ -349,8 +349,14 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .chord-head{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap;margin-block:18px 12px}
 .chord-name{font-family:var(--display);font-weight:400;font-size:72px;line-height:.95}
 .tones{display:flex;gap:6px;flex-wrap:wrap}
+.sc-speed{min-width:200px}.sc-speed input{width:100%}
+html{touch-action:manipulation}
+button,.btn,.chip,a,label,select,input{touch-action:manipulation}
 .tone{display:flex;flex-direction:column;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:4px 10px;min-width:48px}
-.tone b{font-family:var(--display);font-size:20px}
+.tone b{font-family:var(--display);font-size:20px;display:flex;flex-direction:column;align-items:center;line-height:1.15}
+.tone b .dr{font-style:normal;font-family:var(--body);font-size:12px;font-weight:600;color:var(--muted);line-height:1.2}
+.str-notes{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--fg);display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1.35}
+.str-notes span{font-family:var(--body);font-size:11.5px;letter-spacing:.02em;color:var(--muted)}
 .tone small{font-size:11px;color:var(--muted);font-family:var(--mono)}
 .voicings{display:flex;flex-direction:column;gap:12px}
 .vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
@@ -992,6 +998,7 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
         <div class="theme-pop set-pop" id="setPop" role="dialog" aria-label="設定" hidden>
           <div class="set-head"><h3>設定</h3><button class="set-x" id="setClose" type="button" aria-label="閉じる">×</button></div>
           <div class="set-row"><span>言語<small>Language</small></span><div class="seg" id="setLang"><button data-v="ja">日本語</button><button data-v="en">English</button></div></div>
+          <div class="set-row"><span>音名の表記<small>コードの構成音・スケールの音</small></span><div class="seg" id="setNote"><button data-v="abc">C D E</button><button data-v="doremi">ドレミ</button><button data-v="both">両方</button></div></div>
           <div class="set-row"><span>はじめの速さ<small>弾語り練習・TAB練習で曲を開いたとき</small></span><div class="seg" id="setSpeed"><button data-v="75">75%</button><button data-v="100">100%</button><button data-v="125">125%</button><button data-v="150">150%</button></div></div>
           <label class="set-row"><span>再生中に自動でスクロール<small>手で動かすとその再生中は止まります</small></span><input type="checkbox" class="sw-in" id="setFollow"></label>
           <label class="set-row"><span>曲の最後で次の曲へ進む<small>ループ・リピートがオフのとき</small></span><input type="checkbox" class="sw-in" id="setNext"></label>
@@ -1179,8 +1186,9 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
       <div><label class="label" for="scType">スケール</label><select id="scType"></select></div>
       <div class="sc-desc-box"><span class="label">響きと使いどころ</span><p id="scDesc"></p>
         <span class="label" style="margin-top:10px;display:block">実際に使われている楽曲・フレーズ</span><ul class="sc-songs" id="scSongs"></ul></div>
-      <div><span class="label">ラベル</span><div class="seg" id="scLabel"><button data-v="degree">度数</button><button data-v="name">音名</button></div></div>
+      <div><span class="label">ラベル</span><div class="seg" id="scLabel"><button data-v="degree">度数</button><button data-v="name">音名</button><button data-v="doremi">ドレミ</button></div></div>
       <div><span class="label">表示範囲</span><div class="seg" id="scRange"><button data-v="0-22">全体</button><button data-v="0-4">0–4</button><button data-v="3-8">3–8</button><button data-v="5-10">5–10</button><button data-v="8-13">8–13</button><button data-v="10-15">10–15</button><button data-v="12-17">12–17</button><button data-v="15-22">15–22</button></div></div>
+      <div class="sc-speed"><label class="label" for="scSpeed">速さ ♩=<b id="scSpeedV">72</b></label><input type="range" id="scSpeed" min="40" max="160" step="4" value="72" aria-label="スケールの速さ"></div>
       <div><button class="btn sc-play" id="scPlay">▶ スケールを再生</button></div>
     </div>
     <div class="board-scroll" id="scBoard"></div>
@@ -1705,6 +1713,11 @@ function searchVoicings(root,ch,needN){
 const nn=(pc,root)=>(FLAT_ROOTS.has(root)?NOTES_F:NOTES_S)[((pc%12)+12)%12];
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem('fretlab.'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('fretlab.'+k,JSON.stringify(v))}catch(e){}}};
+// 音名の表記：abc＝C D E、doremi＝ド レ ミ（イタリア音名・固定ド）、both＝両方（C の下に小さく ド）
+const NOTE_MODE={v:store.get('noteNames','both')};
+const DOREMI_L=['ド','レ','ミ','ファ','ソ','ラ','シ'];
+const toDoremi=name=>{ const i='CDEFGAB'.indexOf(name[0]); return i<0?name:DOREMI_L[i]+name.slice(1); };
+function noteHTML(name){ const m=NOTE_MODE.v; return m==='abc'?name:m==='doremi'?toDoremi(name):`${name}<i class="dr">${toDoremi(name)}</i>`; }
 /* ---------- 楽器（ギター／ウクレレ／ベース）：コード・進行・指板・スケール・練習曲・TAB で共通 ---------- */
 // m：低い弦→高い弦の開放音（index 0 がいちばん番号の大きい弦）
 const INSTS={
@@ -1794,7 +1807,7 @@ initInstSegs();
 let ctx=null, master=null, a4=440;
 // 再生中のプレーヤーの出力先。停止時にこのバスごと消音して、先に予約済みの音（クリックなど）も確実に止める
 let BUS=null;
-const outNode=()=>BUS||master;
+const outNode=()=>{ if(!master) ac(); return BUS||master; };   // 音の出口を作り直した直後でも鳴らせるように
 function openBus(){const g=ac().createGain();g.connect(master);return g;}
 function closeBus(g){ if(!g) return; const t=ctx.currentTime; try{g.gain.cancelScheduledValues(t);g.gain.setValueAtTime(g.gain.value,t);g.gain.linearRampToValueAtTime(0,t+0.04);}catch(e){} setTimeout(()=>{try{g.disconnect();}catch(e){}},200); }
 function onBus(g,fn){const prev=BUS;BUS=g;try{return fn();}finally{BUS=prev;}}
@@ -1809,9 +1822,33 @@ function ac(){
     master=ctx.createGain(); master.gain.value=0.9; master.connect(comp); comp.connect(ctx.destination);
     loadSamples();
   }
-  if(ctx.state==='suspended') ctx.resume();
+  if(ctx.state!=='running'&&ctx.state!=='closed') ctx.resume().catch(()=>{});
   return ctx;
 }
+// アプリを開き直したときに音が出なくなるのを防ぐ（iPhone）
+// ・画面に戻ったら音を再開。しばらく裏にいたら、次に鳴らすときに音の出口を作り直す（鳴っていないときだけ）
+// ・タップのたびに、止まっている音を再開する（iOS はタップの中でないと再開できない）
+const AUD={hiddenAt:0,stale:false};
+function audioBusy(){ try{ return !!(M.playing||(typeof SP!=='undefined'&&SP.playing)||(typeof TB!=='undefined'&&TB.playing)||(typeof SCP!=='undefined'&&SCP.playing)||(typeof T!=='undefined'&&T.stream)||(typeof REC!=='undefined'&&REC.rec&&REC.rec.state==='recording')); }catch(e){ return false; } }
+function audioRebuild(){
+  if(!ctx||audioBusy()) return;
+  const old=ctx; ctx=null; master=null; BUS=null; SMP.voices={};
+  try{ old.close(); }catch(e){}
+}
+function audioUnlock(){
+  if(AUD.stale&&!audioBusy()){ AUD.stale=false; audioRebuild(); }
+  if(!ctx) return;
+  if(ctx.state!=='running'){ ctx.resume().then(()=>{ if(ctx&&ctx.state!=='running') audioRebuild(); }).catch(()=>audioRebuild()); }
+  // 無音を一瞬鳴らして、iOS の音の出口を起こす
+  try{ const b=ctx.createBuffer(1,1,22050), src=ctx.createBufferSource(); src.buffer=b; src.connect(ctx.destination); src.start(0); }catch(e){}
+}
+['pointerdown','touchend','keydown'].forEach(ev=>document.addEventListener(ev,audioUnlock,{capture:true,passive:true}));
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden'){ AUD.hiddenAt=Date.now(); return; }
+  if(AUD.hiddenAt&&Date.now()-AUD.hiddenAt>20000) AUD.stale=true;   // 20秒以上裏にいたら、次のタップで作り直す
+  if(ctx&&ctx.state!=='running') ctx.resume().catch(()=>{});
+});
+window.addEventListener('pageshow',e=>{ if(e.persisted) AUD.stale=true; });
 /* ---------- 録音した楽器音（FluidR3_GM, MIT License）。読み込めないときは合成音で鳴らす ---------- */
 const SMP={man:null,buf:{},loading:null,voices:{}};
 function loadSamples(){
@@ -1929,6 +1966,7 @@ const ABOUT_HTML=`<p>Fretlab（フレットラボ）は、ギター・ウクレ�
 (function initSettings(){
   $('#aboutText').innerHTML=ABOUT_HTML;
   segInit($('#setLang'),LANG,v=>{ if(v!==LANG){ store.set('lang',v); location.replace(langURL(v)); } });
+  segInit($('#setNote'),NOTE_MODE.v,v=>{ NOTE_MODE.v=v; store.set('noteNames',v); try{renderChord();}catch(e){} try{renderScale();}catch(e){} });
   const pop=$('#setPop'), btn=$('#setBtn');
   const open=v=>{ pop.hidden=!v; btn.setAttribute('aria-expanded',String(v)); };
   btn.addEventListener('click',e=>{ e.stopPropagation(); open(pop.hidden); });
@@ -2671,13 +2709,20 @@ function diagram(v,root,type){
   return s+'</svg>';
 }
 function strum(v){ playShape(Array.isArray(v)?{frets:v}:v); }
+// 押さえ方の各弦の音（低い弦から）：C のオープンなら「C E G C E」「ド ミ ソ ド ミ」
+function strNotes(v,root){
+  const frets=Array.isArray(v)?v:v.frets; if(!frets) return '';
+  const t=tun(), ns=frets.map((f,i)=>f===null?null:nn(t[i]+f,root)).filter(Boolean); if(!ns.length) return '';
+  const m=NOTE_MODE.v, abc=ns.join(' '), dr=ns.map(toDoremi).join(' ');
+  return `<div class="str-notes">${m==='doremi'?dr:abc}${m==='both'?`<span>${dr}</span>`:''}</div>`;
+}
 function renderChord(){
   const cus=C.custom&&CUSTOM, ch=cus?CUSTOM:CHORDS.find(c=>c.id===C.type), r=cus?CUSTOM.root:C.root;
   const fullName=cus?CUSTOM.name:nn(r,r)+ch.sym;
   $('#chordName').textContent=fullName;
   $('#chordTypeName').textContent=cus?'自由入力　構成音':`${ch.name}　構成音`;
-  $('#chordTones').innerHTML=ch.iv.map(i=>`<div class="tone"><b>${nn(r+i,r)}</b><small>${chordDeg(i,ch.id)}</small></div>`).join('')
-    +(cus&&CUSTOM.bass!=null&&!ch.iv.some(i=>(r+i)%12===CUSTOM.bass)?`<div class="tone"><b>${nn(CUSTOM.bass,r)}</b><small>ベース</small></div>`:'');
+  $('#chordTones').innerHTML=ch.iv.map(i=>`<div class="tone"><b>${noteHTML(nn(r+i,r))}</b><small>${chordDeg(i,ch.id)}</small></div>`).join('')
+    +(cus&&CUSTOM.bass!=null&&!ch.iv.some(i=>(r+i)%12===CUSTOM.bass)?`<div class="tone"><b>${noteHTML(nn(CUSTOM.bass,r))}</b><small>ベース</small></div>`:'');
   // いちばん定番の形を特別扱いで先頭に、残りはポジション（0〜12フレット）順に
   const el=$('#voicings'); el.innerHTML=''; let std,rest;
   if(cus&&INS==='guitar'&&ch.known){ std=voicings(r,ch.known)[0]; const key=f=>f.join(','); rest=allVoicings(r,ch.known).filter(v=>!std||key(v.frets)!==key(std.frets)).sort((a,b)=>a.pos-b.pos||(a.fam==='tri')-(b.fam==='tri')); }
@@ -2688,7 +2733,7 @@ function renderChord(){
   const bass=isBass();
   if(std){
     const d=document.createElement('div'); d.className='card voicing featured';
-    d.innerHTML=`<div class="feat-badge">${bass?'基本のアルペジオ':'定番フォーム'}</div><div class="feat-body">${diagram(std,r,ch.id)}<div class="feat-info"><div class="feat-name"></div><div class="vl">${std.label}</div><div class="tab-str">${shapeStr(std)}</div><p class="msg">${bass?'ルートから構成音を順に弾く、まず覚えたい形です。':'いちばんよく使われる、まず覚えたい押さえ方です。'}</p><button class="btn primary">▶ 鳴らす</button></div></div>`;
+    d.innerHTML=`<div class="feat-badge">${bass?'基本のアルペジオ':'定番フォーム'}</div><div class="feat-body">${diagram(std,r,ch.id)}<div class="feat-info"><div class="feat-name"></div><div class="vl">${std.label}</div><div class="tab-str">${shapeStr(std)}</div>${strNotes(std,r)}<p class="msg">${bass?'ルートから構成音を順に弾く、まず覚えたい形です。':'いちばんよく使われる、まず覚えたい押さえ方です。'}</p><button class="btn primary">▶ 鳴らす</button></div></div>`;
     d.querySelector('.feat-name').textContent=fullName;
     d.querySelector('button').addEventListener('click',()=>playShape(std)); el.appendChild(d);
   }
@@ -2696,7 +2741,7 @@ function renderChord(){
   const grid=document.createElement('div'); grid.className='vgrid'; el.appendChild(grid);
   rest.forEach(v=>{
     const d=document.createElement('div'); d.className='card voicing'+(v.fam==='tri'?' tri':'');
-    d.innerHTML=`<div class="vpos">${v.pos===0?'開放':v.pos+'フレット'}</div>${diagram(v,r,ch.id)}<div class="tab-str">${shapeStr(v)}</div><div class="vl">${v.label}</div><button class="btn">▶ 鳴らす</button>`;
+    d.innerHTML=`<div class="vpos">${v.pos===0?'開放':v.pos+'フレット'}</div>${diagram(v,r,ch.id)}<div class="tab-str">${shapeStr(v)}</div>${strNotes(v,r)}<div class="vl">${v.label}</div><button class="btn">▶ 鳴らす</button>`;
     d.querySelector('button').addEventListener('click',()=>playShape(v)); grid.appendChild(d);
   });
   const set=new Set(ch.iv.map(i=>(r+i)%12)); if(cus&&CUSTOM.bass!=null) set.add(CUSTOM.bass);
@@ -4683,7 +4728,7 @@ function scaleStop(){ SCP.timers.forEach(clearTimeout); SCP.timers=[]; SCP.playi
 function scaleToggle(){
   if(SCP.playing){ scaleStop(); return; }
   stopAllPlayback(); const seq=scalePositions(); if(!seq.length) return;
-  const path=[...seq,...seq.slice(0,-1).reverse()], step=Math.min(.32,60/(M.bpm||120)/2), c=ac(), t0=c.currentTime+.08;
+  const path=[...seq,...seq.slice(0,-1).reverse()], step=60/S.bpm/2, c=ac(), t0=c.currentTime+.08;   // 8分音符で弾く
   SCP.playing=true; document.querySelectorAll('.sc-play').forEach(b=>b.textContent='■ 停止');
   // 指板は最初に1回だけ、弾くポジション全体が見える位置へ動かす（再生中は動かさない）
   { const g=geo(22), svg=$('#scBoard svg'), box=$('#scBoard'); if(svg&&box){ const fs=seq.map(p=>p.f), k=svg.clientWidth/g.W, cx=(fxc(Math.min(...fs),g)+fxc(Math.max(...fs),g))/2*k;
@@ -4693,16 +4738,16 @@ function scaleToggle(){
     SCP.timers.push(setTimeout(()=>{ const semi=((p.m-S.root)%12+12)%12; showStaff(p.s,p.f,{pre:'sc',key:S.root,extra:`<span class="msg">スケールの ${semi===0?'ルート':scDeg(semi)}</span>`}); },Math.max(0,(at-c.currentTime)*1000))); });
   SCP.timers.push(setTimeout(scaleStop,(path.length*step+.6)*1000));
 }
-const S={root:store.get('sRoot',9),type:store.get('sType','mpenta'),label:'degree',range:[0,22]};
+const S={root:store.get('sRoot',9),type:store.get('sType','mpenta'),label:'degree',range:[0,22],bpm:store.get('sBpm',72)};
 function scDeg(semi){return (semi===6&&S.type==='lydian')?'♯4':DEG[semi];}
 function renderScale(){
   const sc=SCALES.find(x=>x.id===S.type), r=S.root, set=new Set(sc.iv);
   renderBoard($('#scBoard'),(s,f,m)=>{
     if(f<S.range[0]||f>S.range[1]) return null;
     const semi=(m%12-r+12)%12; if(!set.has(semi)) return null;
-    return {kind:kindOf(semi),label:S.label==='degree'?scDeg(semi):nn(m%12,r)};
+    return {kind:kindOf(semi),label:S.label==='degree'?scDeg(semi):S.label==='doremi'?toDoremi(nn(m%12,r)):nn(m%12,r)};
   },(s,f)=>{ const m=tun()[s]+f, semi=(m%12-r+12)%12; showStaff(s,f,{pre:'sc',key:r,extra:set.has(semi)?`<span class="msg">スケールの ${semi===0?'ルート':scDeg(semi)}</span>`:'<span class="msg">スケール外の音</span>'}); },tun(),22);
-  $('#scNotes').innerHTML=sc.iv.map(i=>`<div class="tone"><b>${nn(r+i,r)}</b><small>${scDeg(i)}</small></div>`).join('');
+  $('#scNotes').innerHTML=sc.iv.map(i=>`<div class="tone"><b>${noteHTML(nn(r+i,r))}</b><small>${scDeg(i)}</small></div>`).join('');
   const steps=sc.iv.map((v,i)=>((sc.iv[i+1]??12)-v));
   $('#scFormula').textContent=steps.map(x=>x===1?'半':x===2?'全':x===3?'全半':x+'半音').join(' – ');
   $('#scDesc').textContent=sc.desc;
@@ -4716,6 +4761,9 @@ function renderScale(){
   r.addEventListener('change',()=>{S.root=+r.value;renderScale();});
   t.addEventListener('change',()=>{S.type=t.value;renderScale();});
   segInit($('#scLabel'),'degree',v=>{S.label=v;renderScale();});
+  { const sp=$('#scSpeed'), out=$('#scSpeedV'); sp.value=S.bpm; out.textContent=S.bpm;
+    sp.addEventListener('input',()=>{ S.bpm=+sp.value; out.textContent=S.bpm; store.set('sBpm',S.bpm); });
+    sp.addEventListener('change',()=>{ if(SCP.playing){ scaleStop(); scaleToggle(); } }); }
   segInit($('#scRange'),'0-22',v=>{S.range=v.split('-').map(Number);renderScale();});
   document.querySelectorAll('.sc-play').forEach(b=>b.addEventListener('click',scaleToggle));
   renderScale(); instHooks.push(renderScale);

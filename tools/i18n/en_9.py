@@ -18,3 +18,4 @@ T={
 '✓ 保存しました（${recFmt(dur)}）':'✓ Saved (${recFmt(dur)})','すべて':'All',
 }
 T['アプリの版 __VERSION__']='App version __VERSION__'
+T.update({'コードの構成音・スケールの音':'Chord tones and scale notes','スケールの速さ':'Scale speed','両方':'Both','速さ ♩=':'Speed ♩=','音名の表記':'Note names','ドレミ':'Do Re Mi'})
