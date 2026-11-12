@@ -856,7 +856,8 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 .intro-wind .bfly .wl,.intro-wind .bfly .wr{transform-box:view-box;transform-origin:16px 14px;animation:bfly-flap .13s ease-in-out infinite alternate}
 .intro-wind .bfly .wr{animation-delay:0s}
 @keyframes bfly-flap{0%{transform:scaleX(1)}100%{transform:scaleX(.12)}}
-.intro-wind .apl{position:absolute;left:0;top:0;width:48px;height:48px;transform-origin:50% 100%;will-change:transform,opacity;filter:drop-shadow(0 2px 2px rgba(0,0,0,.22))}
+.intro-wind .apl{position:absolute;left:0;top:0;width:48px;height:48px;transform-origin:50% 95%;will-change:transform,opacity}
+.intro-wind .apl-sh{position:absolute;left:0;top:0;border-radius:50%;background:radial-gradient(closest-side,rgba(40,25,15,.55),rgba(40,25,15,.22) 60%,transparent);will-change:transform,opacity;transform-origin:50% 50%}
 .intro-wind .apl svg{display:block;width:100%;height:100%;overflow:visible}
 @keyframes intro-draw{to{stroke-dashoffset:0}}
 @keyframes intro-rise{from{transform:translateY(8px) scale(.985)}to{transform:none}}
@@ -4995,30 +4996,49 @@ async function aiSend(text){
       kf.push({transform:`translate(${x.toFixed(0)}px,${y.toFixed(0)}px) rotate(${(12+tilt).toFixed(0)}deg) scale(${sc.toFixed(2)})`,opacity:k<.06?k/.06:k>.92?(1-k)/.08:1,offset:k}); }
     b.animate(kf,{duration:2300+Math.random()*400,delay:120,easing:'linear',fill:'both'});
   };
-  // まれに（30回に1回）リンゴが3つ上から落ちて、はずんで少し転がる
+  // まれに（30回に1回）リンゴが3つ上から落ちて、「はじめる」の少し下にドサッと着地する（転がらない）
   const apples=()=>{
     const box=document.getElementById('introWind'); if(!box) return;
-    const W=innerWidth, H=innerHeight;
-    const svg=i=>`<svg viewBox="0 0 32 32"><defs><radialGradient id="apG${i}" cx=".35" cy=".35" r=".75"><stop offset="0" stop-color="#ff7a6b"/><stop offset=".6" stop-color="#e2352d"/><stop offset="1" stop-color="#b3201f"/></radialGradient></defs><path d="M16 9.5C13 7 6.5 7.5 5 13.5 3.5 20 8 28.5 12.5 28.8 14.3 29 15 28 16 28 17 28 17.7 29 19.5 28.8 24 28.5 28.5 20 27 13.5 25.5 7.5 19 7 16 9.5Z" fill="url(#apG${i})"/><ellipse cx="10.5" cy="14" rx="2.2" ry="3.4" transform="rotate(25 10.5 14)" fill="#fff" opacity=".45"/><path d="M16 10C16 7.5 16.6 5 18 3.6" stroke="#7a4b26" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M17.4 5.6C19.5 2.6 23.6 2.4 25.4 3.6 23.6 6.6 20 7.4 17.4 5.6Z" fill="#6bb04f"/><path d="M18 5.4C20.2 4.6 22.2 4.2 24.2 3.9" stroke="rgba(255,255,255,.5)" stroke-width=".6" fill="none" stroke-linecap="round"/></svg>`;
-    const xs=[.22,.5,.78].sort(()=>Math.random()-.5);
+    const W=innerWidth, H=innerHeight, gb=go.getBoundingClientRect(), ground=Math.min(H-12,gb.bottom+76);   // リンゴの上が「はじめる」より少し下に来る高さ
+    const svg=i=>`<svg viewBox="0 0 64 64"><defs>
+      <radialGradient id="apB${i}" cx=".38" cy=".42" r=".7"><stop offset="0" stop-color="#e8483a"/><stop offset=".55" stop-color="#c62a22"/><stop offset=".85" stop-color="#9c1a18"/><stop offset="1" stop-color="#7c1213"/></radialGradient>
+      <radialGradient id="apY${i}" cx=".62" cy=".2" r=".45"><stop offset="0" stop-color="#e9b84a" stop-opacity=".85"/><stop offset=".6" stop-color="#d9772e" stop-opacity=".35"/><stop offset="1" stop-color="#c62a22" stop-opacity="0"/></radialGradient>
+      <radialGradient id="apC${i}" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#5a2a12" stop-opacity=".75"/><stop offset="1" stop-color="#7c1213" stop-opacity="0"/></radialGradient>
+      <linearGradient id="apL${i}" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#3f7d2c"/><stop offset="1" stop-color="#7fb24a"/></linearGradient>
+      <clipPath id="apK${i}"><path d="M32 16C27 11.5 17 10.5 11 17 4.5 24 6 38 11.5 48 15.5 55.5 21 60.5 26.5 60.5 29 60.5 30.2 59.4 32 59.4 33.8 59.4 35 60.5 37.5 60.5 43 60.5 48.5 55.5 52.5 48 58 38 59.5 24 53 17 47 10.5 37 11.5 32 16Z"/></clipPath></defs>
+      <path d="M32 16C27 11.5 17 10.5 11 17 4.5 24 6 38 11.5 48 15.5 55.5 21 60.5 26.5 60.5 29 60.5 30.2 59.4 32 59.4 33.8 59.4 35 60.5 37.5 60.5 43 60.5 48.5 55.5 52.5 48 58 38 59.5 24 53 17 47 10.5 37 11.5 32 16Z" fill="url(#apB${i})"/>
+      <g clip-path="url(#apK${i})">
+        <rect x="0" y="0" width="64" height="64" fill="url(#apY${i})"/>
+        <path d="M20 20C17 30 18 44 23 56M27 17C25 30 26 45 29 59M38 17C40 30 39 45 36 59M45 20C48 31 47 44 42 56M14 25C12 34 14 44 18 51M51 25C53 34 51 44 47 51" stroke="#f0a050" stroke-opacity=".09" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <ellipse cx="32" cy="17.5" rx="7" ry="3.6" fill="url(#apC${i})"/>
+        <ellipse cx="32" cy="66" rx="30" ry="9" fill="#4a0b0b" opacity=".35"/>
+        <circle cx="24" cy="30" r=".6" fill="#f6d39a" opacity=".55"/><circle cx="40" cy="36" r=".5" fill="#f6d39a" opacity=".5"/><circle cx="30" cy="44" r=".55" fill="#f6d39a" opacity=".45"/><circle cx="45" cy="26" r=".5" fill="#f6d39a" opacity=".5"/><circle cx="19" cy="40" r=".5" fill="#f6d39a" opacity=".45"/>
+      </g>
+      <path d="M15.5 25C14 31 15 37 17.5 41" stroke="#fff" stroke-opacity=".55" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+      <ellipse cx="20" cy="23.5" rx="2.4" ry="1.4" transform="rotate(-35 20 23.5)" fill="#fff" opacity=".6"/>
+      <path d="M32 18.5C32 13 32.8 8.5 35 5.2" stroke="#5b3a1e" stroke-width="2.1" stroke-linecap="round" fill="none"/>
+      <path d="M33.5 11C36 6.5 43 4.5 48.5 6.5 46 11.5 39 13.5 33.5 11Z" fill="url(#apL${i})"/>
+      <path d="M34.5 10.6C38.5 8.8 43 7.6 47.5 6.8" stroke="#cfe6a8" stroke-opacity=".6" stroke-width=".6" fill="none" stroke-linecap="round"/></svg>`;
+    const xs=[.24,.5,.76].sort(()=>Math.random()-.5);
     xs.forEach((fx,i)=>{
-      const a=document.createElement('div'); a.className='apl'; a.innerHTML=svg(i); box.appendChild(a);
-      const sz=44+Math.random()*12; a.style.width=a.style.height=sz+'px';
-      const x=W*fx+(Math.random()-.5)*W*.08-sz/2, g=H-sz-14-Math.random()*26;
-      let dx=(Math.random()<.7?1:-1)*(6+Math.random()*16);   // 転がるのは少しだけ
-      dx=Math.max(6-x,Math.min(W-sz-6-x,dx));
-      const turn=dx/(sz/2)*180/Math.PI, r0=(Math.random()-.5)*30;
-      const T=(xx,yy,rr,sx=1,sy=1)=>`translate(${xx.toFixed(0)}px,${yy.toFixed(0)}px) rotate(${rr.toFixed(0)}deg) scale(${sx},${sy})`;
-      // ドサッ：速く落ちて、つぶれて、小さくはねて、少し転がって止まる
+      const sz=46+Math.random()*12, x=W*fx+(Math.random()-.5)*W*.06-sz/2, g=ground-sz*.95, r0=(Math.random()-.5)*24;
+      const delay=i*110+Math.random()*90, dur=1150+Math.random()*120;
+      // 地面の影：リンゴが近づくほど濃く大きく
+      const sh=document.createElement('div'); sh.className='apl-sh'; sh.style.width=(sz*1.05)+'px'; sh.style.height=(sz*.24)+'px';
+      sh.style.transform=`translate(${(x-sz*.02).toFixed(0)}px,${(ground-sz*.14).toFixed(0)}px)`; box.appendChild(sh);
+      sh.animate([{opacity:0,transform:sh.style.transform+' scale(.35)',offset:0,easing:'cubic-bezier(.55,0,1,.9)'},{opacity:1,transform:sh.style.transform+' scale(1.08)',offset:.36},{opacity:.95,transform:sh.style.transform+' scale(1)',offset:1}],{duration:dur,delay,fill:'both'});
+      const a=document.createElement('div'); a.className='apl'; a.innerHTML=svg(i); a.style.width=a.style.height=sz+'px'; box.appendChild(a);
+      const T=(yy,sx=1,sy=1)=>`translate(${x.toFixed(0)}px,${yy.toFixed(0)}px) rotate(${r0.toFixed(0)}deg) scale(${sx},${sy})`;
+      // ドサッ：速く落ちて、つぶれて、ほんの少しはねて、その場で止まる
       a.animate([
-        {transform:T(x,-sz-20,r0),offset:0,easing:'cubic-bezier(.55,0,1,.9)'},
-        {transform:T(x,g,r0),offset:.34},
-        {transform:T(x,g+sz*.08,r0,1.12,.84),offset:.4,easing:'cubic-bezier(0,0,.4,1)'},
-        {transform:T(x+dx*.25,g-9,r0+turn*.25),offset:.52,easing:'cubic-bezier(.5,0,1,1)'},
-        {transform:T(x+dx*.45,g+sz*.03,r0+turn*.45,1.05,.94),offset:.62,easing:'ease-out'},
-        {transform:T(x+dx*.85,g,r0+turn*.85),offset:.85,easing:'ease-out'},
-        {transform:T(x+dx,g,r0+turn),offset:1}
-      ],{duration:1250+Math.random()*150,delay:i*110+Math.random()*90,fill:'both'});
+        {transform:T(-sz-30),offset:0,easing:'cubic-bezier(.55,0,1,.9)'},
+        {transform:T(g),offset:.36},
+        {transform:T(g,1.1,.86),offset:.43,easing:'cubic-bezier(0,0,.4,1)'},
+        {transform:T(g-6,.97,1.03),offset:.55,easing:'cubic-bezier(.5,0,1,1)'},
+        {transform:T(g,1.03,.96),offset:.64,easing:'ease-out'},
+        {transform:T(g),offset:.78},
+        {transform:T(g),offset:1}
+      ],{duration:dur,delay,fill:'both'});
     });
   };
   let started=false;
