@@ -5022,7 +5022,7 @@ async function aiSend(text){
       <path d="M32 18.5C32 13 32.8 8.5 35 5.2" stroke="#5b3a1e" stroke-width="2.1" stroke-linecap="round" fill="none"/>
       <path d="M33.5 11C36 6.5 43 4.5 48.5 6.5 46 11.5 39 13.5 33.5 11Z" fill="url(#apL${i})"/>
       <path d="M34.5 10.6C38.5 8.8 43 7.6 47.5 6.8" stroke="#cfe6a8" stroke-opacity=".6" stroke-width=".6" fill="none" stroke-linecap="round"/></svg>`;
-    const xs=[.24,.5,.76].sort(()=>Math.random()-.5);
+    const xs=[.24,.76,.5];   // 左、右、真ん中の順に落ちる
     xs.forEach((fx,i)=>{
       const sz=46+Math.random()*12, x=W*fx+(Math.random()-.5)*W*.06-sz/2, g=ground-sz*.95, r0=(Math.random()-.5)*24;
       const delay=900+i*170+Math.random()*120, dur=1750+Math.random()*200;   // 強い風が吹き抜けたあとに落ちる
