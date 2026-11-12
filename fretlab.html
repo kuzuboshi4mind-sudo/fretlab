@@ -856,7 +856,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 .intro-wind .bfly .wl,.intro-wind .bfly .wr{transform-box:view-box;transform-origin:16px 14px;animation:bfly-flap .13s ease-in-out infinite alternate}
 .intro-wind .bfly .wr{animation-delay:0s}
 @keyframes bfly-flap{0%{transform:scaleX(1)}100%{transform:scaleX(.12)}}
-.intro-wind .apl{position:absolute;left:0;top:0;width:48px;height:48px;transform-origin:50% 95%;will-change:transform,opacity}
+.intro-wind .apl{position:absolute;left:0;top:0;width:48px;height:48px;transform-origin:50% 55%;will-change:transform,opacity}
 .intro-wind .apl-sh{position:absolute;left:0;top:0;border-radius:50%;background:radial-gradient(closest-side,rgba(40,25,15,.55),rgba(40,25,15,.22) 60%,transparent);will-change:transform,opacity;transform-origin:50% 50%}
 .intro-wind .apl svg{display:block;width:100%;height:100%;overflow:visible}
 @keyframes intro-draw{to{stroke-dashoffset:0}}
@@ -5023,22 +5023,23 @@ async function aiSend(text){
     const xs=[.24,.5,.76].sort(()=>Math.random()-.5);
     xs.forEach((fx,i)=>{
       const sz=46+Math.random()*12, x=W*fx+(Math.random()-.5)*W*.06-sz/2, g=ground-sz*.95, r0=(Math.random()-.5)*24;
-      const delay=i*110+Math.random()*90, dur=1150+Math.random()*120;
-      // 地面の影：リンゴが近づくほど濃く大きく
-      const sh=document.createElement('div'); sh.className='apl-sh'; sh.style.width=(sz*1.05)+'px'; sh.style.height=(sz*.24)+'px';
-      sh.style.transform=`translate(${(x-sz*.02).toFixed(0)}px,${(ground-sz*.14).toFixed(0)}px)`; box.appendChild(sh);
-      sh.animate([{opacity:0,transform:sh.style.transform+' scale(.35)',offset:0,easing:'cubic-bezier(.55,0,1,.9)'},{opacity:1,transform:sh.style.transform+' scale(1.08)',offset:.36},{opacity:.95,transform:sh.style.transform+' scale(1)',offset:1}],{duration:dur,delay,fill:'both'});
+      const delay=i*150+Math.random()*120, dur=1750+Math.random()*200;
+      let dx=(Math.random()<.5?-1:1)*(10+Math.random()*14);   // 着地したら左右どちらかへ少しコロっと
+      dx=Math.max(6-x,Math.min(W-sz-6-x,dx));
+      const turn=dx/(sz/2)*180/Math.PI;
+      // 地面の影：リンゴが近づくほど濃く大きく。転がるとついていく
+      const sh=document.createElement('div'); sh.className='apl-sh'; sh.style.width=(sz*1.05)+'px'; sh.style.height=(sz*.24)+'px'; box.appendChild(sh);
+      const S=(xx,k)=>`translate(${(xx-sz*.02).toFixed(0)}px,${(ground-sz*.14).toFixed(0)}px) scale(${k})`;
+      sh.animate([{opacity:0,transform:S(x,.35),offset:0,easing:'cubic-bezier(.45,0,.9,.6)'},{opacity:1,transform:S(x,1.05),offset:.42},{opacity:.95,transform:S(x,1),offset:.56,easing:'cubic-bezier(.2,.6,.35,1)'},{opacity:.95,transform:S(x+dx,1),offset:1}],{duration:dur,delay,fill:'both'});
       const a=document.createElement('div'); a.className='apl'; a.innerHTML=svg(i); a.style.width=a.style.height=sz+'px'; box.appendChild(a);
-      const T=(yy,sx=1,sy=1)=>`translate(${x.toFixed(0)}px,${yy.toFixed(0)}px) rotate(${r0.toFixed(0)}deg) scale(${sx},${sy})`;
-      // ドサッ：速く落ちて、つぶれて、ほんの少しはねて、その場で止まる
+      const T=(xx,yy,rr)=>`translate(${xx.toFixed(1)}px,${yy.toFixed(1)}px) rotate(${rr.toFixed(1)}deg)`;
+      // 落ちて、ほんの少しはねて、左右どちらかへ少しだけ転がって止まる
       a.animate([
-        {transform:T(-sz-30),offset:0,easing:'cubic-bezier(.55,0,1,.9)'},
-        {transform:T(g),offset:.36},
-        {transform:T(g,1.1,.86),offset:.43,easing:'cubic-bezier(0,0,.4,1)'},
-        {transform:T(g-6,.97,1.03),offset:.55,easing:'cubic-bezier(.5,0,1,1)'},
-        {transform:T(g,1.03,.96),offset:.64,easing:'ease-out'},
-        {transform:T(g),offset:.78},
-        {transform:T(g),offset:1}
+        {transform:T(x,-sz-30,r0),offset:0,easing:'cubic-bezier(.45,0,.9,.6)'},
+        {transform:T(x,g,r0),offset:.42,easing:'cubic-bezier(.2,.7,.4,1)'},
+        {transform:T(x+dx*.08,g-5,r0+turn*.08),offset:.49,easing:'cubic-bezier(.6,0,1,1)'},
+        {transform:T(x+dx*.16,g,r0+turn*.16),offset:.56,easing:'cubic-bezier(.2,.6,.35,1)'},
+        {transform:T(x+dx,g,r0+turn),offset:1}
       ],{duration:dur,delay,fill:'both'});
     });
   };
@@ -5048,7 +5049,7 @@ async function aiSend(text){
     try{ sound(); }catch(e){}
     const bf=!calm&&(Math.random()<.1||/[?&]butterfly/.test(location.search));
     const ap=!calm&&(Math.random()<1/30||/[?&]apple/.test(location.search));
-    const extra=ap?700:bf?400:0;   // 蝶やリンゴのときは少しだけ長く見せる
+    const extra=ap?1300:bf?400:0;   // 蝶やリンゴのときは少しだけ長く見せる
     if(!calm){ el.classList.add('blow'); strings(); wind(); if(bf) butterfly(); if(ap) apples(); }
     setTimeout(()=>el.classList.add('leaving'),calm?500:1900+extra);
     setTimeout(()=>{ if(el.isConnected) el.remove(); },calm?1200:2800+extra);
