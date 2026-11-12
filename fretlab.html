@@ -552,12 +552,29 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .ring.glow .ring-fg{filter:drop-shadow(0 0 5px var(--glow,#fff))}
 .ring.thick circle{stroke-width:11}
 .ring.dashed .ring-bg{stroke-dasharray:3 6}
-.lg-banner{position:relative;overflow:hidden;border-radius:16px;padding:14px 18px;margin-bottom:16px;color:#fff;display:flex;align-items:center;gap:14px;text-shadow:0 1px 2px rgba(0,0,0,.25)}
-.lg-banner .bi{font-size:30px;line-height:1;flex:0 0 auto}
-.lg-banner b{display:block;font-size:17px;letter-spacing:.04em}
-.lg-banner small{opacity:.9;font-size:12.5px}
-.lg-banner::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.22) 45%,transparent 60%);pointer-events:none}
-.rv-card,.tr-card{margin-top:16px;display:flex;flex-direction:column;gap:14px}
+.lg-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.lg-title{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto}
+.lg-title h2{flex:0 0 auto}
+.lg-banner{display:inline-flex;align-items:center;gap:5px;min-width:0;max-width:100%;padding:3px 10px 3px 7px;border-radius:999px;color:#fff;font-size:12px;font-weight:600;letter-spacing:.03em;line-height:1.5;text-shadow:0 1px 2px rgba(0,0,0,.25);box-shadow:0 1px 3px rgba(0,0,0,.15);cursor:pointer;border:0;font-family:inherit}
+.lg-banner[hidden]{display:none}
+.lg-banner span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ach-btn{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:4px 12px;font-size:13px;letter-spacing:.02em}
+.ach-btn b{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--muted)}
+.lg-sub{grid-column:1/-1}
+@media (max-width:420px){.ach-btn{font-size:12px;padding:4px 10px;gap:4px;letter-spacing:0}.ach-btn b{display:none}.lg-title{gap:8px}.lg-head h2{font-size:22px;letter-spacing:.03em}}
+.ach-modal{position:fixed;inset:0;z-index:80;background:rgba(20,18,14,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.ach-modal[hidden]{display:none}
+.ach-box{background:var(--surface);color:var(--fg);border-radius:18px;padding:18px;width:min(640px,100%);max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow:auto;display:flex;flex-direction:column;gap:12px;box-shadow:0 12px 40px rgba(0,0,0,.25);overscroll-behavior:contain}
+.ach-top{display:flex;align-items:center;gap:10px}
+.ach-top h3{margin:0;font-size:18px;flex:1}
+.ach-x{min-height:36px;min-width:40px;padding:2px 10px}
+.ach-box .msg{margin:0}
+.pomo-main{position:relative}
+.pomo-main.wp{border-color:transparent;background-size:auto;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.pomo-main.wp-light{--fg:#1d201e;--muted:#585d55;--line:rgba(0,0,0,.14);--surface:rgba(255,255,255,.7);color:var(--fg)}
+.pomo-main.wp-dark{--fg:#f1f3f8;--muted:#c3c9d6;--line:rgba(255,255,255,.28);--surface:rgba(255,255,255,.1);color:var(--fg)}
+.pomo-main.wp .tm-chip{backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.rv-card{margin-top:16px;display:flex;flex-direction:column;gap:14px}
 .rv-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
 .rv-nav{display:flex;align-items:center;gap:8px}
 .rv-nav .btn{min-height:38px;min-width:42px;padding:2px 10px;font-size:18px}
@@ -604,8 +621,6 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .rv-form .acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px}
 .rv-form .acts .del{margin-left:auto;color:var(--bad)}
 .rv-form .acts .del.confirm{border-color:var(--bad)}
-.tr-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.tr-head p{margin:2px 0 0}
 .tr-count{font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap}
 .tr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px}
 .tr{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:10px 4px;border-radius:12px;border:1px solid var(--line);background:var(--surface);min-width:0}
@@ -616,6 +631,8 @@ input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
 .tr.lock b{color:var(--muted)}
 .tr.next{border-color:var(--fg)}
 .tr-dress{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.rec-bulk[hidden]{display:none}
+.rec-item .ra .btn.confirm{font-size:12px}
 .dress{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;margin-bottom:6px}
 .dr{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;border:0;background:none;padding:4px 2px;cursor:pointer;color:var(--fg);font:inherit;font-size:11px;width:68px}
 .dr .pv{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:16px}
@@ -1301,8 +1318,11 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
 
   <!-- PRACTICE LOG -->
   <section data-panel="log" hidden>
-    <div class="panel-head"><div><h2>マイ記録</h2><p>タイマーを選んでスタート。止めるまで時間を数えて記録。</p></div></div>
-    <div class="lg-banner" id="lgBanner" hidden></div>
+    <div class="panel-head lg-head">
+      <div class="lg-title"><h2>マイ記録</h2><span class="lg-banner" id="lgBanner" hidden></span></div>
+      <button class="btn ach-btn" id="achBtn" type="button" aria-haspopup="dialog"><span aria-hidden="true">🏆</span><span>アチーブメント</span><b id="achCount"></b></button>
+      <p class="lg-sub">タイマーを選んでスタート。止めるまで時間を数えて記録。</p>
+    </div>
     <div class="pomo">
       <div class="card pomo-main" id="pomoMain">
         <div class="tm-head"><span class="label">タイマー</span><button class="btn tm-edit" id="tmEdit" type="button" aria-pressed="false" aria-label="タイマーを編集"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>編集</span></button></div>
@@ -1346,36 +1366,40 @@ el.addEventListener('animationend',e=>{if(e.target===el&&e.animationName==='intr
       <div class="rv-recs-head"><b>記録</b><button class="btn" id="rvAdd" type="button">＋ 記録を追加</button></div>
       <div id="rvList" class="rv-list"></div>
     </div>
-    <div class="card tr-card">
-      <div class="tr-head"><div><b>トロフィー</b><p class="msg" id="trNext"></p></div><span class="tr-count" id="trCount"></span></div>
-      <div class="goal-bar"><i id="trFill"></i></div>
-      <div class="tr-grid" id="trGrid"></div>
-      <div class="tr-dress">
-        <span class="label">タイマーの着せ替え</span><div class="dress" id="dressSkin"></div>
-        <span class="label">バナー</span><div class="dress" id="dressBanner"></div>
-      </div>
-    </div>
     <div class="card rec-card">
       <div class="rec-head">
-        <div><b>録音・録画</b><p class="msg" style="margin:2px 0 0">演奏を録って聴き返す。動画でフォームも確認。</p></div>
-        <div class="seg" id="recMode"><button data-v="audio">音声</button><button data-v="video">動画</button></div>
+        <b>録音・録画</b>
+        <div class="seg" id="recMode"><button data-v="audio">🎙 音声</button><button data-v="video">🎥 動画</button></div>
       </div>
       <div class="cam-wrap" id="camWrap" hidden>
         <video id="camView" playsinline muted autoplay></video>
-        <button class="btn cam-flip" id="camFlip" type="button" aria-label="カメラを切り替え">⟲ 前/後</button>
+        <button class="btn cam-flip" id="camFlip" type="button" aria-label="カメラを切り替え">⟲</button>
         <span class="cam-rec" id="camRec" hidden>● REC</span>
       </div>
       <div class="rec-ctrl">
         <button class="rec-btn" id="recBtn" aria-label="録音を開始"><i></i></button>
-        <div class="rec-info"><div class="rec-time" id="recTime">00:00</div><div class="rec-level"><i id="recLevel"></i></div><div class="msg" id="recMsg">赤いボタンで録音開始</div></div>
+        <div class="rec-info"><div class="rec-time" id="recTime">00:00</div><div class="rec-level"><i id="recLevel"></i></div><div class="msg" id="recMsg"></div></div>
       </div>
       <div class="rec-store" id="recStore"></div>
       <div class="rec-bulk" id="recBulk" hidden>
-        <label class="rec-all"><input type="checkbox" id="recAll"> すべて選ぶ</label>
-        <button class="btn primary" id="recExport" type="button" disabled>選んだものを書き出す</button>
+        <label class="rec-all"><input type="checkbox" id="recAll"> すべて</label>
+        <button class="btn primary" id="recExport" type="button" disabled>⤴ 書き出す</button>
+        <button class="btn" id="recUnsel" type="button" aria-label="選択をやめる">✕</button>
         <span class="msg" id="recBulkMsg"></span>
       </div>
       <div class="rec-list" id="recList"></div>
+    </div>
+    <div class="ach-modal" id="achModal" hidden>
+      <div class="ach-box" role="dialog" aria-modal="true" aria-labelledby="achTitle">
+        <div class="ach-top"><h3 id="achTitle">アチーブメント</h3><span class="tr-count" id="trCount"></span><button class="btn ach-x" id="achClose" type="button" aria-label="閉じる">✕</button></div>
+        <p class="msg" id="trNext"></p>
+        <div class="goal-bar"><i id="trFill"></i></div>
+        <div class="tr-grid" id="trGrid"></div>
+        <div class="tr-dress">
+          <span class="label">タイマーの壁紙</span><div class="dress" id="dressSkin"></div>
+          <span class="label">バナー</span><div class="dress" id="dressBanner"></div>
+        </div>
+      </div>
     </div>
     <details class="card log-more">
       <summary>目標とバックアップ</summary>
@@ -4275,17 +4299,18 @@ function rvForm(e,defDate){
 }
 
 /* --- トロフィーとごほうび（バナー・タイマーの着せ替え） --- */
+// タイマーの壁紙（アチーブメントのごほうび）。dark=文字を白くする
 const SKINS={
-  classic:{name:'クラシック'},
-  mint:{name:'ミント',c:['#7be0c3','#1f9e83']},
-  sunset:{name:'サンセット',c:['#ffc35a','#ff6a5c','#d9467a']},
-  ocean:{name:'オーシャン',c:['#58c8f0','#2a6fdb']},
-  sakura:{name:'さくら',c:['#ffc4d6','#e5638f']},
-  neon:{name:'ネオン',c:['#3dff8a','#00d4ff'],glow:'#4ff3c0'},
-  aurora:{name:'オーロラ',c:['#8b5cf6','#22c38e','#38bdf8'],thick:1},
-  gold:{name:'ゴールド',c:['#ffe58a','#e0a526','#9c6b12'],glow:'#f3c85a',thick:1},
-  rainbow:{name:'レインボー',c:['#ff5a5f','#ffb030','#ffe14a','#53c95a','#3a8fe0','#8a5be0'],thick:1},
-  diamond:{name:'ダイヤモンド',c:['#ffffff','#a9dcff','#c8b6ff','#ffffff'],glow:'#bfe3ff',thick:1,dash:1}
+  classic:{name:'なし'},
+  mint:{name:'ミント',bg:'radial-gradient(circle at 15% 20%,rgba(255,255,255,.7) 0 9%,transparent 10%),radial-gradient(circle at 85% 75%,rgba(255,255,255,.5) 0 14%,transparent 15%),linear-gradient(160deg,#e6f8f1,#b9ebd8)'},
+  sunset:{name:'サンセット',bg:'radial-gradient(circle at 50% 78%,rgba(255,236,190,.9) 0 16%,transparent 34%),linear-gradient(180deg,#ffe6bf,#ffbe9e 55%,#f5a3b8)'},
+  ocean:{name:'オーシャン',bg:'repeating-radial-gradient(ellipse at 50% 130%,#d4efff 0 16px,#bfe6fb 16px 32px)'},
+  sakura:{name:'さくら',bg:'radial-gradient(#ffc2d4 20%,transparent 22%) 0 0/34px 34px,radial-gradient(#ffd8e4 15%,transparent 17%) 17px 17px/34px 34px,linear-gradient(#fff4f7,#ffe2eb)'},
+  neon:{name:'ネオン',dark:1,bg:'linear-gradient(rgba(0,255,200,.13) 1px,transparent 1px) 0 0/26px 26px,linear-gradient(90deg,rgba(255,0,200,.13) 1px,transparent 1px) 0 0/26px 26px,linear-gradient(135deg,#0d1b2e,#24103a)'},
+  aurora:{name:'オーロラ',dark:1,bg:'radial-gradient(ellipse at 15% 0%,rgba(167,139,250,.85),transparent 55%),radial-gradient(ellipse at 85% 30%,rgba(52,211,153,.7),transparent 50%),radial-gradient(ellipse at 50% 105%,rgba(56,189,248,.7),transparent 60%),#0f172a'},
+  gold:{name:'ゴールド',bg:'repeating-linear-gradient(45deg,rgba(255,255,255,.28) 0 2px,transparent 2px 16px),linear-gradient(135deg,#fff5d2,#f1d27f 55%,#e2b450)'},
+  rainbow:{name:'レインボー',bg:'linear-gradient(160deg,#ffd9d9,#ffe9c4,#fff6c2,#dbf4d1,#d0e6ff,#e6d8ff)'},
+  diamond:{name:'ダイヤモンド',bg:'radial-gradient(circle,rgba(255,255,255,.95) 0 1.5px,transparent 2.5px) 0 0/22px 22px,radial-gradient(circle,rgba(255,255,255,.7) 0 1px,transparent 2px) 11px 11px/22px 22px,conic-gradient(from 45deg,#eaf6ff,#ddd5ff,#d3f0ff,#ffffff,#eaf6ff)'}
 };
 const BANNERS={
   none:{name:'なし'},
@@ -4308,43 +4333,40 @@ function earnedCount(){ const t=totalMin(); return MS.filter(x=>t>=x[0]).length;
 function unlocked(kind,id){ if(id==='classic'||id==='none') return true; const i=MS.findIndex(x=>x[1]===kind&&x[2]===id); return i>=0&&totalMin()>=MS[i][0]; }
 function applySkin(){
   let id=LOG.skin; if(!SKINS[id]||!unlocked('skin',id)) id='classic';
-  const sk=SKINS[id], fg=$('#ringFg'), ring=fg.closest('svg');
-  ring.classList.toggle('glow',!!sk.glow); ring.classList.toggle('thick',!!sk.thick); ring.classList.toggle('dashed',!!sk.dash);
-  if(sk.glow) ring.style.setProperty('--glow',sk.glow); else ring.style.removeProperty('--glow');
-  if(sk.c){ $('#ringDefs').innerHTML=`<linearGradient id="skinG" x1="0" y1="0" x2="1" y2="1">${sk.c.map((c,i)=>`<stop offset="${(i/(sk.c.length-1)*100).toFixed(0)}%" stop-color="${c}"/>`).join('')}</linearGradient>`; fg.style.stroke='url(#skinG)'; }
-  else { $('#ringDefs').innerHTML=''; fg.style.stroke=''; }
+  const sk=SKINS[id], m=$('#pomoMain');
+  m.style.background=sk.bg||''; m.classList.toggle('wp',!!sk.bg); m.classList.toggle('wp-dark',!!sk.dark); m.classList.toggle('wp-light',!!sk.bg&&!sk.dark);
 }
 function applyBanner(){
   const el=$('#lgBanner'); let id=LOG.banner; if(!BANNERS[id]||!unlocked('banner',id)) id='none';
   if(id==='none'){ el.hidden=true; return; }
   const bn=BANNERS[id]; el.style.background=bn.bg; el.hidden=false;
-  el.innerHTML=`<span class="bi">${bn.i}</span><div><b></b><small>累計 ${fmtHM(totalMin())}・トロフィー ${earnedCount()}/${MS.length}</small></div>`; el.querySelector('b').textContent=bn.name;
+  el.innerHTML=`<i aria-hidden="true" style="font-style:normal">${bn.i}</i><span></span>`; el.querySelector('span').textContent=bn.name; el.title=`累計 ${fmtHM(totalMin())}`;
 }
-function rewardName(x){ return x[1]==='skin'?`着せ替え「${SKINS[x[2]].name}」`:`バナー「${BANNERS[x[2]].name}」`; }
+function rewardName(x){ return x[1]==='skin'?`壁紙「${SKINS[x[2]].name}」`:`バナー「${BANNERS[x[2]].name}」`; }
 function renderTrophies(){
   const t=totalMin(), n=earnedCount(), nx=MS[n];
-  $('#trCount').textContent=`${n}/${MS.length}`;
+  $('#trCount').textContent=`${n}/${MS.length}`; $('#achCount').textContent=`${n}/${MS.length}`;
   const prev=n?MS[n-1][0]:0;
   $('#trFill').style.width=(nx?Math.min(100,(t-prev)/(nx[0]-prev)*100):100)+'%';
-  $('#trNext').textContent=nx?`累計 ${fmtHM(t)}。次の「${msLabel(nx[0])}」まであと ${fmtHM(nx[0]-t)}（${rewardName(nx)}）`:`累計 ${fmtHM(t)}。すべてのトロフィーを獲得しました！`;
+  $('#trNext').textContent=nx?`累計 ${fmtHM(t)}。次の「${msLabel(nx[0])}」まであと ${fmtHM(nx[0]-t)}（${rewardName(nx)}）`:`累計 ${fmtHM(t)}。すべてのアチーブメントを達成しました！`;
   const g=$('#trGrid'); g.innerHTML='';
   MS.forEach((x,i)=>{ const d=document.createElement('div'); d.className='tr'+(i<n?'':' lock')+(i===n?' next':'');
-    d.innerHTML=`<span class="md">${i<n?'🏆':'🔒'}</span><b>${msLabel(x[0])}</b><small></small>`; d.querySelector('small').textContent=(x[1]==='skin'?'着せ替え ':'バナー ')+(x[1]==='skin'?SKINS[x[2]].name:BANNERS[x[2]].name);
-    d.title=i<n?'獲得済み':`あと ${fmtHM(x[0]-t)}`; g.appendChild(d); });
+    d.innerHTML=`<span class="md">${i<n?'🏆':'🔒'}</span><b>${msLabel(x[0])}</b><small></small>`; d.querySelector('small').textContent=(x[1]==='skin'?'壁紙 ':'バナー ')+(x[1]==='skin'?SKINS[x[2]].name:BANNERS[x[2]].name);
+    d.title=i<n?'達成':`あと ${fmtHM(x[0]-t)}`; g.appendChild(d); });
   const mk=(box,kind,dict,cur,set)=>{ box.innerHTML=''; Object.entries(dict).forEach(([id,o])=>{ const ok=unlocked(kind,id), b=document.createElement('button'); b.type='button'; b.className='dr'; b.setAttribute('role','radio'); b.setAttribute('aria-checked',String(cur===id&&ok)); b.disabled=!ok;
-      const pv=kind==='skin'?(o.c?`background:conic-gradient(${o.c.join(',')},${o.c[0]})`:'background:var(--root)'):(o.bg?`background:${o.bg}`:'background:var(--panel)');
-      b.innerHTML=`<span class="pv${kind==='banner'?' bn':''}" style="${pv}">${ok?(kind==='banner'?(o.i||'—'):''):'🔒'}</span><span></span>`; b.lastChild.textContent=o.name;
+      const pv=kind==='skin'?(o.bg?`background:${o.bg};background-size:auto`:'background:var(--panel)'):(o.bg?`background:${o.bg}`:'background:var(--panel)');
+      b.innerHTML=`<span class="pv${kind==='banner'?' bn':''}" style="${pv}">${ok?(kind==='banner'?(o.i||'—'):(o.bg?'':'—')):'🔒'}</span><span></span>`; b.lastChild.textContent=o.name;
       if(!ok){ const m=MS.find(x=>x[1]===kind&&x[2]===id); b.title=`累計 ${msLabel(m[0])} で使えます`; }
       b.addEventListener('click',()=>set(id)); box.appendChild(b); }); };
   mk($('#dressSkin'),'skin',SKINS,SKINS[LOG.skin]&&unlocked('skin',LOG.skin)?LOG.skin:'classic',id=>{LOG.skin=id;store.set('skin',id);applySkin();renderTrophies();});
   mk($('#dressBanner'),'banner',BANNERS,BANNERS[LOG.banner]&&unlocked('banner',LOG.banner)?LOG.banner:'none',id=>{LOG.banner=id;store.set('banner',id);applyBanner();renderTrophies();});
   applySkin(); applyBanner();
 }
-// 新しいトロフィーを取ったら知らせる（いちばん新しいもの1つだけ）
+// 新しいアチーブメントを達成したら知らせる（いちばん新しいもの1つだけ）
 function trophyCheck(){
   const n=earnedCount(), seen=store.get('trSeen',-1);
   if(seen<0){ store.set('trSeen',n); return; }
-  if(n>seen){ const x=MS[n-1], t=$('#toast'); t.innerHTML=''; const s=document.createElement('span'); s.textContent=`🏆 トロフィー獲得！ 累計 ${msLabel(x[0])}。${rewardName(x)}が使えるようになりました`; t.appendChild(s);
+  if(n>seen){ const x=MS[n-1], t=$('#toast'); t.innerHTML=''; const s=document.createElement('span'); s.textContent=`🏆 アチーブメント達成！ 累計 ${msLabel(x[0])}。${rewardName(x)}が使えるようになりました`; t.appendChild(s);
     const b=document.createElement('button'); b.className='btn'; b.textContent='使う'; b.addEventListener('click',()=>{ if(x[1]==='skin'){LOG.skin=x[2];store.set('skin',x[2]);} else {LOG.banner=x[2];store.set('banner',x[2]);} renderTrophies(); t.hidden=true; });
     const c=document.createElement('button'); c.className='btn'; c.textContent='閉じる'; c.addEventListener('click',()=>t.hidden=true);
     t.append(b,c); t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,12000); }
@@ -4382,6 +4404,10 @@ const backupData=()=>JSON.stringify({app:'fretlab',v:2,log:LOG.entries,timers:LO
   $('#rvPrev').addEventListener('click',()=>{LOG.rv.off--;LOG.rv.edit=null;LOG.rv.more=false;renderReview();});
   $('#rvNext').addEventListener('click',()=>{if(LOG.rv.off<0){LOG.rv.off++;LOG.rv.edit=null;LOG.rv.more=false;renderReview();}});
   $('#rvAdd').addEventListener('click',()=>{LOG.rv.edit='new';renderReview();});
+  const am=$('#achModal'), openA=()=>{ renderTrophies(); am.hidden=false; $('#achClose').focus(); }, closeA=()=>{ am.hidden=true; $('#achBtn').focus(); };
+  $('#achBtn').addEventListener('click',openA); $('#lgBanner').addEventListener('click',openA);
+  $('#achClose').addEventListener('click',closeA); am.addEventListener('click',e=>{ if(e.target===am) closeA(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!am.hidden) closeA(); });
   const g=$('#goalSel'); g.value=String(LOG.goal); g.addEventListener('change',()=>{LOG.goal=+g.value;store.set('goal',LOG.goal);renderLog();});
   document.querySelector('.log-more').addEventListener('toggle',e=>{if(e.target.open) $('#backupTxt').value=backupData();});
   $('#backupCopy').addEventListener('click',()=>{const t=$('#backupTxt');t.value=backupData();
@@ -4433,11 +4459,11 @@ function camOff(){
   const v=$('#camView'); if(v) v.srcObject=null; const b=$('#camStart'); if(b) b.hidden=false;
   if(!T.stream&&!(REC.rec&&REC.rec.state==='recording')) audioMode();
 }
-async function camStart(){ try{ await camOn(); $('#recMsg').textContent='赤いボタンで録画開始'; }catch(e){ $('#recMsg').textContent='カメラを使えませんでした。カメラとマイクの使用を許可してください。'; } }
+async function camStart(){ try{ await camOn(); $('#recMsg').textContent=''; }catch(e){ $('#recMsg').textContent='カメラを使えませんでした。カメラとマイクの使用を許可してください。'; } }
 function recSetMode(v){
   if(REC.rec&&REC.rec.state==='recording') return;
   REC.mode=v; store.set('recMode',v); $('#camWrap').hidden=v!=='video';
-  if(v==='video') camStart(); else { camOff(); $('#recMsg').textContent='赤いボタンで録音開始'; }
+  $('#recMsg').textContent=''; if(v==='video') camStart(); else camOff();
   $('#recBtn').setAttribute('aria-label',v==='video'?'録画を開始':'録音を開始');
 }
 async function recToggle(){
@@ -4464,7 +4490,7 @@ async function recToggle(){
     REC.tick=setInterval(()=>$('#recTime').textContent=recFmt(Date.now()-REC.start),250);
     $('#recBtn').classList.add('on'); $('#recBtn').setAttribute('aria-label',video?'録画を停止':'録音を停止');
     $('#camRec').hidden=!video; $('#camFlip').disabled=true; document.querySelectorAll('#recMode button').forEach(b=>b.disabled=true);
-    msg.textContent=video?'録画中… もう一度押すと止まります':'録音中… もう一度押すと止まります';
+    msg.textContent='';
   }catch(e){
     msg.textContent=e.message==='unsupported'?'このブラウザは録音・録画に対応していません。':video?'カメラを使えませんでした。カメラとマイクの使用を許可してください。':'マイクを使えませんでした。マイクの使用を許可してください。';
     recCleanup();
@@ -4485,8 +4511,8 @@ async function recSave(){
   const d=new Date(), name=`${video?'動画':'練習'} ${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   const blob=new Blob(REC.chunks,{type}); REC.chunks=[];
   const item={id:Date.now(),name,date:d.toISOString(),dur,type,kind:REC.kind,size:blob.size,blob};
-  try{ await recPut(item); $('#recMsg').textContent=`保存しました（${recFmt(dur)}・${fmtSize(blob.size)}）`; }
-  catch(e){ $('#recMsg').textContent='端末の空きが足りず保存できませんでした。今のうちに「保存」で書き出してください'; REC.items.unshift(item); }
+  try{ await recPut(item); $('#recMsg').textContent=`✓ 保存しました（${recFmt(dur)}）`; }
+  catch(e){ $('#recMsg').textContent='空きが足りず保存できませんでした。⤴ で書き出してください'; REC.items.unshift(item); }
   $('#recTime').textContent='00:00';
   try{ if(navigator.storage&&navigator.storage.persist&&!(await navigator.storage.persisted())) await navigator.storage.persist(); }catch(e){}
   recRender();
@@ -4508,18 +4534,18 @@ async function recExport(){
 }
 // 使っている容量と、自動で消されにくくする設定
 async function recStorage(){
-  const el=$('#recStore'), na=REC.items.filter(x=>!isVideo(x)), nv=REC.items.filter(isVideo);
-  const sum=REC.items.reduce((s,x)=>s+(x.size||x.blob&&x.blob.size||0),0);
-  let h=`録音 <b>${na.length}</b>件・動画 <b>${nv.length}</b>件・合計 <b>${fmtSize(sum)}</b>`;
-  try{ if(navigator.storage&&navigator.storage.estimate){ const e=await navigator.storage.estimate(); if(e.quota) h+=`／保存できる残り 約${fmtSize(Math.max(0,e.quota-(e.usage||0)))}`; } }catch(e){}
+  const el=$('#recStore'), sum=REC.items.reduce((s,x)=>s+(x.size||x.blob&&x.blob.size||0),0);
+  if(!REC.items.length){ el.innerHTML=''; return; }
+  let h=`${REC.items.length}件・${fmtSize(sum)}`;
+  try{ if(navigator.storage&&navigator.storage.estimate){ const e=await navigator.storage.estimate(); if(e.quota) h+=`・空き ${fmtSize(Math.max(0,e.quota-(e.usage||0)))}`; } }catch(e){}
   let per=null; try{ if(navigator.storage&&navigator.storage.persisted) per=await navigator.storage.persisted(); }catch(e){}
-  el.innerHTML=h+(per===null?'':per?'<br>自動で消されにくい設定：<b>オン</b>':'<br>自動で消されにくい設定：オフ<button class="btn pbtn" type="button" id="recPersist">オンにする</button>');
+  el.innerHTML=h+(per===null?'':per?' <span title="自動で消されにくい設定がオン">🔒</span>':'<button class="btn pbtn" type="button" id="recPersist" title="自動で消されにくくする">🔓 保護する</button>');
   const pb=$('#recPersist'); if(pb) pb.addEventListener('click',async()=>{ let ok=false; try{ ok=await navigator.storage.persist(); }catch(e){}
-    if(!ok) $('#recMsg').textContent='このブラウザでは今はオンにできませんでした。ホーム画面に追加して使うと消されにくくなります。'; recStorage(); });
+    if(!ok) $('#recMsg').textContent='ホーム画面に追加して使うと消されにくくなります。'; recStorage(); });
 }
 function recBulkUI(){
-  const n=REC.sel.size; $('#recBulk').hidden=!REC.items.length;
-  $('#recExport').disabled=!n; $('#recExport').textContent=n?`選んだ${n}件を書き出す`:'選んだものを書き出す';
+  const n=REC.sel.size; $('#recBulk').hidden=!n;
+  $('#recExport').disabled=!n; $('#recExport').textContent=`⤴ ${n}件を書き出す`;
   const all=$('#recAll'); all.checked=n>0&&n===REC.items.length; all.indeterminate=n>0&&n<REC.items.length;
 }
 async function recRender(){
@@ -4532,7 +4558,7 @@ async function recRender(){
   REC.items.forEach(it=>{
     const r=document.createElement('div'), vid=isVideo(it); r.className='rec-item';
     const url=URL.createObjectURL(it.blob); REC.urls[it.id]=url;
-    r.innerHTML=`<input type="checkbox" class="ck" aria-label="選ぶ"><div><div class="rn"></div><div class="rd"><span class="kd">${vid?'動画':'音声'}</span>${recFmt(it.dur)}・${fmtSize(it.size||it.blob.size)}</div></div><div class="ra"><button class="btn sv">保存</button><button class="btn dl">削除</button></div>${vid?'<video controls playsinline preload="metadata"></video>':'<audio controls preload="none"></audio>'}`;
+    r.innerHTML=`<input type="checkbox" class="ck" aria-label="選ぶ"><div><div class="rn"></div><div class="rd"><span class="kd">${vid?'動画':'音声'}</span>${recFmt(it.dur)}・${fmtSize(it.size||it.blob.size)}</div></div><div class="ra"><button class="btn sv" aria-label="書き出す・共有">⤴</button><button class="btn dl" aria-label="削除">🗑</button></div>${vid?'<video controls playsinline preload="metadata"></video>':'<audio controls preload="none"></audio>'}`;
     const ck=r.querySelector('.ck'); ck.checked=REC.sel.has(it.id);
     ck.addEventListener('change',()=>{ if(ck.checked) REC.sel.add(it.id); else REC.sel.delete(it.id); recBulkUI(); });
     const rn=r.querySelector('.rn');
@@ -4549,7 +4575,7 @@ async function recRender(){
     const del=r.querySelector('.dl');
     del.addEventListener('click',async()=>{
       if(REC.del===it.id){ REC.del=null; try{await recDel(it.id);}catch(e){} REC.items=REC.items.filter(x=>x.id!==it.id); REC.sel.delete(it.id); recRender(); return; }
-      REC.del=it.id; document.querySelectorAll('.rec-item .dl.confirm').forEach(b=>{b.classList.remove('confirm');b.textContent='削除';}); del.classList.add('confirm'); del.textContent='本当に削除';
+      REC.del=it.id; document.querySelectorAll('.rec-item .dl.confirm').forEach(b=>{b.classList.remove('confirm');b.textContent='🗑';}); del.classList.add('confirm'); del.textContent='削除する';
     });
     el.appendChild(r);
   });
@@ -4558,11 +4584,11 @@ async function recRender(){
   $('#recBtn').addEventListener('click',recToggle);
   segInit($('#recMode'),REC.mode,recSetMode);
   $('#camWrap').hidden=REC.mode!=='video';
-  if(REC.mode==='video') $('#recMsg').textContent='「カメラをオン」でカメラを起動';
   const cs=document.createElement('button'); cs.id='camStart'; cs.type='button'; cs.className='btn primary cam-start'; cs.textContent='カメラをオン'; cs.addEventListener('click',camStart); $('#camWrap').appendChild(cs);
   $('#camFlip').addEventListener('click',async()=>{ if(REC.rec&&REC.rec.state==='recording') return; REC.facing=REC.facing==='user'?'environment':'user'; store.set('camFacing',REC.facing); if(REC.cam){ REC.cam.getTracks().forEach(t=>t.stop()); REC.cam=null; } camStart(); });
   $('#recAll').addEventListener('change',e=>{ REC.sel=new Set(e.target.checked?REC.items.map(x=>x.id):[]); document.querySelectorAll('#recList .ck').forEach(c=>c.checked=e.target.checked); recBulkUI(); });
   $('#recExport').addEventListener('click',recExport);
+  $('#recUnsel').addEventListener('click',()=>{ REC.sel.clear(); document.querySelectorAll('#recList .ck').forEach(c=>c.checked=false); recBulkUI(); });
   document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'&&REC.cam&&!(REC.rec&&REC.rec.state==='recording')) camOff(); });
   if(window.indexedDB) recRender(); else $('#recList').innerHTML='<p class="msg">この環境では録音・録画を保存できません。</p>';
 })();
